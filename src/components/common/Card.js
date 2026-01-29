@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card as MuiCard, CardContent, CardHeader, Box } from '@mui/material';
+import { Card as MuiCard, CardContent, CardHeader } from '@mui/material';
 
 const Card = ({ children, title, action, sx = {} }) => {
     return (

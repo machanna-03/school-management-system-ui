@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Grid, Typography, Avatar, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip } from '@mui/material';
+import { Box, Grid, Typography, Avatar, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Card from '../../components/common/Card';
 import { BiDotsHorizontalRounded, BiPhone, BiEnvelope, BiMap, BiUser } from 'react-icons/bi';
 

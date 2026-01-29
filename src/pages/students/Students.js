@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, Avatar, IconButton, InputBase, Select, MenuItem, Stack } from '@mui/material';
 import Card from '../../components/common/Card';
-import { BiPlus, BiPencil, BiTrash, BiSearch, BiDotsHorizontalRounded, BiPhone, BiEnvelope } from 'react-icons/bi';
+import { BiPlus, BiSearch, BiDotsHorizontalRounded, BiPhone, BiEnvelope } from 'react-icons/bi';
 import { Link } from 'react-router-dom';
 
 const Students = () => {

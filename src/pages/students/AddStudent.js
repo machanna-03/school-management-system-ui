@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-import { Box, Typography, Button, Grid, TextField, MenuItem, Avatar, IconButton } from '@mui/material';
-import { BiCloudUpload } from 'react-icons/bi';
+import { Box, Typography, Button, Grid, TextField, Avatar } from '@mui/material';
 
 const AddStudent = () => {
     return (
