@@ -1,0 +1,108 @@
+/* Akademi Design System - CSS Variables */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Colors */
+  --primary: #4d44b5;
+  --primary-dark: #3a3390;
+  --secondary: #f0f1f5; /* Background */
+  --text-dark: #3d4465;
+  --text-light: #a1a5b7;
+  --white: #ffffff;
+  --success: #369c5e;
+  --warning: #ff9f43;
+  --danger: #ff5b5b;
+
+  /* Spacing & Layout */
+  --sidebar-width: 280px;
+  --header-height: 80px;
+  --card-radius: 20px;
+  --btn-radius: 30px;
+  
+  /* Shadows */
+  --shadow-sm: 0px 5px 20px 0px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0px 10px 40px 0px rgba(50, 50, 50, 0.08);
+
+  /* Transitions */
+  --transition: all 0.3s ease;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--secondary);
+  color: var(--text-dark);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
+}
+
+/* Utility Classes matching Akademi */
+.card {
+  background: var(--white);
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow-md);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border-radius: var(--btn-radius);
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: var(--transition);
+  font-size: 14px;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--white);
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+.badge {
+  padding: 6px 12px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-success { background: rgba(54, 156, 94, 0.1); color: var(--success); }
+.badge-warning { background: rgba(255, 159, 67, 0.1); color: var(--warning); }
+.badge-danger { background: rgba(255, 91, 91, 0.1); color: var(--danger); }
