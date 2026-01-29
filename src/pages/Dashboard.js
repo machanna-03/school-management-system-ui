@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Grid, Typography, Stack } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import Card from '../components/common/Card';
 import { BiUser, BiBook, BiCalendar, BiDish } from 'react-icons/bi';
 import SchoolPerformanceChart from '../components/dashboard/SchoolPerformanceChart';
