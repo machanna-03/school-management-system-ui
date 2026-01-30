@@ -8,6 +8,7 @@ import AddStudent from './pages/students/AddStudent';
 import Teachers from './pages/teachers/Teachers';
 import TeacherDetails from './pages/teachers/TeacherDetails';
 import AddTeacher from './pages/teachers/AddTeacher';
+import NotificationPage from './pages/Notifications/NotificationPage';
 
 
 function App() {
@@ -21,6 +22,8 @@ function App() {
           <Route path="/students/details" element={<StudentDetails />} />
           <Route path="/students/add" element={<AddStudent />} />
 
+          {/* Users */}
+          <Route path="/notifications" element={<NotificationPage />} />
 
           {/* Teacher Module */}
           <Route path="/teachers" element={<Teachers />} />

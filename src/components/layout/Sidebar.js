@@ -72,9 +72,14 @@ const Sidebar = ({ collapsed }) => {
                 zIndex: 1200,
                 overflowY: 'auto',
                 overflowX: 'hidden',
+                padding: 0,
+                margin: 0,
                 transition: 'width 0.3s',
-                '&::-webkit-scrollbar': { width: '4px' },
-                '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(255,255,255,0.2)', borderRadius: '4px' }
+                '&::-webkit-scrollbar': {
+                 width: 0,
+                },
+                scrollbarWidth: 'none',
+
             }}
         >
             {/* Logo Section */}
@@ -115,7 +120,8 @@ const Sidebar = ({ collapsed }) => {
                                     borderRadius: item.name === 'Dashboard' ? '0 50px 50px 0' : '0 50px 50px 0',
                                     ml: -2,
                                     pl: 4,
-                                    py: 1.5,
+                                    px: 2,
+                                    py: 1.2,
                                     bgcolor: item.name === 'Dashboard' ? 'rgba(255,255,255,0.1)' : 'transparent',
                                     color: item.name === 'Dashboard' ? '#fff' : '#c0beea',
                                     justifyContent: collapsed ? 'center' : 'initial',
@@ -125,7 +131,7 @@ const Sidebar = ({ collapsed }) => {
                                     }
                                 }}
                             >
-                                <ListItemIcon sx={{ color: 'inherit', minWidth: 45, fontSize: 24, justifyContent: 'center', mr: collapsed ? 0 : 2 }}>
+                                <ListItemIcon sx={{ color: 'inherit', minWidth: 34, fontSize: 24, justifyContent: 'center', mr: collapsed ? 0 : 2 }}>
                                     {item.icon}
                                 </ListItemIcon>
                                 {!collapsed && (

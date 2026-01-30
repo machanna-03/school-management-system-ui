@@ -1,15 +1,49 @@
-import React from 'react';
-import { Box, IconButton, Badge, Typography, Avatar, Stack } from '@mui/material';
-import { BiSearch, BiGridAlt, BiMoon, BiFullscreen, BiMessageDetail, BiBell, BiCog, BiChevronRight } from 'react-icons/bi';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+    Box,
+    IconButton,
+    Badge,
+    Typography,
+    Avatar,
+    Stack,
+    Menu,
+    MenuItem,
+    Divider,
+    Button
+} from "@mui/material";
+
+import {
+    BiSearch,
+    BiGridAlt,
+    BiMoon,
+    BiFullscreen,
+    BiMessageDetail,
+    BiBell,
+    BiCog,
+    BiChevronRight,
+    BiUser,
+    BiLogOut
+} from "react-icons/bi";
 
 const Header = ({ toggleSidebar, collapsed }) => {
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+
+    const handleAvatarClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
     const actionIcons = [
         { icon: <BiSearch />, badge: false },
         { icon: <BiGridAlt />, badge: false },
         { icon: <BiMoon />, badge: false },
         { icon: <BiFullscreen />, badge: false },
-        { icon: <BiMessageDetail />, badge: 5, color: 'primary' },
-        { icon: <BiBell />, badge: 25, color: 'warning' },
+        { icon: <BiMessageDetail />, badge: 5, color: "primary" },
+        { icon: <BiBell />, badge: 25, color: "warning" },
         { icon: <BiCog />, badge: false },
     ];
 
@@ -17,43 +51,49 @@ const Header = ({ toggleSidebar, collapsed }) => {
         <Box
             component="header"
             sx={{
-                height: 90, // Match sidebar logo area height
-                bgcolor: 'transparent', // Transparent to show body bg? Or matches body bg.
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                px: 5,
+                height: 56,
+                minHeight: 56,        // 🔹 reduced header height
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                px: 2,
             }}
         >
-            {/* Title */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <IconButton onClick={toggleSidebar}>
-                    {collapsed ? <BiChevronRight size={30} color="#3d4465" /> : <BiGridAlt size={30} color="#3d4465" />}
+            {/* Left */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                <IconButton onClick={toggleSidebar} sx={{ p: 0.5 }}  >
+                    {collapsed ? (
+                        <BiChevronRight size={26} color="#3d4465" />
+                    ) : (
+                        <BiGridAlt size={26} color="#3d4465" />
+                    )}
                 </IconButton>
-                <Typography variant="h4" sx={{ fontWeight: 700, color: '#3d4465', fontSize: '24px' }}>
+                <Typography sx={{ fontWeight: 700, fontSize: 20, color: "#3d4465", lineHeight: 1, }}>
                     Dashboard
                 </Typography>
             </Box>
-
-            {/* Actions */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                <Stack direction="row" spacing={2}>
+            {/* Right */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                <Stack direction="row" spacing={1}>
                     {actionIcons.map((item, index) => (
                         <IconButton
                             key={index}
                             sx={{
-                                bgcolor: '#fff',
-                                color: '#a1a5b7',
-                                width: 48,
-                                height: 48,
-                                borderRadius: '14px',
-                                '&:hover': { bgcolor: '#f8f9fa', transform: 'translateY(-2px)' },
-                                transition: 'all 0.2s',
-                                fontSize: 24
+                                p: 0.5,
+                                bgcolor: "#fff",
+                                color: "#a1a5b7",
+                                width: 40,
+                                height: 40,
+                                borderRadius: "12px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                "&:hover": { bgcolor: "#f8f9fa" },
+                                // fontSize: 20,
                             }}
                         >
                             {item.badge ? (
-                                <Badge badgeContent={item.badge} color={item.color || 'error'} sx={{ '& .MuiBadge-badge': { fontSize: 9, minWidth: 15, height: 15, p: 0 } }}>
+                                <Badge badgeContent={item.badge} color={item.color}>
                                     {item.icon}
                                 </Badge>
                             ) : (
@@ -63,26 +103,78 @@ const Header = ({ toggleSidebar, collapsed }) => {
                     ))}
                 </Stack>
 
-                {/* Profile */}
-                <Box
-                    sx={{
-                        width: 48,
-                        height: 48,
-                        cursor: 'pointer',
-                        ml: 1
+                {/* Avatar */}
+                <IconButton sx={{ p: 0.5 }} onClick={handleAvatarClick}>
+                    <Avatar
+                        src="https://images.unsplash.com/photo-1494790108377-be9c29b29330"
+                        sx={{ width: 40, height: 40, borderRadius: "12px" }}
+                    />
+                </IconButton>
+
+                {/* Dropdown */}
+                <Menu
+                    anchorEl={anchorEl}
+                    open={open}
+                    onClose={handleClose}
+                    PaperProps={{
+                        sx: {
+                            width: 260,
+                            borderRadius: "18px",
+                            p: 2,
+                            mt: 1,
+                        },
                     }}
                 >
-                    <Avatar
-                        src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80"
+                    {/* User Info */}
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1 }}>
+                        <Avatar
+                            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330"
+                            sx={{ width: 50, height: 50 }}
+                        />
+                        <Box>
+                            <Typography fontWeight={700}>Nella Vita</Typography>
+                            <Typography fontSize={13} color="text.secondary">
+                                Admin
+                            </Typography>
+                        </Box>
+                    </Box>
+
+                    <Divider sx={{ my: 1 }} />
+
+                    <MenuItem>
+                        <BiUser size={18} style={{ marginRight: 10 }} /> Profile
+                    </MenuItem>
+                    <MenuItem>
+                        <BiMessageDetail size={18} style={{ marginRight: 10 }} /> Message
+                    </MenuItem>
+                    <MenuItem
+                        component={Link}
+                        to="/notifications"
+                    >
+                        <BiBell size={18} style={{ marginRight: 10 }} />
+                        Notification
+                    </MenuItem>
+                    <MenuItem>
+                        <BiCog size={18} style={{ marginRight: 10 }} /> Settings
+                    </MenuItem>
+
+                    <Divider sx={{ my: 1 }} />
+
+                    <Button
+                        fullWidth
+                        startIcon={<BiLogOut />}
                         sx={{
-                            width: '100%',
-                            height: '100%',
-                            borderRadius: '14px' // Rounded square
+                            bgcolor: "#f3f4ff",
+                            color: "#5b5fe3",
+                            borderRadius: "12px",
+                            textTransform: "none",
+                            fontWeight: 600,
+                            py: 1,
                         }}
                     >
-                        NA
-                    </Avatar>
-                </Box>
+                        Logout
+                    </Button>
+                </Menu>
             </Box>
         </Box>
     );
