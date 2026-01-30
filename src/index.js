@@ -50,17 +50,12 @@ const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: '20px',
           boxShadow: '0px 10px 40px 0px rgba(50, 50, 50, 0.08)',
           padding: '24px',
         },
       },
     },
-    MuiPaper: {
-      styleOverrides: {
-        rounded: { borderRadius: '20px' },
-      },
-    },
+   
   },
 });
 
