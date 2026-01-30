@@ -80,7 +80,6 @@ const Sidebar = ({ collapsed }) => {
                 },
                 scrollbarWidth: 'none',
 
-
             }}
         >
             {/* Logo Section */}
