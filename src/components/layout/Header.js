@@ -48,57 +48,61 @@ const Header = ({ toggleSidebar, collapsed }) => {
     { icon: <BiCog />, badge: false },
   ];
 
-  return (
-    <Box
-      component="header"
-      sx={{
-        height: 90,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        px: 5,
-      }}
-    >
-      {/* Left */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-        <IconButton onClick={toggleSidebar}>
-          {collapsed ? (
-            <BiChevronRight size={30} color="#3d4465" />
-          ) : (
-            <BiGridAlt size={30} color="#3d4465" />
-          )}
-        </IconButton>
-        <Typography sx={{ fontWeight: 700, fontSize: 24, color: "#3d4465" }}>
-          Dashboard
-        </Typography>
-      </Box>
-
-      {/* Right */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
-        <Stack direction="row" spacing={2}>
-          {actionIcons.map((item, index) => (
-            <IconButton
-              key={index}
-              sx={{
-                bgcolor: "#fff",
-                color: "#a1a5b7",
-                width: 48,
-                height: 48,
-                borderRadius: "14px",
-                "&:hover": { bgcolor: "#f8f9fa" },
-                fontSize: 24,
-              }}
-            >
-              {item.badge ? (
-                <Badge badgeContent={item.badge} color={item.color}>
-                  {item.icon}
-                </Badge>
-              ) : (
-                item.icon
-              )}
-            </IconButton>
-          ))}
-        </Stack>
+    return (
+        <Box
+            component="header"
+            sx={{
+                height: 56,
+                minHeight: 56,        // 🔹 reduced header height
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                px: 2,
+            }}
+        >
+            {/* Left */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, ml:5 }}>
+                <IconButton onClick={toggleSidebar} sx={{ p: 0.5 }}  >
+                    {collapsed ? (
+                        <BiChevronRight size={26} color="#3d4465" />
+                    ) : (
+                        <BiGridAlt size={26} color="#3d4465" />
+                    )}
+                </IconButton>
+                <Typography sx={{ fontWeight: 700, fontSize: 20, color: "#3d4465", lineHeight: 1, }}>
+                    Dashboard
+                </Typography>
+            </Box>
+            {/* Right */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                <Stack direction="row" spacing={1}>
+                    {actionIcons.map((item, index) => (
+                        <IconButton
+                            key={index}
+                            sx={{
+                                p: 0.5,
+                                bgcolor: "#fff",
+                                color: "#a1a5b7",
+                                width: 40,
+                                height: 40,
+                                borderRadius: "12px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                "&:hover": { bgcolor: "#f8f9fa" },
+                                // fontSize: 20,
+                            }}
+                        >
+                            {item.badge ? (
+                                <Badge badgeContent={item.badge} color={item.color}>
+                                    {item.icon}
+                                </Badge>
+                            ) : (
+                                item.icon
+                            )}
+                        </IconButton>
+                    ))}
+                </Stack>
 
         {/* Avatar */}
         <IconButton onClick={handleAvatarClick}>
