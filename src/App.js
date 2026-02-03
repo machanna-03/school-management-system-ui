@@ -34,6 +34,7 @@ function App() {
           {/* Users */}
           <Route path="/notifications" element={<NotificationPage />} />
 
+          
           {/* Teacher Module */}
           <Route path="/teachers" element={<Teachers />} />
           <Route path="/teachers/details" element={<TeacherDetails />} />
@@ -57,7 +58,7 @@ function App() {
           <Route path="/events" element={<div style={{ padding: 20 }}><h2>Events Module</h2><p>Coming soon...</p></div>} />
           <Route path="/food" element={<div style={{ padding: 20 }}><h2>Food Module</h2><p>Coming soon...</p></div>} />
 
-          <Route path="/profile" element={<Profile />} />
+
         </Routes>
       </Layout>
     </BrowserRouter>
