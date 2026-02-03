@@ -17,7 +17,7 @@ const Layout = ({ children }) => {
                 component="main"
                 sx={{
                     flexGrow: 1,
-                    ml: { xs: 0, md: collapsed ? '80px' : '280px' }, // Dynamic Sidebar width
+                    ml: { xs: 0, md: collapsed ? '80px' : '260px' }, 
                     display: 'flex',
                     flexDirection: 'column',
                     width: { xs: '100%', md: `calc(100% - ${collapsed ? '80px' : '280px'})` },
