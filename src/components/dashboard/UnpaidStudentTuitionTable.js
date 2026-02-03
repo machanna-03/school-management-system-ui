@@ -9,7 +9,6 @@ import {
     Avatar,
     Box,
     Typography,
-    Chip,
     IconButton
 } from '@mui/material';
 import { BiDotsHorizontalRounded, BiPrinter } from 'react-icons/bi';
