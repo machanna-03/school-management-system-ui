@@ -22,6 +22,10 @@ import {
   BiTable,
   BiChevronRight,
   BiChevronDown,
+  BiTime,
+  BiCalendarCheck,
+  BiBook,
+  BiBookContent,
 } from "react-icons/bi";
 import { IoMdListBox } from "react-icons/io";
 import { Link, useLocation } from "react-router-dom";
@@ -31,6 +35,11 @@ const Sidebar = ({ collapsed }) => {
   const [openDashboard, setOpenDashboard] = useState(false);
   const [openStudent, setOpenStudent] = useState(true);
   const [openTeacher, setOpenTeacher] = useState(true);
+
+  const [openClasses, setOpenClasses] = useState(false);
+  const [openSubjects, setOpenSubjects] = useState(false);
+  const [openAttendance, setOpenAttendance] = useState(false);
+  const [openTimeTable, setOpenTimeTable] = useState(false);
 
   const location = useLocation();
 
@@ -70,6 +79,50 @@ const Sidebar = ({ collapsed }) => {
         { name: "Add New Teacher", path: "/teachers/add" },
       ],
     },
+
+    {
+      name: "Classes",
+      icon: <BiBookContent />,
+      hasSubmenu: true,
+      isOpen: openClasses,
+      onClick: () => setOpenClasses(!openClasses),
+      children: [
+        { name: "All Classes", path: "/classes" },
+        { name: "Add New Class", path: "/classes/add" },
+      ],
+    },
+    {
+      name: "Subjects",
+      icon: <BiBook />,
+      hasSubmenu: true,
+      isOpen: openSubjects,
+      onClick: () => setOpenSubjects(!openSubjects),
+      children: [
+        { name: "All Subjects", path: "/subjects" },
+        { name: "Add New Subject", path: "/subjects/add" },
+      ],
+    },
+    {
+      name: "Attendance",
+      icon: <BiCalendarCheck />,
+      hasSubmenu: true,
+      isOpen: openAttendance,
+      onClick: () => setOpenAttendance(!openAttendance),
+      children: [
+        { name: "Attendance Dashboard", path: "/attendance" },
+        { name: "Student Attendance", path: "/attendance/student" },
+        { name: "Teacher Attendance", path: "/attendance/teacher" },
+      ],
+    },
+    {
+      name: "Time Table",
+      icon: <BiTime />,
+      hasSubmenu: true,
+      isOpen: openTimeTable,
+      onClick: () => setOpenTimeTable(!openTimeTable),
+      children: [{ name: "View Time Table", path: "/timetable" }],
+    },
+
     { name: "Food", icon: <BiDish />, hasArrow: true },
     { name: "File Manager", icon: <BiFolder />, hasArrow: true },
     { name: "Apps", icon: <BiGridAlt />, hasArrow: true },
