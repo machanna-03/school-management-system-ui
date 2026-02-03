@@ -49,7 +49,9 @@ const Sidebar = ({ collapsed }) => {
                 { name: 'All Teachers', path: '/teachers' },
                 { name: 'Teacher Details', path: '/teachers/details' },
                 { name: 'Add New Teacher', path: '/teachers/add' },
+                { name: 'Sub To Teachers', path: '/teachers/sub-to-teachers' },
             ]
+            
         },
         {
             name: 'Classes',

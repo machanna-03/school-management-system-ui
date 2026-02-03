@@ -8,6 +8,7 @@ import AddStudent from './pages/students/AddStudent';
 import Teachers from './pages/teachers/Teachers';
 import TeacherDetails from './pages/teachers/TeacherDetails';
 import AddTeacher from './pages/teachers/AddTeacher';
+<<<<<<< Updated upstream
 import NotificationPage from './pages/Notifications/NotificationPage';
 import Profile from './pages/User/Profile';
 import Classes from './pages/classes/Classes';
@@ -18,6 +19,9 @@ import Attendance from './pages/attendance/Attendance';
 import StudentAttendance from './pages/attendance/StudentAttendance';
 import TeacherAttendance from './pages/attendance/TeacherAttendance';
 import TimeTable from './pages/timetable/TimeTable';
+=======
+import SubToTeachers from './pages/teachers/SubToTeachers';
+>>>>>>> Stashed changes
 
 
 function App() {
@@ -39,6 +43,7 @@ function App() {
           <Route path="/teachers" element={<Teachers />} />
           <Route path="/teachers/details" element={<TeacherDetails />} />
           <Route path="/teachers/add" element={<AddTeacher />} />
+          <Route path="/teachers/sub-to-teachers" element={<SubToTeachers />} />
 
           {/* New Modules */}
           <Route path="/classes" element={<Classes />} />
