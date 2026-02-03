@@ -9,6 +9,7 @@ import Teachers from './pages/teachers/Teachers';
 import TeacherDetails from './pages/teachers/TeacherDetails';
 import AddTeacher from './pages/teachers/AddTeacher';
 import NotificationPage from './pages/Notifications/NotificationPage';
+import Profile from './pages/User/Profile';
 
 
 function App() {
@@ -34,6 +35,8 @@ function App() {
           <Route path="/finance" element={<div style={{ padding: 20 }}><h2>Finance Module</h2><p>Coming soon...</p></div>} />
           <Route path="/events" element={<div style={{ padding: 20 }}><h2>Events Module</h2><p>Coming soon...</p></div>} />
           <Route path="/food" element={<div style={{ padding: 20 }}><h2>Food Module</h2><p>Coming soon...</p></div>} />
+
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </Layout>
     </BrowserRouter>
