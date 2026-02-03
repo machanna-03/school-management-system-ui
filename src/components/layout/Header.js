@@ -10,7 +10,7 @@ import {
     Menu,
     MenuItem,
     Divider,
-    Button
+    Button,
 } from "@mui/material";
 
 import {
@@ -23,13 +23,14 @@ import {
     BiCog,
     BiChevronRight,
     BiUser,
-    BiLogOut
+    BiLogOut,
 } from "react-icons/bi";
+import { useNavigate } from "react-router-dom";
 
 const Header = ({ toggleSidebar, collapsed }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
-
+  const navigate = useNavigate();
     const handleAvatarClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -141,10 +142,11 @@ const Header = ({ toggleSidebar, collapsed }) => {
 
                     <Divider sx={{ my: 1 }} />
 
-                    <MenuItem>
+                    <MenuItem 
+                 onClick={() => navigate('/profile')}>
                         <BiUser size={18} style={{ marginRight: 10 }} /> Profile
                     </MenuItem>
-                    <MenuItem>
+                    <MenuItem> 
                         <BiMessageDetail size={18} style={{ marginRight: 10 }} /> Message
                     </MenuItem>
                     <MenuItem
