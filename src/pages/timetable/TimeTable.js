@@ -9,7 +9,7 @@ const TimeTable = () => {
 
     const schedule = {
         'Monday': [
-            { subject: 'Math', room: '101', color: '#4d44b5' },
+            { subject: 'Math', room: '101', color: '#]4d44b5' },
             { subject: 'Physics', room: 'Lab A', color: '#fb7d5b' },
             { subject: 'Break', room: '', color: '#f0f1f5', isBreak: true },
             { subject: 'English', room: '102', color: '#30c7ec' },
