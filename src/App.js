@@ -18,10 +18,76 @@ import Attendance from './pages/attendance/Attendance';
 import StudentAttendance from './pages/attendance/StudentAttendance';
 import TeacherAttendance from './pages/attendance/TeacherAttendance';
 import TimeTable from './pages/timetable/TimeTable';
+import Login from './components/auth/Login';
+import Signup from './components/auth/Signup';
+import { AppProvider, useApp } from './context/AppContext';
+import { CookiesProvider } from 'react-cookie';
 
+// Protected Route Component
+const ProtectedRoute = ({ children }) => {
+  const { state } = useApp();
+  if (!state.isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
+
+// Main App Content with Logic
+const AppContent = () => {
+  return (
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+
+      {/* Protected Routes */}
+      <Route path="/*" element={
+        <ProtectedRoute>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/students" element={<Students />} />
+              <Route path="/students/details" element={<StudentDetails />} />
+              <Route path="/students/add" element={<AddStudent />} />
+
+              {/* Users */}
+              <Route path="/notifications" element={<NotificationPage />} />
+              <Route path="/profile" element={<Profile />} />
+
+              {/* Teacher Module */}
+              <Route path="/teachers" element={<Teachers />} />
+              <Route path="/teachers/details" element={<TeacherDetails />} />
+              <Route path="/teachers/add" element={<AddTeacher />} />
+
+              {/* New Modules */}
+              <Route path="/classes" element={<Classes />} />
+              <Route path="/classes/add" element={<AddClass />} />
+
+              <Route path="/subjects" element={<Subjects />} />
+              <Route path="/subjects/add" element={<AddSubject />} />
+
+              <Route path="/attendance" element={<Attendance />} />
+              <Route path="/attendance/student" element={<StudentAttendance />} />
+              <Route path="/attendance/teacher" element={<TeacherAttendance />} />
+
+              <Route path="/timetable" element={<TimeTable />} />
+
+              <Route path="/courses" element={<div style={{ padding: 20 }}><h2>Courses Module</h2><p>Coming soon...</p></div>} />
+              <Route path="/finance" element={<div style={{ padding: 20 }}><h2>Finance Module</h2><p>Coming soon...</p></div>} />
+              <Route path="/events" element={<div style={{ padding: 20 }}><h2>Events Module</h2><p>Coming soon...</p></div>} />
+              <Route path="/food" element={<div style={{ padding: 20 }}><h2>Food Module</h2><p>Coming soon...</p></div>} />
+            </Routes>
+          </Layout>
+        </ProtectedRoute>
+      } />
+    </Routes>
+  );
+}
 
 function App() {
   return (
+<<<<<<< Updated upstream
     <BrowserRouter>
       <Layout>
         <Routes>
@@ -62,6 +128,15 @@ function App() {
         </Routes>
       </Layout>
     </BrowserRouter>
+=======
+    <CookiesProvider>
+      <AppProvider>
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </AppProvider>
+    </CookiesProvider>
+>>>>>>> Stashed changes
   );
 }
 
