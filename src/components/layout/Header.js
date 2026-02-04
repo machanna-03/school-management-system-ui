@@ -61,7 +61,7 @@ const Header = ({ toggleSidebar, collapsed }) => {
             }}
         >
             {/* Left */}
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, ml:2 }}>
                 <IconButton onClick={toggleSidebar} sx={{ p: 0.5 }}  >
                     {collapsed ? (
                         <BiChevronRight size={26} color="#3d4465" />
@@ -70,7 +70,7 @@ const Header = ({ toggleSidebar, collapsed }) => {
                     )}
                 </IconButton>
                 <Typography sx={{ fontWeight: 700, fontSize: 20, color: "#3d4465", lineHeight: 1, }}>
-                    Dashboard
+                    Menu
                 </Typography>
             </Box>
             {/* Right */}

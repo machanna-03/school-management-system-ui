@@ -33,7 +33,7 @@ function App() {
 
           {/* Users */}
           <Route path="/notifications" element={<NotificationPage />} />
-
+          <Route path="/profile" element={<Profile />} />
           
           {/* Teacher Module */}
           <Route path="/teachers" element={<Teachers />} />
