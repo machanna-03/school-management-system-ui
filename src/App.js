@@ -22,6 +22,8 @@ import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
 import { AppProvider, useApp } from './context/AppContext';
 import { CookiesProvider } from 'react-cookie';
+import ParentLayout from './parentportal/layout/ParentLayout';
+import ParentDashboard from './parentportal/pages/ParentDashboard';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -79,6 +81,24 @@ const AppContent = () => {
               <Route path="/food" element={<div style={{ padding: 20 }}><h2>Food Module</h2><p>Coming soon...</p></div>} />
             </Routes>
           </Layout>
+        </ProtectedRoute>
+      } />
+
+      {/* Parent Portal Routes */}
+      <Route path="/parent/*" element={
+        <ProtectedRoute>
+          <ParentLayout>
+            <Routes>
+              <Route path="/" element={<Navigate to="/parent/dashboard" replace />} />
+              <Route path="/dashboard" element={<ParentDashboard />} />
+              <Route path="/children" element={<div style={{ padding: 20 }}><h2>My Children</h2><p>Coming soon...</p></div>} />
+              <Route path="/academics" element={<div style={{ padding: 20 }}><h2>Academics</h2><p>Coming soon...</p></div>} />
+              <Route path="/attendance" element={<div style={{ padding: 20 }}><h2>Attendance</h2><p>Coming soon...</p></div>} />
+              <Route path="/timetable" element={<div style={{ padding: 20 }}><h2>Timetable</h2><p>Coming soon...</p></div>} />
+              <Route path="/fees" element={<div style={{ padding: 20 }}><h2>Fees</h2><p>Coming soon...</p></div>} />
+              <Route path="/messages" element={<div style={{ padding: 20 }}><h2>Messages</h2><p>Coming soon...</p></div>} />
+            </Routes>
+          </ParentLayout>
         </ProtectedRoute>
       } />
     </Routes>
