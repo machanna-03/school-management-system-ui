@@ -43,7 +43,7 @@ const Profile = () => {
   const buttonStyle = { borderRadius: 0, minHeight: 32, px: 2 };
 
   return (
-    <Box sx={{ background: "#eef2f5", minHeight: "100vh", p: 3, maxwidth:1400 }}>
+    <Box sx={{ background: "#eef2f5", minHeight: "100vh", p: 3 }}>
       {/* HEADER */}
       <Card sx={{ borderRadius: 3, overflow: "hidden", mb: 3 }}>
         <Box sx={{ position: "relative" }}>
@@ -167,10 +167,10 @@ const Profile = () => {
               </Button>
             </Box>
           </Card>
-          {/* Today Highlights */}
+          {/* Today Highlights */}{" "}
           <Card sx={{ p: 2, borderRadius: 3, mt: 3 }}>
-            <Typography fontWeight={600}>Today Highlights</Typography>
-
+            {" "}
+            <Typography fontWeight={600}>Today Highlights</Typography>{" "}
             <Box
               component="img"
               src="https://images.unsplash.com/photo-1588072432836-e10032774350"
@@ -181,24 +181,25 @@ const Profile = () => {
                 borderRadius: 2,
                 my: 2,
               }}
-            />
-
+            />{" "}
             <Typography fontWeight={600}>
-              Proof Education Is Important
-            </Typography>
-
+              {" "}
+              Proof Education Is Important{" "}
+            </Typography>{" "}
             <Typography variant="body2" color="text.secondary">
-              Education plays a key role in society development.
-            </Typography>
-          </Card>
-
-          {/* Interests */}
+              {" "}
+              Education plays a key role in society development.{" "}
+            </Typography>{" "}
+          </Card>{" "}
+          {/* Interests */}{" "}
           <Card sx={{ p: 2, borderRadius: 3, mt: 3 }}>
-            <Typography fontWeight={600}>Interests</Typography>
-
+            {" "}
+            <Typography fontWeight={600}>Interests</Typography>{" "}
             <Grid container spacing={1} mt={1}>
+              {" "}
               {[1, 2, 3, 4].map((i) => (
                 <Grid item xs={6} key={i}>
+                  {" "}
                   <Box
                     component="img"
                     src="https://images.unsplash.com/photo-1588072432836-e10032774350"
@@ -208,18 +209,18 @@ const Profile = () => {
                       objectFit: "cover",
                       borderRadius: 2,
                     }}
-                  />
+                  />{" "}
                 </Grid>
-              ))}
-            </Grid>
-          </Card>
-
-          {/* Latest News */}
+              ))}{" "}
+            </Grid>{" "}
+          </Card>{" "}
+          {/* Latest News */}{" "}
           <Card sx={{ p: 2, borderRadius: 3, mt: 3 }}>
-            <Typography fontWeight={600}>Our Latest News</Typography>
-
+            {" "}
+            <Typography fontWeight={600}>Our Latest News</Typography>{" "}
             {[1, 2, 3].map((item) => (
               <Box key={item} sx={{ display: "flex", gap: 2, mt: 2 }}>
+                {" "}
                 <Box
                   component="img"
                   src="https://images.unsplash.com/photo-1588072432836-e10032774350"
@@ -229,18 +230,20 @@ const Profile = () => {
                     borderRadius: 2,
                     objectFit: "cover",
                   }}
-                />
-
+                />{" "}
                 <Box>
+                  {" "}
                   <Typography fontWeight={600} fontSize={14}>
-                    Education News Title
-                  </Typography>
+                    {" "}
+                    Education News Title{" "}
+                  </Typography>{" "}
                   <Typography variant="body2" color="text.secondary">
-                    Short news description...
-                  </Typography>
-                </Box>
+                    {" "}
+                    Short news description...{" "}
+                  </Typography>{" "}
+                </Box>{" "}
               </Box>
-            ))}
+            ))}{" "}
           </Card>
         </Grid>
 
@@ -322,19 +325,32 @@ const Profile = () => {
             )}
 
             {tabValue === 1 && (
-              <Box sx={{ mt: 2 }}>
-                <Typography fontWeight={700}>About Me</Typography>
-
-                <Typography variant="body2" color="text.secondary" mt={1}>
-                  A wonderful serenity has taken possession of my entire soul,
-                  like these sweet mornings of spring.
+              <Card sx={{ p: 3, borderRadius: 3 }}>
+                {/* About */}
+                <Typography fontWeight={700} mb={1}>
+                  About Me
                 </Typography>
 
-                <Typography fontWeight={700} mt={3}>
+                <Typography variant="body2" color="text.secondary" mb={2}>
+                  A wonderful serenity has taken possession of my entire soul,
+                  like these sweet mornings of spring which I enjoy with my
+                  whole heart. I am alone, and feel the charm of existence was
+                  created for the bliss of souls like mine.
+                </Typography>
+
+                <Typography variant="body2" color="text.secondary" mb={3}>
+                  A collection of textile samples lay spread out on the table —
+                  Samsa was a travelling salesman — and above it there hung a
+                  picture that he had recently cut out of an illustrated
+                  magazine.
+                </Typography>
+
+                {/* Skills */}
+                <Typography fontWeight={700} mb={1}>
                   Skills
                 </Typography>
 
-                <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 1 }}>
+                <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 3 }}>
                   {["Admin", "Dashboard", "Photoshop", "Bootstrap"].map(
                     (skill) => (
                       <Button
@@ -342,8 +358,10 @@ const Profile = () => {
                         variant="contained"
                         size="small"
                         sx={{
-                          backgroundColor: "#423ada",
+                          backgroundColor: "#4f46e5",
                           color: "#fff",
+                          textTransform: "none",
+                          "&:hover": { backgroundColor: "#4338ca" },
                         }}
                       >
                         {skill}
@@ -353,119 +371,129 @@ const Profile = () => {
                 </Box>
 
                 {/* Language */}
-                <Typography fontWeight={700} mt={3}>
+                <Typography fontWeight={700} mb={1}>
                   Language
                 </Typography>
 
-                <Typography variant="body2" color="text.secondary" mt={1}>
+                <Typography variant="body2" color="text.secondary" mb={3}>
                   English &nbsp;&nbsp; French &nbsp;&nbsp; Bangla
                 </Typography>
 
                 {/* Personal Information */}
-                <Typography fontWeight={700} mt={3}>
+                <Typography fontWeight={700} mb={2}>
                   Personal Information
                 </Typography>
 
-                <Box sx={{ mt: 2 }}>
-                  {[
-                    ["Name", "Mitchell C. Shay"],
-                    ["Email", "example@example.com"],
-                    ["Availability", "Full Time (Free Lancer)"],
-                    ["Age", "27"],
-                    ["Location", "Rosemont Avenue Melbourne, Florida"],
-                    ["Year Experience", "07 Year Experiences"],
-                  ].map(([label, value]) => (
-                    <Grid container key={label} sx={{ mb: 1 }}>
-                      <Grid item xs={4}>
-                        <Typography fontWeight={600}>{label}</Typography>
-                      </Grid>
-
-                      <Grid item xs={1}>
-                        <Typography fontWeight={600}>:</Typography>
-                      </Grid>
-
-                      <Grid item xs={7}>
-                        <Typography color="text.secondary">{value}</Typography>
-                      </Grid>
+                {[
+                  ["Name", "Mitchell C. Shay"],
+                  ["Email", "example@example.com"],
+                  ["Availability", "Full Time (Free Lancer)"],
+                  ["Age", "27"],
+                  ["Location", "Rosemont Avenue Melbourne, Florida"],
+                  ["Year Experience", "07 Year Experiences"],
+                ].map(([label, value]) => (
+                  <Grid container key={label} sx={{ mb: 1 }}>
+                    <Grid item xs={4}>
+                      <Typography fontWeight={600}>{label}</Typography>
                     </Grid>
-                  ))}
-                </Box>
-              </Box>
+
+                    <Grid item xs={1}>
+                      <Typography fontWeight={600}>:</Typography>
+                    </Grid>
+
+                    <Grid item xs={7}>
+                      <Typography color="text.secondary">{value}</Typography>
+                    </Grid>
+                  </Grid>
+                ))}
+              </Card>
             )}
 
             {tabValue === 2 && (
-              <Grid container spacing={2} mt={2}>
-                <Grid item xs={12}>
-                  <Typography variant="h6">Account Settings</Typography>
-                </Grid>
-                {/* Email */}
-                <Grid item xs={12} md={6}>
-                  <Typography>Email</Typography>
-                  <TextField fullWidth placeholder="Email" />
-                </Grid>
+              <Card sx={{ p: 3, borderRadius: 3 }}>
+                <Typography fontWeight={700} color="primary" mb={2}>
+                  Account Setting
+                </Typography>
 
-                {/* Password */}
-                <Grid item xs={12} md={6}>
-                  <Typography>Password</Typography>
-                  <TextField fullWidth type="password" placeholder="Password" />
-                </Grid>
+                <Grid container spacing={2}>
+                  {/* Email */}
+                  <Grid item xs={12} md={6}>
+                    <Typography>Email</Typography>
+                    <TextField fullWidth placeholder="Email" />
+                  </Grid>
 
-                {/* Address */}
-                <Grid item xs={12}>
-                  <Typography>Address</Typography>
-                  <TextField fullWidth placeholder="House No" />
-                </Grid>
+                  {/* Password */}
+                  <Grid item xs={12} md={6}>
+                    <Typography>Password</Typography>
+                    <TextField
+                      fullWidth
+                      type="password"
+                      placeholder="Password"
+                    />
+                  </Grid>
 
-                {/* Address 2 */}
-                <Grid item xs={12}>
-                  <Typography>Address 2</Typography>
-                  <TextField
-                    fullWidth
-                    placeholder="Apartment Name or Street Name"
-                  />
-                </Grid>
+                  {/* Address */}
+                  <Grid item xs={12}>
+                    <Typography>Address</Typography>
+                    <TextField fullWidth placeholder="1234 Main St" />
+                  </Grid>
 
-                {/* City */}
-                <Grid item xs={12} md={4}>
-                  <Typography>City</Typography>
-                  <TextField fullWidth />
-                </Grid>
+                  {/* Address 2 */}
+                  <Grid item xs={12}>
+                    <Typography>Address 2</Typography>
+                    <TextField
+                      fullWidth
+                      placeholder="Apartment, studio, or floor"
+                    />
+                  </Grid>
 
-                {/* State */}
-                <Grid item xs={12} md={4}>
-                  <Typography>State</Typography>
-                  <TextField fullWidth />
-                </Grid>
+                  {/* City */}
+                  <Grid item xs={12} md={6}>
+                    <Typography>City</Typography>
+                    <TextField fullWidth />
+                  </Grid>
 
-                {/* Zip */}
-                <Grid item xs={12} md={4}>
-                  <Typography>Zip</Typography>
-                  <TextField fullWidth />
-                </Grid>
+                  {/* State */}
+                  <Grid item xs={12} md={4}>
+                    <Typography>State</Typography>
+                    <TextField select fullWidth defaultValue="">
+                      <MenuItem value="">Choose...</MenuItem>
+                      <MenuItem value="NY">New York</MenuItem>
+                      <MenuItem value="CA">California</MenuItem>
+                      <MenuItem value="TX">Texas</MenuItem>
+                    </TextField>
+                  </Grid>
 
-                {/* Checkbox */}
-                <Grid item xs={12}>
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="Check me out"
-                  />
-                </Grid>
+                  {/* Zip */}
+                  <Grid item xs={12} md={2}>
+                    <Typography>Zip</Typography>
+                    <TextField fullWidth />
+                  </Grid>
 
-                {/* Button */}
-                <Grid item xs={12}>
-                  <Button
-                    variant="contained"
-                    sx={{
-                      borderRadius: 2,
-                      px: 4,
-                      py: 1,
-                      textTransform: "none",
-                    }}
-                  >
-                    Sign in
-                  </Button>
+                  {/* Checkbox */}
+                  <Grid item xs={12}>
+                    <FormControlLabel
+                      control={<Checkbox />}
+                      label="Check me out"
+                    />
+                  </Grid>
+
+                  {/* Button */}
+                  <Grid item xs={12}>
+                    <Button
+                      variant="contained"
+                      sx={{
+                        borderRadius: 2,
+                        px: 4,
+                        py: 1,
+                        textTransform: "none",
+                      }}
+                    >
+                      Sign in
+                    </Button>
+                  </Grid>
                 </Grid>
-              </Grid>
+              </Card>
             )}
           </Card>
         </Grid>

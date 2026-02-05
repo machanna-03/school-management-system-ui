@@ -8,7 +8,6 @@ import AddStudent from './pages/students/AddStudent';
 import Teachers from './pages/teachers/Teachers';
 import TeacherDetails from './pages/teachers/TeacherDetails';
 import AddTeacher from './pages/teachers/AddTeacher';
-<<<<<<< Updated upstream
 import NotificationPage from './pages/Notifications/NotificationPage';
 import Profile from './pages/User/Profile';
 import Classes from './pages/classes/Classes';
@@ -19,55 +18,102 @@ import Attendance from './pages/attendance/Attendance';
 import StudentAttendance from './pages/attendance/StudentAttendance';
 import TeacherAttendance from './pages/attendance/TeacherAttendance';
 import TimeTable from './pages/timetable/TimeTable';
-=======
-import SubToTeachers from './pages/teachers/SubToTeachers';
->>>>>>> Stashed changes
+import Login from './components/auth/Login';
+import Signup from './components/auth/Signup';
+import { AppProvider, useApp } from './context/AppContext';
+import { CookiesProvider } from 'react-cookie';
+import ParentLayout from './parentportal/layout/ParentLayout';
+import ParentDashboard from './parentportal/pages/ParentDashboard';
 
+// Protected Route Component
+const ProtectedRoute = ({ children }) => {
+  const { state } = useApp();
+  if (!state.isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
 
-function App() {
+// Main App Content with Logic
+const AppContent = () => {
   return (
-    <BrowserRouter>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/students" element={<Students />} />
-          <Route path="/students/details" element={<StudentDetails />} />
-          <Route path="/students/add" element={<AddStudent />} />
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
 
-          {/* Users */}
-          <Route path="/notifications" element={<NotificationPage />} />
+      {/* Protected Routes */}
+      <Route path="/*" element={
+        <ProtectedRoute>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/students" element={<Students />} />
+              <Route path="/students/details" element={<StudentDetails />} />
+              <Route path="/students/add" element={<AddStudent />} />
 
-          
-          {/* Teacher Module */}
-          <Route path="/teachers" element={<Teachers />} />
-          <Route path="/teachers/details" element={<TeacherDetails />} />
-          <Route path="/teachers/add" element={<AddTeacher />} />
-          <Route path="/teachers/sub-to-teachers" element={<SubToTeachers />} />
+              {/* Users */}
+              <Route path="/notifications" element={<NotificationPage />} />
+              <Route path="/profile" element={<Profile />} />
 
-          {/* New Modules */}
-          <Route path="/classes" element={<Classes />} />
-          <Route path="/classes/add" element={<AddClass />} />
+              {/* Teacher Module */}
+              <Route path="/teachers" element={<Teachers />} />
+              <Route path="/teachers/details" element={<TeacherDetails />} />
+              <Route path="/teachers/add" element={<AddTeacher />} />
 
-          <Route path="/subjects" element={<Subjects />} />
-          <Route path="/subjects/add" element={<AddSubject />} />
+              {/* New Modules */}
+              <Route path="/classes" element={<Classes />} />
+              <Route path="/classes/add" element={<AddClass />} />
 
-          <Route path="/attendance" element={<Attendance />} />
-          <Route path="/attendance/student" element={<StudentAttendance />} />
-          <Route path="/attendance/teacher" element={<TeacherAttendance />} />
+              <Route path="/subjects" element={<Subjects />} />
+              <Route path="/subjects/add" element={<AddSubject />} />
 
-          <Route path="/timetable" element={<TimeTable />} />
+              <Route path="/attendance" element={<Attendance />} />
+              <Route path="/attendance/student" element={<StudentAttendance />} />
+              <Route path="/attendance/teacher" element={<TeacherAttendance />} />
 
-          <Route path="/courses" element={<div style={{ padding: 20 }}><h2>Courses Module</h2><p>Coming soon...</p></div>} />
-          <Route path="/finance" element={<div style={{ padding: 20 }}><h2>Finance Module</h2><p>Coming soon...</p></div>} />
-          <Route path="/events" element={<div style={{ padding: 20 }}><h2>Events Module</h2><p>Coming soon...</p></div>} />
-          <Route path="/food" element={<div style={{ padding: 20 }}><h2>Food Module</h2><p>Coming soon...</p></div>} />
+              <Route path="/timetable" element={<TimeTable />} />
 
+              <Route path="/courses" element={<div style={{ padding: 20 }}><h2>Courses Module</h2><p>Coming soon...</p></div>} />
+              <Route path="/finance" element={<div style={{ padding: 20 }}><h2>Finance Module</h2><p>Coming soon...</p></div>} />
+              <Route path="/events" element={<div style={{ padding: 20 }}><h2>Events Module</h2><p>Coming soon...</p></div>} />
+              <Route path="/food" element={<div style={{ padding: 20 }}><h2>Food Module</h2><p>Coming soon...</p></div>} />
+            </Routes>
+          </Layout>
+        </ProtectedRoute>
+      } />
 
-        </Routes>
-      </Layout>
-    </BrowserRouter>
+      {/* Parent Portal Routes */}
+      <Route path="/parent/*" element={
+        <ProtectedRoute>
+          <ParentLayout>
+            <Routes>
+              <Route path="/" element={<Navigate to="/parent/dashboard" replace />} />
+              <Route path="/dashboard" element={<ParentDashboard />} />
+              <Route path="/children" element={<div style={{ padding: 20 }}><h2>My Children</h2><p>Coming soon...</p></div>} />
+              <Route path="/academics" element={<div style={{ padding: 20 }}><h2>Academics</h2><p>Coming soon...</p></div>} />
+              <Route path="/attendance" element={<div style={{ padding: 20 }}><h2>Attendance</h2><p>Coming soon...</p></div>} />
+              <Route path="/timetable" element={<div style={{ padding: 20 }}><h2>Timetable</h2><p>Coming soon...</p></div>} />
+              <Route path="/fees" element={<div style={{ padding: 20 }}><h2>Fees</h2><p>Coming soon...</p></div>} />
+              <Route path="/messages" element={<div style={{ padding: 20 }}><h2>Messages</h2><p>Coming soon...</p></div>} />
+            </Routes>
+          </ParentLayout>
+        </ProtectedRoute>
+      } />
+    </Routes>
   );
 }
 
+function App() {
+  return (
+    <CookiesProvider>
+      <AppProvider>
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </AppProvider>
+    </CookiesProvider>
+  );
+}
 export default App;
