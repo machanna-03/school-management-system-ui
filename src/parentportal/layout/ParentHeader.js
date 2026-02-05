@@ -24,8 +24,10 @@ const ParentHeader = ({ collapsed, toggleSidebar, handleDrawerToggle }) => {
                 color: '#333'
             }}
         >
+
             <Toolbar sx={{ px: { xs: 2, md: 4 } }}>
-                {/* Mobile Menu Button */}
+                {/* Mobile Menu
+                 Button */}
                 <IconButton
                     color="inherit"
                     aria-label="open drawer"
