@@ -247,6 +247,7 @@ const Login = () => {
           {/* <Typography variant="body2" sx={{ mt: 3, color: '#A098AE' }}>
             Don't have an account? <Link to="/signup" style={{ color: '#4d44b5', fontWeight: 600, textDecoration: 'none' }}>Sign up</Link>
           </Typography> */}
+
         </Paper>
       </motion.div>
     </Box>
