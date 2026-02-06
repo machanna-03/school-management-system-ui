@@ -24,6 +24,10 @@ import { AppProvider, useApp } from './context/AppContext';
 import { CookiesProvider } from 'react-cookie';
 import ParentLayout from './parentportal/layout/ParentLayout';
 import ParentDashboard from './parentportal/pages/ParentDashboard';
+import ClassToTeacher from './pages/classes/ClassToTeacher';
+import SubToTeacher from './pages/subjects/SubToTeacher';
+import SubToClass from './pages/subjects/SubToClass';
+import LeaveApplicant from './parentportal/pages/SchoolLife/LeaveApplicant';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -62,12 +66,15 @@ const AppContent = () => {
               <Route path="/teachers/details" element={<TeacherDetails />} />
               <Route path="/teachers/add" element={<AddTeacher />} />
 
-              {/* New Modules */}
-              <Route path="/classes" element={<Classes />} />
-              <Route path="/classes/add" element={<AddClass />} />
+          {/* New Modules */}
+          <Route path="/classes" element={<Classes />} />
+          <Route path="/classes/add" element={<AddClass />} />
+          <Route path="/classes/assign" element={<ClassToTeacher />} />
 
-              <Route path="/subjects" element={<Subjects />} />
-              <Route path="/subjects/add" element={<AddSubject />} />
+          <Route path="/subjects" element={<Subjects />} />
+          <Route path="/subjects/add" element={<AddSubject />} />
+          <Route path="/subjects/assign" element={<SubToTeacher />} />
+          <Route path="/subjects/class" element={<SubToClass />} />
 
               <Route path="/attendance" element={<Attendance />} />
               <Route path="/attendance/student" element={<StudentAttendance />} />
@@ -97,6 +104,7 @@ const AppContent = () => {
               <Route path="/timetable" element={<div style={{ padding: 20 }}><h2>Timetable</h2><p>Coming soon...</p></div>} />
               <Route path="/fees" element={<div style={{ padding: 20 }}><h2>Fees</h2><p>Coming soon...</p></div>} />
               <Route path="/messages" element={<div style={{ padding: 20 }}><h2>Messages</h2><p>Coming soon...</p></div>} />
+              <Route path="/leave" element={<LeaveApplicant />} />
             </Routes>
           </ParentLayout>
         </ProtectedRoute>
