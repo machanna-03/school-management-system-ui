@@ -69,33 +69,39 @@ export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
   // Load data from localStorage on mount
-  // Load data from localStorage on mount
   useEffect(() => {
     // Legacy support or other settings
     const savedData = localStorage.getItem('sms-data');
     if (savedData) {
       try {
         const parsedData = JSON.parse(savedData);
-        // Only load settings or other non-auth data if needed
+        // We carefully only restore SETTINGS or other non-auth state checks here
         if (parsedData.settings) {
           dispatch({ type: ACTIONS.UPDATE_SETTINGS, payload: parsedData.settings });
         }
+        // IMPORTANT: WE DO NOT OVERWRITE isAuthenticated/currentUser from 'sms-data'
+        // Authentication is strictly managed via 'userInfo' key in localStorage.
       } catch (error) {
         console.error('Error loading saved data:', error);
       }
     }
   }, []);
 
-  // Save data to localStorage whenever state changes
+  // Save specific data to localStorage whenever state changes
   useEffect(() => {
-    localStorage.setItem('sms-data', JSON.stringify(state));
-  }, [state]);
+    // We prepare an object that excludes auth info to avoid stale overwrites if logic changes
+    const stateToSave = {
+      settings: state.settings,
+      // users: state.users, // Optionally save users if they are local-only
+      // notifications: state.notifications
+    };
+    localStorage.setItem('sms-data', JSON.stringify(stateToSave));
+  }, [state.settings, state.users, state.notifications]);
 
   const login = (email, password) => {
-    // Mock login logic
+    // Method primarily used for mock testing if needed, mainly relying on Login.js dispatch
     const user = state.users.find(u => u.email === email);
     if (user) {
-      // In a real app check password
       dispatch({ type: ACTIONS.LOGIN, payload: user });
       return true;
     }
@@ -104,6 +110,11 @@ export function AppProvider({ children }) {
 
   const logout = () => {
     localStorage.removeItem('userInfo');
+    localStorage.removeItem('org_user'); // Also clear cookie-related storage if any
+
+    // Optional: Clear 'sms-data' if you want a complete hard reset, but usually settings are nice to keep
+    // localStorage.removeItem('sms-data'); 
+
     dispatch({ type: ACTIONS.LOGOUT });
   };
 

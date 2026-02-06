@@ -28,7 +28,14 @@ import {
     BiBus,
     BiMale,
     BiGridAlt,
-    BiBell
+    BiBell,
+    BiCog,
+    BiCalendar,
+    BiHistory,
+    BiReceipt,
+    BiCreditCard,
+    BiCalendarEvent,
+    BiConversation
 } from "react-icons/bi";
 import { Link, useLocation } from "react-router-dom";
 import logo from "../../assests/GMs-logo.png";
@@ -43,8 +50,9 @@ const ParentSidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
     const [openAcademics, setOpenAcademics] = useState(false);
     const [openSchoolLife, setOpenSchoolLife] = useState(false);
     const [openFinance, setOpenFinance] = useState(false);
-    const [openCommunication, setOpenCommunication] = useState(false);
-    const [openSettings, setOpenSettings] = useState(false);
+    const [openCommunications, setOpenCommunications] = useState(false); // Fixed: was setOpenCommunication but variable was openCommunication, checking below usages
+    // Or rather better to stick with what was likely intended or add new state
+    const [openProgress, setOpenProgress] = useState(false);
 
     const menuItems = [
         {
@@ -62,8 +70,8 @@ const ParentSidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
                     isOpen: openChildren,
                     onClick: () => setOpenChildren(!openChildren),
                     children: [
-                        { name: "Rahul Sharma (5-A)", path: "/parent/children/rahul" },
-                        { name: "Priya Sharma (2-B)", path: "/parent/children/priya" },
+                        { name: "Rahul Sharma (5-A)", path: "/parent/dashboard?studentId=1" },
+                        { name: "Priya Sharma (2-B)", path: "/parent/dashboard?studentId=2" },
                     ],
                 },
             ],
@@ -92,9 +100,20 @@ const ParentSidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
                     path: "/parent/exam-schedule"
                 },
                 {
-                    name: "Homework",
+                    name: "Homework & Assignments",
                     icon: <BiBook />,
                     path: "/parent/homework"
+                },
+                {
+                    name: "Progress Tracking",
+                    icon: <BiGridAlt />,
+                    hasSubmenu: true,
+                    isOpen: openProgress,
+                    onClick: () => setOpenProgress(!openProgress),
+                    children: [
+                        { name: "Weekly Progress", path: "/parent/weekly-progress" },
+                        { name: "Subject Analysis", path: "/parent/subject-analysis" },
+                    ],
                 }
             ],
         },
@@ -105,17 +124,16 @@ const ParentSidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
                 { name: "Attendance", icon: <BiCalendarCheck />, path: "/parent/attendance" },
                 { name: "Leave Applications", icon: <BiMessageDetail />, path: "/parent/leave" },
                 { name: "Transport", icon: <BiBus />, path: "/parent/transport" },
-                { name: "Meal Plan", icon: <BiExtension />, path: "/parent/meals" },
-                
+
             ]
         },
         {
             header: "FINANCE",
             items: [
                 { name: "Fee Details", icon: <BiMoney />, path: "/parent/fees" },
-                { name: "Payment History", icon: <BiExtension />, path: "/parent/payments" },
-                { name: "Generate Receipt", icon: <BiExtension />, path: "/parent/receipts" },
-                { name: "Quick Pay", icon: <BiExtension />, path: "/parent/quickpay" },
+                { name: "Payment History", icon: <BiHistory />, path: "/parent/payments" },
+                { name: "Generate Receipt", icon: <BiReceipt />, path: "/parent/receipts" },
+                { name: "Quick Pay", icon: <BiCreditCard />, path: "/parent/quickpay" },
             ]
         },
         {
@@ -125,6 +143,8 @@ const ParentSidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
                 { name: "School Office", icon: <BiHomeAlt />, path: "/parent/office" },
                 { name: "Messages", icon: <BiMessageDetail />, path: "/parent/messages" },
                 { name: "Announcements", icon: <BiBell />, path: "/parent/announcements" },
+                { name: "Events", icon: <BiCalendarEvent />, path: "/parent/events" },
+                { name: "PTM", icon: <BiConversation />, path: "/parent/ptm" },
             ]
         },
         {

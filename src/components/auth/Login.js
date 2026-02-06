@@ -64,7 +64,7 @@ const Login = () => {
             message: 'Logged in successfully',
             color: 'green',
           });
-          navigate('/');
+          navigate('/dashboard');
         } else if (response.data.responseCode === "HE001") {
           notifications.show({
             title: 'Error',
