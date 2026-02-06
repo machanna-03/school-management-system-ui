@@ -106,6 +106,7 @@ const ParentSidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
                 { name: "Leave Applications", icon: <BiMessageDetail />, path: "/parent/leave" },
                 { name: "Transport", icon: <BiBus />, path: "/parent/transport" },
                 { name: "Meal Plan", icon: <BiExtension />, path: "/parent/meals" },
+                
             ]
         },
         {

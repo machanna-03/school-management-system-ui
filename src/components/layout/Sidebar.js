@@ -89,6 +89,7 @@ const Sidebar = ({ collapsed }) => {
       children: [
         { name: "All Classes", path: "/classes" },
         { name: "Add New Class", path: "/classes/add" },
+        { name: 'Assign Class to Teacher', path: '/classes/assign' },
       ],
     },
     {
@@ -100,6 +101,8 @@ const Sidebar = ({ collapsed }) => {
       children: [
         { name: "All Subjects", path: "/subjects" },
         { name: "Add New Subject", path: "/subjects/add" },
+        { name: 'Assign Subject to Teacher', path: '/subjects/assign' },
+        { name: 'Assign Subject to Class', path: '/subjects/class' },
       ],
     },
     {
