@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Box, Typography, Grid, Card, CardContent, Button, Stack, Chip, Avatar, IconButton, Divider } from '@mui/material';
 import {
     BiUser,
@@ -11,6 +12,17 @@ import {
     BiPlus
 } from 'react-icons/bi';
 import { motion } from 'framer-motion';
+import {
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+    AreaChart,
+    Area
+} from 'recharts';
 
 // Mock Data matching the image exactly
 const students = [
@@ -60,10 +72,23 @@ const schedule = [
     { time: "10:30 - 11:15", subject: "Sports", room: "Ground", teacher: "Coach Singh" },
 ];
 
+
 const ParentDashboard = () => {
+    const location = useLocation();
     const [selectedStudent, setSelectedStudent] = useState(students[0]);
 
-    const StatCard = ({ title, icon, color, data }) => (
+    React.useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const studentId = params.get('studentId');
+        if (studentId) {
+            const student = students.find(s => s.id === parseInt(studentId));
+            if (student) {
+                setSelectedStudent(student);
+            }
+        }
+    }, [location.search]);
+
+    const StatCard = ({ title, icon, color, data, progress }) => (
         <Card sx={{ height: '100%', borderRadius: 4, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
             <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -87,6 +112,17 @@ const ParentDashboard = () => {
                             </Typography>
                         </Box>
                     ))}
+                    {progress && (
+                        <Box sx={{ mt: 2 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                                <Typography variant="caption" sx={{ fontWeight: 600, color }}>Progress</Typography>
+                                <Typography variant="caption" sx={{ fontWeight: 700, color: '#303972' }}>{progress}%</Typography>
+                            </Box>
+                            <Box sx={{ width: '100%', height: 6, bgcolor: '#f0f0f0', borderRadius: 3, overflow: 'hidden' }}>
+                                <Box sx={{ width: `${progress}%`, height: '100%', bgcolor: color, borderRadius: 3 }} />
+                            </Box>
+                        </Box>
+                    )}
                 </Stack>
             </CardContent>
         </Card>
@@ -168,17 +204,65 @@ const ParentDashboard = () => {
                                 data={selectedStudent.stats.fees}
                                 color="#FCC43E"
                                 icon={<BiMoney size={24} />}
+                                progress={65} // Example based on user request "65%"
                             />
                         </Grid>
                         <Grid item xs={12} sm={4}>
                             <StatCard
                                 title="Attendance"
                                 data={selectedStudent.stats.attendance}
-                                color="#fb7d5b"
+                                color="#27AE60"
                                 icon={<BiCalendarCheck size={24} />}
+                                progress={92} // Matching user request "92%"
                             />
                         </Grid>
                     </Grid>
+
+                    {/* Weekly Progress Chart */}
+                    <Box sx={{ mb: 4 }}>
+                        <Typography variant="h6" sx={{ color: '#303972', fontWeight: 700, mb: 2 }}>
+                            Weekly Progress
+                        </Typography>
+                        <Card sx={{ borderRadius: 4, boxShadow: '0 4px 20px rgba(0,0,0,0.05)', height: 300 }}>
+                            <CardContent sx={{ height: '100%', p: 3 }}>
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <AreaChart
+                                        data={[
+                                            { day: 'Mon', score: 85 },
+                                            { day: 'Tue', score: 88 },
+                                            { day: 'Wed', score: 92 },
+                                            { day: 'Thu', score: 89 },
+                                            { day: 'Fri', score: 94 },
+                                            { day: 'Sat', score: 90 },
+                                        ]}
+                                        margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                                    >
+                                        <defs>
+                                            <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#4d44b5" stopOpacity={0.3} />
+                                                <stop offset="95%" stopColor="#4d44b5" stopOpacity={0} />
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                                        <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#A098AE' }} />
+                                        <YAxis axisLine={false} tickLine={false} tick={{ fill: '#A098AE' }} domain={[0, 100]} />
+                                        <Tooltip
+                                            contentStyle={{ borderRadius: 10, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                                            cursor={{ stroke: '#4d44b5', strokeWidth: 1, strokeDasharray: '3 3' }}
+                                        />
+                                        <Area
+                                            type="monotone"
+                                            dataKey="score"
+                                            stroke="#4d44b5"
+                                            strokeWidth={3}
+                                            fillOpacity={1}
+                                            fill="url(#colorScore)"
+                                        />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            </CardContent>
+                        </Card>
+                    </Box>
 
                     {/* Schedule Section */}
                     <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -256,7 +340,12 @@ const ParentDashboard = () => {
                     {/* Recent Notifications */}
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                         <Typography variant="h6" sx={{ color: '#303972', fontWeight: 700 }}>Notifications</Typography>
-                        <Chip label="3 New" color="error" size="small" />
+                        <Box sx={{
+                            width: 24, height: 24, borderRadius: '50%', bgcolor: '#4d44b5', color: 'white',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700
+                        }}>
+                            3
+                        </Box>
                     </Box>
 
                     <Card sx={{ borderRadius: 4, height: 'fit-content', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
@@ -273,7 +362,25 @@ const ParentDashboard = () => {
                                         '&:hover': { bgcolor: '#f9fafb' }
                                     }}
                                 >
-                                    <Box sx={{ fontSize: '24px' }}>{notif.icon}</Box>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        {notif.type === 'alert' && (
+                                            <Box sx={{
+                                                width: 20, height: 20, borderRadius: '50%', bgcolor: '#E74C3C', color: 'white',
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700
+                                            }}>!</Box>
+                                        )}
+                                        {notif.type === 'achievement' && (
+                                            <Box sx={{
+                                                width: 10, height: 10, borderRadius: '50%', bgcolor: '#27AE60', mt: 0.5
+                                            }} />
+                                        )}
+                                        {notif.type === 'exam' && (
+                                            <Box sx={{
+                                                width: 20, height: 20, borderRadius: '50%', bgcolor: '#3498DB', color: 'white',
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 700
+                                            }}>3</Box>
+                                        )}
+                                    </Box>
                                     <Box>
                                         <Typography variant="body2" sx={{ fontWeight: 600, color: '#303972', lineHeight: 1.4 }}>
                                             {notif.title}
