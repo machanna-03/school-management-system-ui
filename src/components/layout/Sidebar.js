@@ -38,6 +38,9 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
   const [openSubjects, setOpenSubjects] = useState(false);
   const [openAttendance, setOpenAttendance] = useState(false);
   const [openTimeTable, setOpenTimeTable] = useState(false);
+  const [openExamSchedule, setOpenExamSchedule] = useState(false);
+  const [openClassroom, setOpenClassroom] = useState(false);
+  const [openGrades, setOpenGrades] = useState(false);
 
   const location = useLocation();
   const theme = useTheme();
@@ -125,6 +128,34 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
       onClick: () => setOpenTimeTable(!openTimeTable),
       children: [{ name: "View Time Table", path: "/timetable" }],
     },
+     {
+      name: "Exam Schedule",
+      icon: <BiTime />,
+      hasSubmenu: true,
+      isOpen: openExamSchedule,
+      onClick: () => setOpenExamSchedule(!openExamSchedule),
+      children: [
+        { name: "Create Exam ", path: "/create-exam" },
+        { name: "Exam Timetable", path: "/exam-timetable" }
+      ],
+    },
+     {
+      name: "Classroom",
+      icon: <BiTime />,
+      hasSubmenu: true,
+      isOpen: openClassroom,
+      onClick: () => setOpenClassroom(!openClassroom),
+      children: [{ name: "View Classroom", path: "/classroom" }],
+    },
+    {
+      name: "Grades",
+      icon: <BiTime />,
+      hasSubmenu: true,
+      isOpen: openGrades,
+      onClick: () => setOpenGrades(!openGrades),
+      children: [{ name: "View Grades", path: "/grades" }],
+    },
+
   ];
 
   const drawerContent = (
