@@ -4,6 +4,10 @@ import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
 import Students from './pages/students/Students';
 import StudentDetails from './pages/students/StudentDetails';
+import CreateExam from './pages/exam/CreateExam';
+import ExamTimetable from './pages/exam/ExamTimetable';
+import ViewClassroom from './pages/classroom/ViewClassroom';
+import Grade from './pages/grades/Grade';
 import AddStudent from './pages/students/AddStudent';
 import Teachers from './pages/teachers/Teachers';
 import TeacherDetails from './pages/teachers/TeacherDetails';
@@ -15,7 +19,6 @@ import AddClass from './pages/classes/AddClass';
 import Subjects from './pages/subjects/Subjects';
 import AddSubject from './pages/subjects/AddSubject';
 import Attendance from './pages/attendance/Attendance';
-import StudentAttendance from './pages/attendance/StudentAttendance';
 import TeacherAttendance from './pages/attendance/TeacherAttendance';
 import TimeTable from './pages/timetable/TimeTable';
 import Login from './components/auth/Login';
@@ -27,8 +30,8 @@ import ParentDashboard from './parentportal/pages/ParentDashboard';
 import Homework from './parentportal/pages/Homework';
 import SubjectAnalysis from './parentportal/pages/SubjectAnalysis';
 import WeeklyProgress from './parentportal/pages/WeeklyProgress';
-import Timetable from './parentportal/pages/Timetable';
-import ParentAttendance from './parentportal/pages/Attendance';
+import ParentTimetable from './parentportal/pages/ParentTimetable';
+import ParentAttendance from './parentportal/pages/ParentAttendance';
 import ParentFinance from './parentportal/pages/Finance';
 import ParentCommunication from './parentportal/pages/Communication';
 import ParentSettings from './parentportal/pages/Settings';
@@ -37,9 +40,12 @@ import ParentAchievements from './parentportal/pages/Achievements';
 import ParentReportCards from './parentportal/pages/ReportCards';
 import ParentPerformance from './parentportal/pages/Performance';
 
+
 // Student Portal Imports
 import StudentLayout from './studentportal/layout/StudentLayout';
 import StudentDashboard from './studentportal/pages/StudentDashboard';
+import StudentTimeTable from './studentportal/pages/StudentTimeTable';
+import StudentAttendance from './studentportal/pages/StudentAttendance';
 
 // Teacher Portal Imports
 import TeacherLayout from './teacherportal/layout/TeacherLayout';
@@ -102,6 +108,10 @@ const AppContent = () => {
               <Route path="/attendance/teacher" element={<TeacherAttendance />} />
 
               <Route path="/timetable" element={<TimeTable />} />
+              <Route path="/create-exam" element={<CreateExam />} />
+              <Route path="/exam-timetable" element={<ExamTimetable />} />
+              <Route path="/classroom" element={<ViewClassroom />} />
+              <Route path="/grades" element={<Grade />} />
 
               <Route path="/courses" element={<div style={{ padding: 20 }}><h2>Courses Module</h2><p>Coming soon...</p></div>} />
               <Route path="/finance" element={<div style={{ padding: 20 }}><h2>Finance Module</h2><p>Coming soon...</p></div>} />
@@ -125,7 +135,7 @@ const AppContent = () => {
               <Route path="/weekly-progress" element={<WeeklyProgress />} />
               <Route path="/subject-analysis" element={<SubjectAnalysis />} />
               <Route path="/attendance" element={<ParentAttendance />} />
-              <Route path="/timetable" element={<Timetable />} />
+              <Route path="/timetable" element={<ParentTimetable />} />
               <Route path="/exam-schedule" element={<ParentExamSchedule />} />
               <Route path="/achievements" element={<ParentAchievements />} />
               <Route path="/report-cards" element={<ParentReportCards />} />
@@ -156,9 +166,12 @@ const AppContent = () => {
         <StudentLayout>
           <Routes>
             <Route path="dashboard" element={<StudentDashboard />} />
+            <Route path="timetable" element={<StudentTimeTable />} />
+            <Route path="attendance" element={<StudentAttendance />} />
           </Routes>
         </StudentLayout>
       } />
+
 
       {/* Teacher Portal Routes */}
       <Route path="/teacher/*" element={

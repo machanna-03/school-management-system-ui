@@ -32,7 +32,8 @@ const ParentLayout = ({ children }) => {
                     flexGrow: 1,
                     display: 'flex',
                     flexDirection: 'column',
-                    minWidth: 0,
+                    // minWidth: 0,
+                    width: '100%',
                     transition: 'margin-left 0.3s',
                 }}
             >
