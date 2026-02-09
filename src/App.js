@@ -19,13 +19,40 @@ import StudentAttendance from './pages/attendance/StudentAttendance';
 import TeacherAttendance from './pages/attendance/TeacherAttendance';
 import TimeTable from './pages/timetable/TimeTable';
 import Login from './components/auth/Login';
-import Signup from './components/auth/Signup';
+// import Signup from './components/auth/Signup';
 import { AppProvider, useApp } from './context/AppContext';
 import { CookiesProvider } from 'react-cookie';
+import ParentLayout from './parentportal/layout/ParentLayout';
+import ParentDashboard from './parentportal/pages/ParentDashboard';
+import Homework from './parentportal/pages/Homework';
+import SubjectAnalysis from './parentportal/pages/SubjectAnalysis';
+import WeeklyProgress from './parentportal/pages/WeeklyProgress';
+import Timetable from './parentportal/pages/Timetable';
+import ParentAttendance from './parentportal/pages/Attendance';
+import ParentFinance from './parentportal/pages/Finance';
+import ParentCommunication from './parentportal/pages/Communication';
+import ParentSettings from './parentportal/pages/Settings';
+import ParentExamSchedule from './parentportal/pages/ExamSchedule';
+import ParentAchievements from './parentportal/pages/Achievements';
+import ParentReportCards from './parentportal/pages/ReportCards';
+import ParentPerformance from './parentportal/pages/Performance';
+
+// Student Portal Imports
+import StudentLayout from './studentportal/layout/StudentLayout';
+import StudentDashboard from './studentportal/pages/StudentDashboard';
+
+// Teacher Portal Imports
+import TeacherLayout from './teacherportal/layout/TeacherLayout';
+import TeacherDashboard from './teacherportal/pages/TeacherDashboard';
+import ClassToTeacher from './pages/classes/ClassToTeacher';
+import SubToTeacher from './pages/subjects/SubToTeacher';
+import SubToClass from './pages/subjects/SubToClass';
+import LeaveApplicant from './parentportal/pages/SchoolLife/LeaveApplicant';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { state } = useApp();
+
   if (!state.isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
@@ -38,7 +65,7 @@ const AppContent = () => {
     <Routes>
       {/* Public Routes */}
       <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
+      {/* <Route path="/signup" element={<Signup />} /> */}
 
       {/* Protected Routes */}
       <Route path="/*" element={
@@ -63,9 +90,12 @@ const AppContent = () => {
               {/* New Modules */}
               <Route path="/classes" element={<Classes />} />
               <Route path="/classes/add" element={<AddClass />} />
+              <Route path="/classes/assign" element={<ClassToTeacher />} />
 
               <Route path="/subjects" element={<Subjects />} />
               <Route path="/subjects/add" element={<AddSubject />} />
+              <Route path="/subjects/assign" element={<SubToTeacher />} />
+              <Route path="/subjects/class" element={<SubToClass />} />
 
               <Route path="/attendance" element={<Attendance />} />
               <Route path="/attendance/student" element={<StudentAttendance />} />
@@ -81,6 +111,64 @@ const AppContent = () => {
           </Layout>
         </ProtectedRoute>
       } />
+
+      {/* Parent Portal Routes */}
+      <Route path="/parent/*" element={
+        <ProtectedRoute>
+          <ParentLayout>
+            <Routes>
+              <Route path="/" element={<Navigate to="/parent/dashboard" replace />} />
+              <Route path="/dashboard" element={<ParentDashboard />} />
+              <Route path="/children" element={<div style={{ padding: 20 }}><h2>My Children</h2><p>Coming soon...</p></div>} />
+              <Route path="/academics" element={<div style={{ padding: 20 }}><h2>Academics</h2><p>Coming soon...</p></div>} />
+              <Route path="/homework" element={<Homework />} />
+              <Route path="/weekly-progress" element={<WeeklyProgress />} />
+              <Route path="/subject-analysis" element={<SubjectAnalysis />} />
+              <Route path="/attendance" element={<ParentAttendance />} />
+              <Route path="/timetable" element={<Timetable />} />
+              <Route path="/exam-schedule" element={<ParentExamSchedule />} />
+              <Route path="/achievements" element={<ParentAchievements />} />
+              <Route path="/report-cards" element={<ParentReportCards />} />
+              <Route path="/performance" element={<ParentPerformance />} />
+              <Route path="/fees" element={<ParentFinance initialTab="fees" />} />
+              <Route path="/payments" element={<ParentFinance initialTab="payments" />} />
+              <Route path="/receipts" element={<ParentFinance initialTab="receipts" />} />
+              <Route path="/quickpay" element={<ParentFinance initialTab="quickpay" />} />
+              <Route path="/teachers" element={<ParentCommunication initialTab="teachers" />} />
+              <Route path="/office" element={<ParentCommunication initialTab="office" />} />
+              <Route path="/messages" element={<ParentCommunication initialTab="messages" />} />
+              <Route path="/announcements" element={<ParentCommunication initialTab="announcements" />} />
+              <Route path="/events" element={<ParentCommunication initialTab="events" />} />
+              <Route path="/ptm" element={<ParentCommunication initialTab="ptm" />} />
+              <Route path="/settings" element={<ParentSettings initialTab="profile" />} />
+              <Route path="/profile" element={<ParentSettings initialTab="profile" />} />
+              <Route path="/security" element={<ParentSettings initialTab="security" />} />
+              <Route path="/notifications" element={<ParentSettings initialTab="notifications" />} />
+              <Route path="/help" element={<ParentSettings initialTab="help" />} />
+              <Route path="/leave" element={<LeaveApplicant />} />
+            </Routes>
+          </ParentLayout>
+        </ProtectedRoute>
+      } />
+
+      {/* Student Portal Routes */}
+      <Route path="/student/*" element={
+        <StudentLayout>
+          <Routes>
+            <Route path="dashboard" element={<StudentDashboard />} />
+          </Routes>
+        </StudentLayout>
+      } />
+
+      {/* Teacher Portal Routes */}
+      <Route path="/teacher/*" element={
+        <TeacherLayout>
+          <Routes>
+            <Route path="dashboard" element={<TeacherDashboard />} />
+          </Routes>
+        </TeacherLayout>
+      } />
+
     </Routes>
   );
 }

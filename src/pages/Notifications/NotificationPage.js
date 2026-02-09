@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Box,
   Typography,
@@ -8,12 +9,14 @@ import {
   Divider,
   Button
 } from "@mui/material";
+
 import {
   FiStar,
   FiTrash2,
   FiSettings,
   FiClock
 } from "react-icons/fi";
+
 import {
   BiLogoGmail,
   BiSend,
@@ -25,6 +28,19 @@ import {
   BiArchive,
 } from "react-icons/bi";
 
+/* ---------------- Sidebar Items ---------------- */
+const sidebarItems = [
+  { label: "Inbox", key: "inbox", icon: <BiLogoGmail size={18} /> },
+  { label: "Sent", key: "sent", icon: <BiSend size={18} /> },
+  { label: "Favorite", key: "favorite", icon: <BiStar size={18} /> },
+  { label: "Draft", key: "draft", icon: <BiFileBlank size={18} /> },
+  { label: "Important", key: "important", icon: <BiLabel size={18} /> },
+  { label: "Scheduled", key: "scheduled", icon: <BiTime size={18} /> },
+  { label: "Trash", key: "trash", icon: <BiTrash size={18} /> },
+  { label: "Archive", key: "archive", icon: <BiArchive size={18} /> },
+];
+
+/* ---------------- Notifications ---------------- */
 const notifications = [
   {
     title: "UI Design Beginner",
@@ -51,35 +67,23 @@ const notifications = [
     message: "working time in this pandemic situation...",
     time: "11:43 AM",
   },
-  {
-    title: "UI Design Beginner",
-    message: "working time in this pandemic situation...",
-    time: "11:43 AM",
-  },
 ];
 
 const NotificationPage = () => {
+  const [activeMenu, setActiveMenu] = useState("inbox");
+
   return (
-    <Box
-      display="flex"
-      height="100vh"
-      overflow="hidden"
-      bgcolor="#f6f7fb"
-    >
+    <Box display="flex" height="100vh" overflow="hidden" bgcolor="#f6f7fb">
+
       {/* ================= LEFT SIDEBAR ================= */}
       <Paper
         sx={{
-          width: 250,              // increased width
+          width: 250,
           height: "100vh",
-          p: 2,                    // reduced margin
+          p: 2,
           borderRadius: 0,
-
-          overflowY: "auto",       // scroll only here
-          overflowX: "hidden",
-
-          "&::-webkit-scrollbar": {
-            width: "4px",
-          },
+          overflowY: "auto",
+          "&::-webkit-scrollbar": { width: "4px" },
           "&::-webkit-scrollbar-thumb": {
             backgroundColor: "#cfcfe3",
             borderRadius: "4px",
@@ -102,43 +106,38 @@ const NotificationPage = () => {
         </Button>
 
         <Stack spacing={1.5}>
-          {[
-            { label: "Inbox", icon: <BiLogoGmail size={18} /> },
-            { label: "Sent", icon: <BiSend size={18} /> },
-            { label: "Favorite", icon: <BiStar size={18} /> },
-            { label: "Draft", icon: <BiFileBlank size={18} /> },
-            { label: "Important", icon: <BiLabel size={18} /> },
-            { label: "Scheduled", icon: <BiTime size={18} /> },
-            { label: "Trash", icon: <BiTrash size={18} /> },
-            { label: "Archive", icon: <BiArchive size={18} /> },
-          ].map((item, i) => (
-            <Stack
-              key={i}
-              direction="row"
-              spacing={2}
-              alignItems="center"
-              sx={{
-                p: 1.2,
-                borderRadius: "10px",
-                cursor: "pointer",
-                fontSize: 15,
-                color: item.label === "Inbox" ? "#ff6b4a" : "#555",
-                bgcolor: item.label === "Inbox" ? "#fff2ee" : "transparent",
-            transition: "background-color 0.25s ease, color 0.2s ease, transform 0.35s ease",
-                "&:hover": {
-                  bgcolor: "#fff2ee",          // light orange bg
-                  color: "#ff6b4a",            // orange text
-                },
+          {sidebarItems.map((item) => {
+            const isActive = activeMenu === item.key;
 
-                "&:hover svg": {
-                  color: "#ff6b4a",            // orange icon
-                },
-              }}
-            >
-              {item.icon}
-              <Typography fontWeight={500}>{item.label}</Typography>
-            </Stack>
-          ))}
+            return (
+              <Stack
+                key={item.key}
+                direction="row"
+                spacing={2}
+                alignItems="center"
+                onClick={() => setActiveMenu(item.key)}
+                sx={{
+                  p: 1.2,
+                  borderRadius: "10px",
+                  cursor: "pointer",
+                  fontSize: 15,
+                  color: isActive ? "#ff6b4a" : "#555",
+                  bgcolor: isActive ? "#fff2ee" : "transparent",
+                  transition: "all 0.25s ease",
+                  "&:hover": {
+                    bgcolor: "#fff2ee",
+                    color: "#ff6b4a",
+                  },
+                  "&:hover svg": {
+                    color: "#ff6b4a",
+                  },
+                }}
+              >
+                {item.icon}
+                <Typography fontWeight={500}>{item.label}</Typography>
+              </Stack>
+            );
+          })}
         </Stack>
       </Paper>
 
@@ -146,7 +145,7 @@ const NotificationPage = () => {
       <Box flex={1} overflow="hidden">
         <Paper
           sx={{
-            height: "calc(100vh - 120px)",
+            height: "100vh",
             display: "flex",
             flexDirection: "column",
             borderRadius: 0,
@@ -158,13 +157,15 @@ const NotificationPage = () => {
             sx={{
               px: 2,
               py: 1.5,
-              bgcolor: "#ffffff", // 🔹 top section color
+              bgcolor: "#ffffff",
               borderBottom: "1px solid #e6e8f0",
             }}
           >
             <Stack direction="row" spacing={2} alignItems="center">
               <Checkbox />
-              <Typography fontWeight={600}>Important</Typography>
+              <Typography fontWeight={600}>
+                {sidebarItems.find(item => item.key === activeMenu)?.label}
+              </Typography>
 
               <Box ml="auto">
                 <IconButton size="small">
@@ -184,15 +185,10 @@ const NotificationPage = () => {
           <Box
             sx={{
               flex: 1,
-              bgcolor: "#f4f6fb", // 🔹 white bottom section
+              bgcolor: "#f4f6fb",
               overflowY: "auto",
-
-              "&::-webkit-scrollbar": {
-                width: "4px",
-              },
-              "&::-webkit-scrollbar-thumb": {
-                backgroundColor: "#d0d2e0",
-              },
+              "&::-webkit-scrollbar": { width: "4px" },
+              "&::-webkit-scrollbar-thumb": { backgroundColor: "#d0d2e0" },
             }}
           >
             {notifications.map((item, index) => (
@@ -205,7 +201,7 @@ const NotificationPage = () => {
                     px: 2,
                     py: 1.2,
                     cursor: "pointer",
-                    "&:hover": { bgcolor: "#f4f6fb" },
+                    "&:hover": { bgcolor: "#eef1f8" },
                   }}
                 >
                   <Checkbox size="small" />
@@ -238,14 +234,12 @@ const NotificationPage = () => {
                     {item.time}
                   </Typography>
                 </Stack>
-
                 <Divider />
               </Box>
             ))}
           </Box>
         </Paper>
       </Box>
-
     </Box>
   );
 };
