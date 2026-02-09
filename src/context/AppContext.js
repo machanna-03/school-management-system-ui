@@ -23,7 +23,7 @@ const initialState = {
     { id: 3, name: 'Student User', role: 'Student', status: 'Active', email: 'student@school.com', avatar: 'https://i.pravatar.cc/150?img=12', class: 'Grade 10', joinDate: '2024-01-10' },
   ],
   notifications: [
-    { id: 1, type: 'System', message: 'Welcome to Akademi School Management System', status: 'Unread', date: new Date().toISOString() }
+    { id: 1, type: 'System', message: 'Welcome to School Management System', status: 'Unread', date: new Date().toISOString() }
   ],
   settings: {
     theme: 'light',

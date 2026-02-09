@@ -124,11 +124,11 @@ const TeacherDetails = () => {
                         <Box sx={{ pl: 2 }}>
                             <Stack spacing={3}>
                                 <Box>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#3d4465' }}>• History Major, University Akademi Historia</Typography>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#3d4465' }}>• History Major, University Historia</Typography>
                                     <Typography variant="body2" color="text.secondary" sx={{ ml: 2, mt: 0.5 }}>2013-2017</Typography>
                                 </Box>
                                 <Box>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#3d4465' }}>• Master of History, University Akademi Historia</Typography>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#3d4465' }}>• Master of History, University Historia</Typography>
                                     <Typography variant="body2" color="text.secondary" sx={{ ml: 2, mt: 0.5 }}>2013-2017</Typography>
                                 </Box>
                             </Stack>
