@@ -24,13 +24,14 @@ import {
     BiChevronRight,
     BiUser,
     BiLogOut,
+    BiMenu,
 } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 
-const Header = ({ toggleSidebar, collapsed }) => {
+const Header = ({ toggleSidebar, collapsed, handleDrawerToggle }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
-  const navigate = useNavigate();
+    const navigate = useNavigate();
     const handleAvatarClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -57,25 +58,45 @@ const Header = ({ toggleSidebar, collapsed }) => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                px: 2,
+                px: { xs: 2, md: 2 },
             }}
         >
             {/* Left */}
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, ml:2 }}>
-                <IconButton onClick={toggleSidebar} sx={{ p: 0.5 }}  >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, ml: { xs: 0, md: 2 } }}>
+                {/* Mobile Menu Button */}
+                <IconButton
+                    onClick={handleDrawerToggle}
+                    sx={{
+                        p: 0.5,
+                        display: { md: 'none' }, // Show only on mobile/tablet portrait
+                        color: "#3d4465"
+                    }}
+                >
+                    <BiMenu size={26} />
+                </IconButton>
+
+                {/* Desktop Collapse Button */}
+                <IconButton
+                    onClick={toggleSidebar}
+                    sx={{
+                        p: 0.5,
+                        display: { xs: 'none', md: 'inline-flex' } // Show only on desktop
+                    }}
+                >
                     {collapsed ? (
                         <BiChevronRight size={26} color="#3d4465" />
                     ) : (
                         <BiGridAlt size={26} color="#3d4465" />
                     )}
                 </IconButton>
+
                 <Typography sx={{ fontWeight: 700, fontSize: 20, color: "#3d4465", lineHeight: 1, }}>
                     Menu
                 </Typography>
             </Box>
             {/* Right */}
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <Stack direction="row" spacing={1}>
+                <Stack direction="row" spacing={1} sx={{ display: { xs: 'none', sm: 'flex' } }}>
                     {actionIcons.map((item, index) => (
                         <IconButton
                             key={index}
@@ -142,11 +163,11 @@ const Header = ({ toggleSidebar, collapsed }) => {
 
                     <Divider sx={{ my: 1 }} />
 
-                    <MenuItem 
-                 onClick={() => navigate('/profile')}>
+                    <MenuItem
+                        onClick={() => navigate('/profile')}>
                         <BiUser size={18} style={{ marginRight: 10 }} /> Profile
                     </MenuItem>
-                    <MenuItem> 
+                    <MenuItem>
                         <BiMessageDetail size={18} style={{ marginRight: 10 }} /> Message
                     </MenuItem>
                     <MenuItem

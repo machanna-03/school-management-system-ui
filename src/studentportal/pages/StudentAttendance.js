@@ -4,7 +4,7 @@ import { BiCalendar, BiBarChartAlt2, BiCheckCircle, BiXCircle, BiTimeFive } from
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, Legend } from 'recharts';
 import dayjs from 'dayjs';
 
-const Attendance = () => {
+const StudentAttendance = () => {
     const [viewMode, setViewMode] = useState('calendar'); // 'calendar', 'report'
     const [currentDate, setCurrentDate] = useState(dayjs());
 
@@ -257,4 +257,4 @@ const Attendance = () => {
     );
 };
 
-export default Attendance;
+export default StudentAttendance;

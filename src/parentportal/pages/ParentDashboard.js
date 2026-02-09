@@ -190,7 +190,7 @@ const ParentDashboard = () => {
                 <Grid item xs={12} md={8}>
                     {/* Stats Section */}
                     <Grid container spacing={3} sx={{ mb: 4 }}>
-                        <Grid item xs={12} sm={4}>
+                        <Grid item xs={12} sm={6}>
                             <StatCard
                                 title="Academics"
                                 data={selectedStudent.stats.academics}
@@ -198,7 +198,7 @@ const ParentDashboard = () => {
                                 icon={<BiBook size={24} />}
                             />
                         </Grid>
-                        <Grid item xs={12} sm={4}>
+                        <Grid item xs={12} sm={6}>
                             <StatCard
                                 title="Fee Status"
                                 data={selectedStudent.stats.fees}
@@ -207,7 +207,7 @@ const ParentDashboard = () => {
                                 progress={65} // Example based on user request "65%"
                             />
                         </Grid>
-                        <Grid item xs={12} sm={4}>
+                        <Grid item xs={12} sm={6}>
                             <StatCard
                                 title="Attendance"
                                 data={selectedStudent.stats.attendance}

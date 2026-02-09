@@ -23,8 +23,8 @@ const students = [
 
 const UnpaidStudentTuitionTable = () => {
     return (
-        <TableContainer>
-            <Table>
+        <TableContainer sx={{ overflowX: 'auto' }}>
+            <Table sx={{ minWidth: 700 }}>
                 <TableHead>
                     <TableRow>
                         <TableCell sx={{ color: 'text.secondary', fontWeight: 600 }}>Name</TableCell>
@@ -45,7 +45,7 @@ const UnpaidStudentTuitionTable = () => {
                                     >
                                         {student.img}
                                     </Avatar>
-                                    <Typography variant="body2" fontWeight={600}>{student.name}</Typography>
+                                    <Typography variant="body2" fontWeight={600} sx={{ whiteSpace: 'nowrap' }}>{student.name}</Typography>
                                 </Box>
                             </TableCell>
                             <TableCell sx={{ color: 'text.secondary' }}>#{student.id}</TableCell>
@@ -53,12 +53,14 @@ const UnpaidStudentTuitionTable = () => {
                             <TableCell sx={{ fontWeight: 600 }}>{student.fees}</TableCell>
                             <TableCell sx={{ color: 'text.secondary' }}>{student.rank}</TableCell>
                             <TableCell>
-                                <IconButton size="small">
-                                    <BiPrinter />
-                                </IconButton>
-                                <IconButton size="small">
-                                    <BiDotsHorizontalRounded />
-                                </IconButton>
+                                <Box sx={{ display: 'flex', gap: 1 }}>
+                                    <IconButton size="small">
+                                        <BiPrinter />
+                                    </IconButton>
+                                    <IconButton size="small">
+                                        <BiDotsHorizontalRounded />
+                                    </IconButton>
+                                </Box>
                             </TableCell>
                         </TableRow>
                     ))}

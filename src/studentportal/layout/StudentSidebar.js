@@ -8,7 +8,7 @@ import {
     BiBarChartAlt2, BiMessageDetail, BiLogOut, BiX, BiChevronDown, BiChevronRight
 } from "react-icons/bi";
 import { Link, useLocation } from "react-router-dom";
-import logo from "../../assests/GMs-logo.png";
+import logo from "../../assets/GMs-logo.png";
 
 const sidebarWidth = 280;
 

@@ -8,40 +8,43 @@ import {
   ListItemText,
   Typography,
   Collapse,
+  Drawer,
+  IconButton,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import {
   BiHomeAlt,
   BiUser,
   BiChalkboard,
-  BiDish,
-  BiFolder,
-  BiGridAlt,
-  BiBarChartSquare,
-  BiHeart,
-  BiExtension,
-  BiTable,
-  BiChevronRight,
-  BiChevronDown,
-  BiTime,
-  BiCalendarCheck,
   BiBook,
   BiBookContent,
+  BiCalendarCheck,
+  BiTime,
+  BiChevronRight,
+  BiChevronDown,
+  BiX,
 } from "react-icons/bi";
-import { IoMdListBox } from "react-icons/io";
 import { Link, useLocation } from "react-router-dom";
-import logo from "../../assests/GMs-logo.png";
+import logo from "../../assets/GMs-logo.png";
 
-const Sidebar = ({ collapsed }) => {
+const sidebarWidth = 280;
+
+const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
   const [openDashboard, setOpenDashboard] = useState(false);
   const [openStudent, setOpenStudent] = useState(true);
   const [openTeacher, setOpenTeacher] = useState(true);
-
   const [openClasses, setOpenClasses] = useState(false);
   const [openSubjects, setOpenSubjects] = useState(false);
   const [openAttendance, setOpenAttendance] = useState(false);
   const [openTimeTable, setOpenTimeTable] = useState(false);
+  const [openExamSchedule, setOpenExamSchedule] = useState(false);
+  const [openClassroom, setOpenClassroom] = useState(false);
+  const [openGrades, setOpenGrades] = useState(false);
 
   const location = useLocation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md")); // Tablet portrait & Mobile (< 900px)
 
   const menuItems = [
     {
@@ -89,7 +92,7 @@ const Sidebar = ({ collapsed }) => {
       children: [
         { name: "All Classes", path: "/classes" },
         { name: "Add New Class", path: "/classes/add" },
-        { name: 'Assign Class to Teacher', path: '/classes/assign' },
+        { name: "Assign Class to Teacher", path: "/classes/assign" },
       ],
     },
     {
@@ -101,8 +104,8 @@ const Sidebar = ({ collapsed }) => {
       children: [
         { name: "All Subjects", path: "/subjects" },
         { name: "Add New Subject", path: "/subjects/add" },
-        { name: 'Assign Subject to Teacher', path: '/subjects/assign' },
-        { name: 'Assign Subject to Class', path: '/subjects/class' },
+        { name: "Assign Subject to Teacher", path: "/subjects/assign" },
+        { name: "Assign Subject to Class", path: "/subjects/class" },
       ],
     },
     {
@@ -125,26 +128,46 @@ const Sidebar = ({ collapsed }) => {
       onClick: () => setOpenTimeTable(!openTimeTable),
       children: [{ name: "View Time Table", path: "/timetable" }],
     },
+     {
+      name: "Exam Schedule",
+      icon: <BiTime />,
+      hasSubmenu: true,
+      isOpen: openExamSchedule,
+      onClick: () => setOpenExamSchedule(!openExamSchedule),
+      children: [
+        { name: "Create Exam ", path: "/create-exam" },
+        { name: "Exam Timetable", path: "/exam-timetable" }
+      ],
+    },
+     {
+      name: "Classroom",
+      icon: <BiTime />,
+      hasSubmenu: true,
+      isOpen: openClassroom,
+      onClick: () => setOpenClassroom(!openClassroom),
+      children: [{ name: "View Classroom", path: "/classroom" }],
+    },
+    {
+      name: "Grades",
+      icon: <BiTime />,
+      hasSubmenu: true,
+      isOpen: openGrades,
+      onClick: () => setOpenGrades(!openGrades),
+      children: [{ name: "View Grades", path: "/grades" }],
+    },
+
   ];
 
-  return (
+  const drawerContent = (
     <Box
       sx={{
-        width: collapsed ? 80 : 280,
-        height: "100vh",
+        height: "100%",
         bgcolor: "#4d44b5",
         color: "#c0beea",
-        position: "fixed",
-        left: 0,
-        top: 0,
         display: "flex",
         flexDirection: "column",
-        zIndex: 1200,
         overflowY: "auto",
         overflowX: "hidden",
-        padding: 0,
-        margin: 0,
-        transition: "width 0.3s",
         "&::-webkit-scrollbar": {
           width: 0,
         },
@@ -157,15 +180,15 @@ const Sidebar = ({ collapsed }) => {
           display: "flex",
           alignItems: "center",
           gap: 1,
-          px: collapsed ? 2.5 : 3,
+          px: collapsed && !isMobile ? 2.5 : 3, // Adjust padding when collapsed on desktop
           minHeight: 90,
           transition: "padding 0.3s",
         }}
       >
         <Box
           sx={{
-            width: collapsed ? 40 : 64,
-            height: collapsed ? 40 : 64,
+            width: collapsed && !isMobile ? 40 : 64,
+            height: collapsed && !isMobile ? 40 : 64,
             bgcolor: "#fefefe",
             borderRadius: "12px",
             display: "flex",
@@ -189,18 +212,27 @@ const Sidebar = ({ collapsed }) => {
           />
         </Box>
 
-        {!collapsed && (
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: 700,
-              color: "#fff",
-              fontSize: "24px",
-              whiteSpace: "nowrap",
-            }}
-          >
-            GetMySchool
-          </Typography>
+        {(!collapsed || isMobile) && (
+          <Box sx={{ flexGrow: 1 }}>
+            <Typography
+              variant="h4"
+              sx={{
+                fontWeight: 700,
+                color: "#fff",
+                fontSize: "24px",
+                whiteSpace: "nowrap",
+              }}
+            >
+              GetMySchool
+            </Typography>
+          </Box>
+        )}
+
+        {/* Close Button for Mobile */}
+        {isMobile && (
+          <IconButton onClick={handleDrawerToggle} sx={{ color: "white", ml: "auto" }}>
+            <BiX />
+          </IconButton>
         )}
       </Box>
 
@@ -212,10 +244,7 @@ const Sidebar = ({ collapsed }) => {
               <ListItemButton
                 onClick={item.onClick}
                 sx={{
-                  borderRadius:
-                    item.name === "Dashboard"
-                      ? "0 50px 50px 0"
-                      : "0 50px 50px 0",
+                  borderRadius: "0 50px 50px 0",
                   ml: -2,
                   pl: 4,
                   px: 2,
@@ -225,7 +254,7 @@ const Sidebar = ({ collapsed }) => {
                       ? "rgba(255,255,255,0.1)"
                       : "transparent",
                   color: item.name === "Dashboard" ? "#fff" : "#c0beea",
-                  justifyContent: collapsed ? "center" : "initial",
+                  justifyContent: collapsed && !isMobile ? "center" : "initial",
                   "&:hover": {
                     bgcolor: "rgba(255,255,255,0.05)",
                     color: "#fff",
@@ -238,12 +267,12 @@ const Sidebar = ({ collapsed }) => {
                     minWidth: 34,
                     fontSize: 24,
                     justifyContent: "center",
-                    mr: collapsed ? 0 : 2,
+                    mr: collapsed && !isMobile ? 0 : 2,
                   }}
                 >
                   {item.icon}
                 </ListItemIcon>
-                {!collapsed && (
+                {(!collapsed || isMobile) && (
                   <>
                     <ListItemText
                       primary={item.name}
@@ -251,16 +280,13 @@ const Sidebar = ({ collapsed }) => {
                     />
                     {item.hasSubmenu &&
                       (item.isOpen ? <BiChevronDown /> : <BiChevronRight />)}
-                    {item.hasArrow && (
-                      <BiChevronRight style={{ opacity: 0.5 }} />
-                    )}
                   </>
                 )}
               </ListItemButton>
             </ListItem>
 
             {/* Submenu */}
-            {!collapsed && item.hasSubmenu && (
+            {(!collapsed || isMobile) && item.hasSubmenu && (
               <Collapse in={item.isOpen} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
                   {item.children.map((child, idx) => {
@@ -295,14 +321,53 @@ const Sidebar = ({ collapsed }) => {
       </List>
 
       {/* Footer Text */}
-      {!collapsed && (
+      {(!collapsed || isMobile) && (
         <Box sx={{ p: 4, textAlign: "center", mt: "auto", mb: 2 }}>
           <Typography variant="caption" sx={{ color: "#8d87d3" }}>
-             - School Admission Dashboard
+            - School Admission Dashboard
             <br />
           </Typography>
         </Box>
       )}
+    </Box>
+  );
+
+  return (
+    <Box component="nav" sx={{ width: { md: collapsed ? 80 : sidebarWidth }, flexShrink: { md: 0 } }}>
+      {/* Mobile / Tablet Portrait Drawer */}
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={handleDrawerToggle}
+        ModalProps={{
+          keepMounted: true, // Better open performance on mobile.
+        }}
+        sx={{
+          display: { xs: "block", md: "none" },
+          "& .MuiDrawer-paper": { boxSizing: "border-box", width: sidebarWidth, border: "none" },
+        }}
+      >
+        {drawerContent}
+      </Drawer>
+
+      {/* Desktop / Tablet Landscape Box (Reverted from Permanent Drawer) */}
+      <Box
+        sx={{
+          display: { xs: "none", md: "block" },
+          width: collapsed ? 80 : sidebarWidth,
+          transition: "width 0.3s",
+          overflowX: "hidden",
+          height: "100vh",
+          position: "fixed", // Keeping it fixed to ensure it stays in place
+          top: 0,
+          left: 0,
+          borderRight: "none",
+          bgcolor: "#4d44b5",
+          zIndex: 1200
+        }}
+      >
+        {drawerContent}
+      </Box>
     </Box>
   );
 };

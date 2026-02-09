@@ -22,8 +22,8 @@ const teachers = [
 
 const TeacherDetailsTable = () => {
     return (
-        <TableContainer>
-            <Table>
+        <TableContainer sx={{ overflowX: 'auto' }}>
+            <Table sx={{ minWidth: 600 }}>
                 <TableHead>
                     <TableRow>
                         <TableCell sx={{ color: 'text.secondary', fontWeight: 600 }}>Name</TableCell>
@@ -43,12 +43,12 @@ const TeacherDetailsTable = () => {
                                     >
                                         {teacher.name.charAt(0)}
                                     </Avatar>
-                                    <Typography variant="body2" fontWeight={600}>{teacher.name}</Typography>
+                                    <Typography variant="body2" fontWeight={600} sx={{ whiteSpace: 'nowrap' }}>{teacher.name}</Typography>
                                 </Box>
                             </TableCell>
                             <TableCell>{teacher.subject}</TableCell>
                             <TableCell>{teacher.qualification}</TableCell>
-                            <TableCell sx={{ width: 200 }}>
+                            <TableCell sx={{ width: 200, minWidth: 200 }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <LinearProgress
                                         variant="determinate"
