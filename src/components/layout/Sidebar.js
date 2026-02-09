@@ -125,16 +125,6 @@ const Sidebar = ({ collapsed }) => {
       onClick: () => setOpenTimeTable(!openTimeTable),
       children: [{ name: "View Time Table", path: "/timetable" }],
     },
-
-    { name: "Food", icon: <BiDish />, hasArrow: true },
-    { name: "File Manager", icon: <BiFolder />, hasArrow: true },
-    { name: "Apps", icon: <BiGridAlt />, hasArrow: true },
-    { name: "Charts", icon: <BiBarChartSquare />, hasArrow: true },
-    { name: "Bootstrap", icon: <BiHeart />, hasArrow: true },
-    { name: "Plugins", icon: <BiExtension />, hasArrow: true },
-    { name: "Widget", icon: <BiGridAlt />, hasArrow: true },
-    { name: "Forms", icon: <IoMdListBox />, hasArrow: true },
-    { name: "Table", icon: <BiTable />, hasArrow: true },
   ];
 
   return (
@@ -308,9 +298,8 @@ const Sidebar = ({ collapsed }) => {
       {!collapsed && (
         <Box sx={{ p: 4, textAlign: "center", mt: "auto", mb: 2 }}>
           <Typography variant="caption" sx={{ color: "#8d87d3" }}>
-            Akademi - School Admission Dashboard
+             - School Admission Dashboard
             <br />
-            Made with ♥ by Peterdraw
           </Typography>
         </Box>
       )}
