@@ -79,7 +79,7 @@ export const apiList = {
     deleteUser: "/deleteUser",
 
     //Sign-Up
-    signup: "/signup",
+    signup: "/register",
 
     // traffic tracking
     addWebTraffic: "/web/addWebTraffic",
