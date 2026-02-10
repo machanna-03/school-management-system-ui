@@ -73,7 +73,6 @@ const AppContent = () => {
     <Routes>
       {/* Public Routes */}
       <Route path="/login" element={<Login />} />
-      {/* <Route path="/signup" element={<Signup />} /> */}
 
       {/* Protected Routes */}
       <Route path="/*" element={
