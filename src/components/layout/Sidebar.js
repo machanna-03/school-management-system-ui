@@ -20,6 +20,8 @@ import {
   BiBook,
   BiBookContent,
   BiCalendarCheck,
+  BiBuilding,
+  BiBarChart,
   BiTime,
   BiChevronRight,
   BiChevronDown,
@@ -39,8 +41,8 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
   const [openAttendance, setOpenAttendance] = useState(false);
   const [openTimeTable, setOpenTimeTable] = useState(false);
   const [openExamSchedule, setOpenExamSchedule] = useState(false);
-  const [openClassroom, setOpenClassroom] = useState(false);
   const [openGrades, setOpenGrades] = useState(false);
+  const [openClassroom, setOpenClassroom] = useState(false);
 
   const location = useLocation();
   const theme = useTheme();
@@ -128,32 +130,28 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
       onClick: () => setOpenTimeTable(!openTimeTable),
       children: [{ name: "View Time Table", path: "/timetable" }],
     },
-     {
+    {
       name: "Exam Schedule",
-      icon: <BiTime />,
+      icon: <BiCalendarCheck />,
       hasSubmenu: true,
       isOpen: openExamSchedule,
       onClick: () => setOpenExamSchedule(!openExamSchedule),
       children: [
         { name: "Create Exam ", path: "/create-exam" },
-        { name: "Exam Timetable", path: "/exam-timetable" }
+        { name: "Exam Timetable", path: "/exam-timetable" },
+        { name: "Student Exam Marks", path: "/exam-marks  " },
+        { name: "Student Exam Marks History", path: "/exam-history" }
       ],
     },
-     {
+    {
       name: "Classroom",
-      icon: <BiTime />,
-      hasSubmenu: true,
-      isOpen: openClassroom,
-      onClick: () => setOpenClassroom(!openClassroom),
-      children: [{ name: "View Classroom", path: "/classroom" }],
+      path: "/classroom",
+      icon: <BiBuilding />,
     },
     {
       name: "Grades",
-      icon: <BiTime />,
-      hasSubmenu: true,
-      isOpen: openGrades,
-      onClick: () => setOpenGrades(!openGrades),
-      children: [{ name: "View Grades", path: "/grades" }],
+      path: "/grades",
+      icon: <BiBarChart />,
     },
 
   ];
@@ -242,7 +240,9 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
           <React.Fragment key={index}>
             <ListItem disablePadding sx={{ mb: 0.5, display: "block" }}>
               <ListItemButton
-                onClick={item.onClick}
+                component={item.path ? Link : "button"}
+                to={item.path || undefined}
+                onClick={item.hasSubmenu ? item.onClick : undefined}
                 sx={{
                   borderRadius: "0 50px 50px 0",
                   ml: -2,
@@ -250,10 +250,13 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
                   px: 2,
                   py: 1.2,
                   bgcolor:
-                    item.name === "Dashboard"
-                      ? "rgba(255,255,255,0.1)"
+                    location.pathname === item.path
+                      ? "rgba(255,255,255,0.15)"
                       : "transparent",
-                  color: item.name === "Dashboard" ? "#fff" : "#c0beea",
+                  color:
+                    location.pathname === item.path
+                      ? "#fff"
+                      : "#c0beea",
                   justifyContent: collapsed && !isMobile ? "center" : "initial",
                   "&:hover": {
                     bgcolor: "rgba(255,255,255,0.05)",
