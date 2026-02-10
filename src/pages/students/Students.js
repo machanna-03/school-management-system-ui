@@ -49,9 +49,6 @@ const Students = () => {
                         <MenuItem value="newest">Newest</MenuItem>
                         <MenuItem value="oldest">Oldest</MenuItem>
                     </Select>
-                    <Button variant="contained" component={Link} to="/students/add" startIcon={<BiPlus size={18} />}>
-                        New Student
-                    </Button>
                 </Stack>
             </Box>
 

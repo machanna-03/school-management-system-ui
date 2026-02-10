@@ -56,6 +56,8 @@ import ClassToTeacher from './pages/classes/ClassToTeacher';
 import SubToTeacher from './pages/subjects/SubToTeacher';
 import SubToClass from './pages/subjects/SubToClass';
 import LeaveApplicant from './parentportal/pages/SchoolLife/LeaveApplicant';
+import ApplicationForm from './pages/admission/ApplicationForm';
+import Admission from './pages/admission/Admission';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -73,7 +75,6 @@ const AppContent = () => {
     <Routes>
       {/* Public Routes */}
       <Route path="/login" element={<Login />} />
-      {/* <Route path="/signup" element={<Signup />} /> */}
 
       {/* Protected Routes */}
       <Route path="/*" element={
@@ -117,10 +118,8 @@ const AppContent = () => {
               <Route path="/classroom" element={<Classroom />} />
               <Route path="/grades" element={<Grades />} />
 
-              <Route path="/courses" element={<div style={{ padding: 20 }}><h2>Courses Module</h2><p>Coming soon...</p></div>} />
-              <Route path="/finance" element={<div style={{ padding: 20 }}><h2>Finance Module</h2><p>Coming soon...</p></div>} />
-              <Route path="/events" element={<div style={{ padding: 20 }}><h2>Events Module</h2><p>Coming soon...</p></div>} />
-              <Route path="/food" element={<div style={{ padding: 20 }}><h2>Food Module</h2><p>Coming soon...</p></div>} />
+              <Route path="/admission" element={<Admission />} />
+              <Route path="/admission/application-form" element={<ApplicationForm />} />
             </Routes>
           </Layout>
         </ProtectedRoute>
