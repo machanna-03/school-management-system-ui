@@ -6,8 +6,10 @@ import Students from './pages/students/Students';
 import StudentDetails from './pages/students/StudentDetails';
 import CreateExam from './pages/exam/CreateExam';
 import ExamTimetable from './pages/exam/ExamTimetable';
-import ViewClassroom from './pages/classroom/ViewClassroom';
-import Grade from './pages/grades/Grade';
+import StudentMarks from './pages/exam/StudentMarks';
+import StudentMarksHistory from './pages/exam/StudentMarksHistory';
+import Classroom from './pages/Classroom';
+import Grades from './pages/Grades';
 import AddStudent from './pages/students/AddStudent';
 import Teachers from './pages/teachers/Teachers';
 import TeacherDetails from './pages/teachers/TeacherDetails';
@@ -71,7 +73,6 @@ const AppContent = () => {
     <Routes>
       {/* Public Routes */}
       <Route path="/login" element={<Login />} />
-      {/* <Route path="/signup" element={<Signup />} /> */}
 
       {/* Protected Routes */}
       <Route path="/*" element={
@@ -110,8 +111,10 @@ const AppContent = () => {
               <Route path="/timetable" element={<TimeTable />} />
               <Route path="/create-exam" element={<CreateExam />} />
               <Route path="/exam-timetable" element={<ExamTimetable />} />
-              <Route path="/classroom" element={<ViewClassroom />} />
-              <Route path="/grades" element={<Grade />} />
+              <Route path="/exam-marks" element={<StudentMarks />} />
+              <Route path="/exam-history" element={<StudentMarksHistory />} />
+              <Route path="/classroom" element={<Classroom />} />
+              <Route path="/grades" element={<Grades />} />
 
               <Route path="/courses" element={<div style={{ padding: 20 }}><h2>Courses Module</h2><p>Coming soon...</p></div>} />
               <Route path="/finance" element={<div style={{ padding: 20 }}><h2>Finance Module</h2><p>Coming soon...</p></div>} />

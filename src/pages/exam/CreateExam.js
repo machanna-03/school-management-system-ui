@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Card,
@@ -11,6 +12,8 @@ import {
 } from "@mui/material";
 
 const CreateExam = () => {
+  const navigate = useNavigate();
+
   const [examData, setExamData] = useState({
     examName: "",
     academicYear: "",
@@ -18,7 +21,11 @@ const CreateExam = () => {
     examType: "",
     startDate: "",
     endDate: "",
-    totalMarks: ""
+    totalMarks: "",
+    subject: "",
+    examDate: "",
+    startTime: "",
+    endTime: ""
   });
 
   const handleChange = (e) => {
@@ -30,8 +37,10 @@ const CreateExam = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Exam Data:", examData);
-    // API call will go here
+
+    navigate("/exam-timetable", {
+      state: examData
+    });
   };
 
   return (
@@ -43,14 +52,16 @@ const CreateExam = () => {
       <Card>
         <CardContent>
           <Typography variant="h6" mb={3}>
-            Create New Exam
+            Exam Details
           </Typography>
 
           <form onSubmit={handleSubmit}>
             <Grid container spacing={2}>
+              {/* Exam Info */}
               <Grid item xs={12}>
                 <TextField
                   fullWidth
+                  size="small"
                   label="Exam Name"
                   name="examName"
                   value={examData.examName}
@@ -61,6 +72,7 @@ const CreateExam = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
+                  size="small"
                   select
                   label="Academic Year"
                   name="academicYear"
@@ -75,34 +87,29 @@ const CreateExam = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  select
-                  label="Select Class"
+                  size="small"
+                  label="Class"
                   name="className"
                   value={examData.className}
                   onChange={handleChange}
-                >
-                  <MenuItem value="Class 5">Class 5</MenuItem>
-                  <MenuItem value="Class 6">Class 6</MenuItem>
-                </TextField>
+                />
               </Grid>
 
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  select
+                  size="small"
                   label="Exam Type"
                   name="examType"
                   value={examData.examType}
                   onChange={handleChange}
-                >
-                  <MenuItem value="Written Exam">Written Exam</MenuItem>
-                  <MenuItem value="Online Exam">Online Exam</MenuItem>
-                </TextField>
+                />
               </Grid>
 
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
+                  size="small"
                   type="date"
                   label="Start Date"
                   name="startDate"
@@ -115,6 +122,7 @@ const CreateExam = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
+                  size="small"
                   type="date"
                   label="End Date"
                   name="endDate"
@@ -127,10 +135,68 @@ const CreateExam = () => {
               <Grid item xs={12}>
                 <TextField
                   fullWidth
+                  size="small"
                   type="number"
                   label="Total Marks"
                   name="totalMarks"
                   value={examData.totalMarks}
+                  onChange={handleChange}
+                />
+              </Grid>
+
+              {/* Timetable Section */}
+              <Grid item xs={12}>
+                <Typography variant="h6" mt={2}>
+                  Exam Timetable
+                </Typography>
+              </Grid>
+
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Subject"
+                  name="subject"
+                  value={examData.subject}
+                  onChange={handleChange}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  type="date"
+                  label="Exam Date"
+                  name="examDate"
+                  InputLabelProps={{ shrink: true }}
+                  value={examData.examDate}
+                  onChange={handleChange}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={2}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  type="time"
+                  label="Start Time"
+                  name="startTime"
+                  InputLabelProps={{ shrink: true }}
+                  value={examData.startTime}
+                  onChange={handleChange}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={2}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  type="time"
+                  label="End Time"
+                  name="endTime"
+                  InputLabelProps={{ shrink: true }}
+                  value={examData.endTime}
                   onChange={handleChange}
                 />
               </Grid>
