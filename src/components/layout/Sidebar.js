@@ -25,6 +25,7 @@ import {
   BiTime,
   BiChevronRight,
   BiChevronDown,
+  BiUserPlus,
   BiX,
 } from "react-icons/bi";
 import { Link, useLocation } from "react-router-dom";
@@ -34,12 +35,13 @@ const sidebarWidth = 280;
 
 const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
   const [openDashboard, setOpenDashboard] = useState(false);
-  const [openStudent, setOpenStudent] = useState(true);
-  const [openTeacher, setOpenTeacher] = useState(true);
+  const [openStudent, setOpenStudent] = useState(false);
+  const [openTeacher, setOpenTeacher] = useState(false);
   const [openClasses, setOpenClasses] = useState(false);
   const [openSubjects, setOpenSubjects] = useState(false);
   const [openAttendance, setOpenAttendance] = useState(false);
   const [openTimeTable, setOpenTimeTable] = useState(false);
+  const [openAdmission, setOpenAdmission] = useState(false);
   const [openExamSchedule, setOpenExamSchedule] = useState(false);
   const [openGrades, setOpenGrades] = useState(false);
   const [openClassroom, setOpenClassroom] = useState(false);
@@ -131,6 +133,18 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
       children: [{ name: "View Time Table", path: "/timetable" }],
     },
     {
+      name: "Admission",
+      icon: <BiUserPlus />,
+      hasSubmenu: true,
+      isOpen: openAdmission,
+      onClick: () => setOpenAdmission(!openAdmission),
+      children: [
+        { name: "Admission", path: "/admission" },
+        { name: "Application Form", path: "/admission/application-form" },
+        { name: "Application List", path: "/admission/application-list" }
+      ],
+    },
+     {
       name: "Exam Schedule",
       icon: <BiCalendarCheck />,
       hasSubmenu: true,

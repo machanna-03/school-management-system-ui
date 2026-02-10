@@ -53,7 +53,6 @@ const AddStudent = () => {
                                     <Typography variant="subtitle2" sx={{ mb: 1, color: '#3d4465', fontWeight: 600 }}>Date & Place of Birth *</Typography>
                                     <Box sx={{ display: 'flex', gap: 2 }}>
                                         <TextField type="date" fullWidth variant="outlined" InputProps={{ sx: { borderRadius: 2 } }} />
-                                        <TextField placeholder="Place" fullWidth variant="outlined" InputProps={{ sx: { borderRadius: 2 } }} />
                                     </Box>
                                 </Grid>
                                 <Grid item xs={12} md={6}>
@@ -82,12 +81,12 @@ const AddStudent = () => {
                     <Typography variant="h5" sx={{ mb: 3, fontWeight: 700, color: '#3d4465' }}>Parent Details</Typography>
                     <Grid container spacing={3}>
                         <Grid item xs={12} md={6}>
-                            <Typography variant="subtitle2" sx={{ mb: 1, color: '#3d4465', fontWeight: 600 }}>First Name *</Typography>
+                            <Typography variant="subtitle2" sx={{ mb: 1, color: '#3d4465', fontWeight: 600 }}>Parent Name *</Typography>
                             <TextField fullWidth placeholder="First Name" variant="outlined" InputProps={{ sx: { borderRadius: 2 } }} />
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <Typography variant="subtitle2" sx={{ mb: 1, color: '#3d4465', fontWeight: 600 }}>Last Name *</Typography>
-                            <TextField fullWidth placeholder="Last Name" variant="outlined" InputProps={{ sx: { borderRadius: 2 } }} />
+                            <Typography variant="subtitle2" sx={{ mb: 1, color: '#3d4465', fontWeight: 600 }}>Relation *</Typography>
+                            <TextField fullWidth placeholder="Relation" variant="outlined" InputProps={{ sx: { borderRadius: 2 } }} />
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <Typography variant="subtitle2" sx={{ mb: 1, color: '#3d4465', fontWeight: 600 }}>Email *</Typography>
@@ -96,10 +95,6 @@ const AddStudent = () => {
                         <Grid item xs={12} md={6}>
                             <Typography variant="subtitle2" sx={{ mb: 1, color: '#3d4465', fontWeight: 600 }}>Phone *</Typography>
                             <TextField fullWidth placeholder="Phone" variant="outlined" InputProps={{ sx: { borderRadius: 2 } }} />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Typography variant="subtitle2" sx={{ mb: 1, color: '#3d4465', fontWeight: 600 }}>Address *</Typography>
-                            <TextField multiline rows={4} fullWidth placeholder="Address" variant="outlined" InputProps={{ sx: { borderRadius: 2 } }} />
                         </Grid>
                     </Grid>
                 </Box>
