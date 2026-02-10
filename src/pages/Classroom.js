@@ -16,73 +16,66 @@ import {
   Stack
 } from "@mui/material";
 
-const Grade = () => {
-  const [grade, setGrade] = useState("");
-  const [admissionFee, setAdmissionFee] = useState("");
-  const [hallCharge, setHallCharge] = useState("");
-
-  const [grades, setGrades] = useState([
-    { id: 1, grade: "Grade 1", fee: 1000, hall: 25 },
-    { id: 2, grade: "Grade 2", fee: 1000, hall: 25 },
-    { id: 3, grade: "Grade 3", fee: 1000, hall: 25 },
-    { id: 4, grade: "Grade 4", fee: 1777, hall: 15 }
+const Classroom = () => {
+  const [className, setClassName] = useState("");
+  const [studentCount, setStudentCount] = useState("");
+  const [classrooms, setClassrooms] = useState([
+    { id: 1, name: "Class A", count: 750 },
+    { id: 2, name: "Class B", count: 500 },
+    { id: 3, name: "Class C", count: 850 }
   ]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!grade || !admissionFee || !hallCharge) return;
+    if (!className || !studentCount) return;
 
-    setGrades([
-      ...grades,
+    setClassrooms([
+      ...classrooms,
       {
-        id: grades.length + 1,
-        grade,
-        fee: admissionFee,
-        hall: hallCharge
+        id: classrooms.length + 1,
+        name: className,
+        count: studentCount
       }
     ]);
 
-    setGrade("");
-    setAdmissionFee("");
-    setHallCharge("");
+    setClassName("");
+    setStudentCount("");
+  };
+
+  const handleDelete = (id) => {
+    setClassrooms(classrooms.filter((item) => item.id !== id));
   };
 
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h5" fontWeight="bold" mb={2}>
-        Grade Management
+        Classroom Management
       </Typography>
 
-      {/* Add Grade Form */}
+      {/* Add Classroom Form */}
       <Card sx={{ mb: 4 }}>
         <CardContent>
           <Typography variant="h6" mb={2}>
-            Add Grade
+            Add Classroom
           </Typography>
 
           <form onSubmit={handleSubmit}>
-            <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
               <TextField
-                label="Grade"
-                value={grade}
-                onChange={(e) => setGrade(e.target.value)}
+              size="small"
+                label="Classroom Name"
+                value={className}
+                onChange={(e) => setClassName(e.target.value)}
                 fullWidth
               />
 
               <TextField
-                label="Admission Fee"
+              size="small"
+                label="Student Count"
                 type="number"
-                value={admissionFee}
-                onChange={(e) => setAdmissionFee(e.target.value)}
-                fullWidth
-              />
-
-              <TextField
-                label="Hall Charge (%)"
-                type="number"
-                value={hallCharge}
-                onChange={(e) => setHallCharge(e.target.value)}
+                value={studentCount}
+                onChange={(e) => setStudentCount(e.target.value)}
                 fullWidth
               />
 
@@ -98,11 +91,11 @@ const Grade = () => {
         </CardContent>
       </Card>
 
-      {/* Grade Table */}
+      {/* Classroom Table */}
       <Card>
         <CardContent>
           <Typography variant="h6" mb={2}>
-            All Grades
+            All Classrooms
           </Typography>
 
           <TableContainer component={Paper}>
@@ -110,35 +103,30 @@ const Grade = () => {
               <TableHead>
                 <TableRow>
                   <TableCell>ID</TableCell>
-                  <TableCell>Grade</TableCell>
-                  <TableCell>Admission Fee (₹)</TableCell>
-                  <TableCell>Hall Charge (%)</TableCell>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Student Count</TableCell>
                   <TableCell align="center">Action</TableCell>
                 </TableRow>
               </TableHead>
 
               <TableBody>
-                {grades.map((row) => (
+                {classrooms.map((row) => (
                   <TableRow key={row.id}>
                     <TableCell>{row.id}</TableCell>
-                    <TableCell>{row.grade}</TableCell>
-                    <TableCell>{row.fee}</TableCell>
-                    <TableCell>{row.hall}</TableCell>
+                    <TableCell>{row.name}</TableCell>
+                    <TableCell>{row.count}</TableCell>
                     <TableCell align="center">
-                      <Stack
-                        direction="row"
-                        spacing={1}
-                        alignItems="center"
-                      >
+                      <Stack direction="row" spacing={1} justifyContent="center">
                         <Button size="small" variant="contained">
                           Edit
                         </Button>
                         <Button
                           size="small"
                           variant="contained"
-                          sx={{ bgcolor: "#f9a825" }}
+                          color="error"
+                          onClick={() => handleDelete(row.id)}
                         >
-                          View & Mark
+                          Delete
                         </Button>
                       </Stack>
                     </TableCell>
@@ -153,4 +141,4 @@ const Grade = () => {
   );
 };
 
-export default Grade;
+export default Classroom;
