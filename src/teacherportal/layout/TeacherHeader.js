@@ -1,6 +1,9 @@
 import React from 'react';
 import { Box, IconButton, AppBar, Toolbar, Typography, Avatar, Badge, Menu, MenuItem, Stack } from '@mui/material';
 import { BiMenu, BiBell, BiChevronDown } from 'react-icons/bi';
+import { useCookies } from 'react-cookie';
+import { useNavigate } from 'react-router-dom';
+import { config } from '../../config/Config';
 
 const TeacherHeader = ({ collapsed, toggleSidebar, handleDrawerToggle }) => {
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -11,6 +14,17 @@ const TeacherHeader = ({ collapsed, toggleSidebar, handleDrawerToggle }) => {
 
     const handleMenuClose = () => {
         setAnchorEl(null);
+    };
+
+    const navigate = useNavigate();
+    const [cookies, setCookie, removeCookie] = useCookies([config.cookieName]);
+
+    const handleLogout = () => {
+        handleMenuClose();
+        removeCookie(config.cookieName, { path: '/' });
+        localStorage.removeItem('userInfo');
+        localStorage.removeItem('sms-data');
+        navigate('/login');
     };
 
     return (
@@ -105,7 +119,7 @@ const TeacherHeader = ({ collapsed, toggleSidebar, handleDrawerToggle }) => {
                     >
                         <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
                         <MenuItem onClick={handleMenuClose}>Account Settings</MenuItem>
-                        <MenuItem onClick={handleMenuClose} sx={{ color: 'error.main' }}>Logout</MenuItem>
+                        <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>Logout</MenuItem>
                     </Menu>
                 </Stack>
             </Toolbar>

@@ -33,8 +33,7 @@ const Login = () => {
     try {
       let response = await invokeApi(
         config.getMySchool + apiList.userLogin,
-        params,
-        cookies
+        params
       );
 
       if (response?.status >= 200 && response?.status < 300) {
@@ -49,11 +48,14 @@ const Login = () => {
           );
 
           // Update Context state so ProtectedRoute works immediately
+          const roles = response.data.roles || [];
+          const primaryRole = roles.length > 0 ? roles[0] : 'User';
+
           const userData = {
             id: response.data.userId,
             email: email,
-            // We might want to fetch more user details here or decode the token
-            role: 'User', // Placeholder until we get role from response
+            role: primaryRole,
+            roles: roles,
             status: 'Active'
           };
           localStorage.setItem('userInfo', JSON.stringify(userData));
@@ -64,7 +66,18 @@ const Login = () => {
             message: 'Logged in successfully',
             color: 'green',
           });
-          navigate('/dashboard');
+
+          // Conditional Navigation based on Role
+          if (roles.includes('Student')) {
+            navigate('/student/dashboard');
+          } else if (roles.includes('Teacher')) {
+            navigate('/teacher/dashboard');
+          } else if (roles.includes('Parent')) {
+            navigate('/parent/dashboard');
+          } else {
+            // Default for Admin, SuperAdmin, Account, etc.
+            navigate('/dashboard');
+          }
         } else if (response.data.responseCode === "HE001") {
           notifications.show({
             title: 'Error',
@@ -75,7 +88,7 @@ const Login = () => {
         } else {
           notifications.show({
             title: 'Error',
-            message: "Please try again later!",
+            message: response.data.responseMessage || "Please try again later!",
             color: 'red',
           });
         }
@@ -101,15 +114,24 @@ const Login = () => {
       } else {
         notifications.show({
           title: 'Error',
-          message: "Please try again later!!",
+          message: response.data.responseMessage || "Please try again later!!",
           color: 'red',
         });
       }
     } catch (error) {
       console.error("Error during login:", error);
+      let errorMessage = "Please try again later!!";
+
+      if (error.response && error.response.data && error.response.data.responseMessage) {
+        errorMessage = error.response.data.responseMessage;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      setError(errorMessage);
       notifications.show({
         title: 'Error',
-        message: "Please try again later!!",
+        message: errorMessage,
         color: 'red',
       });
     } finally {

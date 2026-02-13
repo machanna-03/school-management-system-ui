@@ -1,11 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Box,
     Paper,
     TextField,
     MenuItem,
-    Checkbox,
-    FormControlLabel,
     Button,
     Typography,
     Stack,
@@ -19,65 +17,112 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-
-/* ---------- Static Data (Replace with API later) ---------- */
-const classes = ["Class 1", "Class 2"];
-const sections = ["A", "B"];
-const subjectGroups = ["Science", "Arts"];
-
-const subjects = [
-    { id: 1, name: "Mathematics" },
-    { id: 2, name: "Science" },
-    { id: 3, name: "English" },
-];
-
-const teachers = [
-    { id: 9002, name: "Shivam Verma" },
-    { id: 9001, name: "Jason Sharlton" },
-];
-
-/* --------------------------------------------------------- */
+import api from '../../services/api';
+import { notifications } from '@mantine/notifications';
 
 export default function SubToTeacher() {
-    const [selectedClass, setSelectedClass] = useState("");
-    const [selectedSection, setSelectedSection] = useState("");
-    const [selectedGroup, setSelectedGroup] = useState("");
-    const [selectedSubjects, setSelectedSubjects] = useState([]);
-    const [selectedTeacher, setSelectedTeacher] = useState("");
+    const [classes, setClasses] = useState([]);      // List of Parent Classes (Grades) with ID
+    const [sections, setSections] = useState([]);    // List of Sections for selected Class
+    const [subjects, setSubjects] = useState([]);    // List of Subjects assigned to Selected Class
+    const [teachers, setTeachers] = useState([]);
 
-    const [list] = useState([
-        {
-            class: "Class 1",
-            section: "A",
-            subject: "Mathematics",
-            teacher: "Shivam Verma (9002)",
-        },
-    ]);
+    const [selectedClassId, setSelectedClassId] = useState("");
+    const [selectedSectionId, setSelectedSectionId] = useState("");
+    const [selectedSubjectId, setSelectedSubjectId] = useState("");
+    const [selectedTeacherId, setSelectedTeacherId] = useState("");
 
-    const handleSubjectChange = (id) => {
-        setSelectedSubjects((prev) =>
-            prev.includes(id)
-                ? prev.filter((s) => s !== id)
-                : [...prev, id]
-        );
+    const [assignments, setAssignments] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    // Temp store to hold all raw section data to filter relationally
+    const [rawSections, setRawSections] = useState([]);
+
+    useEffect(() => {
+        fetchInitialData();
+        fetchAssignments();
+    }, []);
+
+    // Refresh assignments list
+    const fetchAssignments = async () => {
+        try {
+            const res = await api.get('/getAssignments');
+            if (res.data.assignments) {
+                setAssignments(res.data.assignments);
+            }
+        } catch (e) { console.error(e); }
     };
 
-    const handleSave = () => {
-        console.log({
-            class: selectedClass,
-            section: selectedSection,
-            subjectGroup: selectedGroup,
-            subjects: selectedSubjects,
-            teacher: selectedTeacher,
-        });
-    };
-    const oneLineCell = {
-        whiteSpace: "nowrap",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        maxWidth: 160, // adjust per column
+    const fetchInitialData = async () => {
+        try {
+            // 1. Fetch Teachers
+            const tRes = await api.get('/getTeachers');
+            if (tRes.data.teachers) setTeachers(tRes.data.teachers);
+
+            // 2. Fetch Classes/Sections
+            const cRes = await api.get('/getClasses');
+            if (cRes.data.classes) {
+                setRawSections(cRes.data.classes);
+                // Extract unique Parent Classes
+                const uniqueClasses = [];
+                const seen = new Set();
+                for (const item of cRes.data.classes) {
+                    if (!seen.has(item.class_id)) {
+                        seen.add(item.class_id);
+                        uniqueClasses.push({ id: item.class_id, name: item.class_name });
+                    }
+                }
+                setClasses(uniqueClasses);
+            }
+        } catch (error) {
+            console.error(error);
+        }
     };
 
+    // When Class Changes, Filter Sections and Fetch Subjects
+    const handleClassChange = async (classId) => {
+        setSelectedClassId(classId);
+        setSelectedSectionId("");
+        setSelectedSubjectId("");
+
+        // Filter sections for this class
+        const relatedSections = rawSections.filter(s => s.class_id === classId);
+        setSections(relatedSections);
+
+        // Fetch Subjects for this Class (Curriculum)
+        try {
+            const subRes = await api.get(`/getClassSubjects?classId=${classId}`);
+            if (subRes.data.subjects) {
+                setSubjects(subRes.data.subjects);
+            } else {
+                setSubjects([]);
+            }
+        } catch (e) {
+            console.error(e);
+            setSubjects([]);
+        }
+    };
+
+    const handleSave = async () => {
+        if (!selectedSectionId || !selectedSubjectId || !selectedTeacherId) {
+            notifications.show({ title: 'Error', message: 'All fields are required', color: 'red' });
+            return;
+        }
+        setLoading(true);
+        try {
+            await api.post('/assignSubjectTeacher', {
+                sectionId: selectedSectionId,
+                subjectId: selectedSubjectId,
+                teacherId: selectedTeacherId
+            });
+            notifications.show({ title: 'Success', message: 'Teacher Assigned Successfully', color: 'green' });
+            fetchAssignments(); // Refresh list
+            // clear form?
+        } catch (error) {
+            notifications.show({ title: 'Error', message: 'Failed to assign teacher', color: 'red' });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <Grid container spacing={2}>
@@ -92,14 +137,14 @@ export default function SubToTeacher() {
                         <TextField
                             select
                             label="Class *"
-                            value={selectedClass}
-                            onChange={(e) => setSelectedClass(e.target.value)}
+                            value={selectedClassId}
+                            onChange={(e) => handleClassChange(e.target.value)}
                             fullWidth
                         >
                             <MenuItem value="">Select</MenuItem>
                             {classes.map((cls) => (
-                                <MenuItem key={cls} value={cls}>
-                                    {cls}
+                                <MenuItem key={cls.id} value={cls.id}>
+                                    {cls.name}
                                 </MenuItem>
                             ))}
                         </TextField>
@@ -107,67 +152,51 @@ export default function SubToTeacher() {
                         <TextField
                             select
                             label="Section *"
-                            value={selectedSection}
-                            onChange={(e) => setSelectedSection(e.target.value)}
+                            value={selectedSectionId}
+                            onChange={(e) => setSelectedSectionId(e.target.value)}
                             fullWidth
+                            disabled={!selectedClassId}
                         >
                             <MenuItem value="">Select</MenuItem>
                             {sections.map((sec) => (
-                                <MenuItem key={sec} value={sec}>
-                                    {sec}
+                                <MenuItem key={sec.section_id} value={sec.section_id}>
+                                    {sec.section_name} ({sec.academic_year})
                                 </MenuItem>
                             ))}
                         </TextField>
 
                         <TextField
                             select
-                            label="Subject Group"
-                            value={selectedGroup}
-                            onChange={(e) => setSelectedGroup(e.target.value)}
+                            label="Subject *"
+                            value={selectedSubjectId}
+                            onChange={(e) => setSelectedSubjectId(e.target.value)}
                             fullWidth
+                            disabled={!selectedClassId}
                         >
                             <MenuItem value="">Select</MenuItem>
-                            {subjectGroups.map((grp) => (
-                                <MenuItem key={grp} value={grp}>
-                                    {grp}
-                                </MenuItem>
+                            {subjects.map((sub) => (
+                                <MenuItem key={sub.id} value={sub.id}>{sub.name} ({sub.code})</MenuItem>
                             ))}
                         </TextField>
-
-                        <Box>
-                            <Typography variant="subtitle1">Subjects *</Typography>
-                            {subjects.map((sub) => (
-                                <FormControlLabel
-                                    key={sub.id}
-                                    control={
-                                        <Checkbox
-                                            checked={selectedSubjects.includes(sub.id)}
-                                            onChange={() => handleSubjectChange(sub.id)}
-                                        />
-                                    }
-                                    label={sub.name}
-                                />
-                            ))}
-                        </Box>
 
                         <TextField
                             select
                             label="Teacher *"
-                            value={selectedTeacher}
-                            onChange={(e) => setSelectedTeacher(e.target.value)}
+                            value={selectedTeacherId}
+                            onChange={(e) => setSelectedTeacherId(e.target.value)}
                             fullWidth
                         >
                             <MenuItem value="">Select</MenuItem>
                             {teachers.map((t) => (
                                 <MenuItem key={t.id} value={t.id}>
-                                    {t.name} ({t.id})
+                                    {t.name} ({t.designation})
                                 </MenuItem>
                             ))}
                         </TextField>
 
                         <Box textAlign="right">
-                            <Button variant="contained" color="inherit" onClick={handleSave}>
-                                Save
+                            <Button variant="contained" color="primary" onClick={handleSave} disabled={loading}>
+                                {loading ? 'Saving...' : 'Save'}
                             </Button>
                         </Box>
                     </Stack>
@@ -181,12 +210,6 @@ export default function SubToTeacher() {
                         Subject Teacher List
                     </Typography>
 
-                    <TextField
-                        size="small"
-                        placeholder="Search..."
-                        sx={{ mb: 2, width: 250 }}
-                    />
-
                     <Table size="small">
                         <TableHead>
                             <TableRow>
@@ -199,37 +222,34 @@ export default function SubToTeacher() {
                         </TableHead>
 
                         <TableBody>
-                            {list.map((row, index) => (
+                            {assignments.map((row, index) => (
                                 <TableRow key={index}>
-                                    <TableCell sx={oneLineCell}>{row.class}</TableCell>
-
-                                    <TableCell sx={oneLineCell}>{row.section}</TableCell>
-
-                                    <TableCell sx={{ ...oneLineCell, maxWidth: 180 }}>
-                                        {row.subject}
-                                    </TableCell>
-
-                                    <TableCell sx={{ ...oneLineCell, maxWidth: 220 }}>
-                                        {row.teacher}
-                                    </TableCell>
-
-                                    <TableCell align="center" sx={{ whiteSpace: "nowrap" }}>
-                                        <IconButton size="small">
-                                            <EditIcon fontSize="small" />
-                                        </IconButton>
-                                        <IconButton size="small">
+                                    <TableCell>{row.class_name}</TableCell>
+                                    <TableCell>{row.section_name}</TableCell>
+                                    <TableCell>{row.subject_name}</TableCell>
+                                    <TableCell>{row.teacher_name}</TableCell>
+                                    <TableCell align="center">
+                                        <IconButton size="small"><EditIcon fontSize="small" /></IconButton>
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => {
+                                                if (window.confirm('Are you sure you want to unassign this teacher?')) {
+                                                    api.post('/deleteAssignment', { id: row.id })
+                                                        .then(() => {
+                                                            notifications.show({ title: 'Success', message: 'Assignment Removed', color: 'green' });
+                                                            fetchAssignments();
+                                                        })
+                                                        .catch(e => console.error(e));
+                                                }
+                                            }}
+                                        >
                                             <DeleteIcon fontSize="small" />
                                         </IconButton>
                                     </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
-
                     </Table>
-
-                    <Typography variant="caption" display="block" mt={1}>
-                        Records: 1 to 1 of 1
-                    </Typography>
                 </Paper>
             </Grid>
         </Grid>

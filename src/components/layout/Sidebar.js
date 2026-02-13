@@ -27,6 +27,7 @@ import {
   BiChevronDown,
   BiUserPlus,
   BiX,
+  BiMoney,
 } from "react-icons/bi";
 import { Link, useLocation } from "react-router-dom";
 import logo from "../../assets/GMs-logo.png";
@@ -45,6 +46,8 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
   const [openExamSchedule, setOpenExamSchedule] = useState(false);
   const [openGrades, setOpenGrades] = useState(false);
   const [openClassroom, setOpenClassroom] = useState(false);
+  const [openParents, setOpenParents] = useState(false);
+  const [openFees, setOpenFees] = useState(false);
 
   const location = useLocation();
   const theme = useTheme();
@@ -69,9 +72,20 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
       isOpen: openStudent,
       onClick: () => setOpenStudent(!openStudent),
       children: [
+        { name: "Add New Student", path: "/students/add" },
         { name: "All Students", path: "/students" },
         { name: "Student Details", path: "/students/details" },
-        { name: "Add New Student", path: "/students/add" },
+
+      ],
+    },
+    {
+      name: "Parents",
+      icon: <BiUser />,
+      hasSubmenu: true,
+      isOpen: openParents,
+      onClick: () => setOpenParents(!openParents),
+      children: [
+        { name: "All Parents", path: "/parents" },
       ],
     },
     {
@@ -81,9 +95,10 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
       hasSubmenu: true,
       onClick: () => setOpenTeacher(!openTeacher),
       children: [
+        { name: "Add New Teacher", path: "/teachers/add" },
         { name: "All Teachers", path: "/teachers" },
         { name: "Teacher Details", path: "/teachers/details" },
-        { name: "Add New Teacher", path: "/teachers/add" },
+
       ],
     },
 
@@ -94,10 +109,10 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
       isOpen: openClasses,
       onClick: () => setOpenClasses(!openClasses),
       children: [
-        { name: "All Classes", path: "/classes" },
         { name: "Add New Class", path: "/classes/add" },
-        { name: "Assign Class to Teacher", path: "/classes/assign" },
-      ],
+        { name: "All Classes", path: "/classes" },
+        { name: "Class Assignments", path: "/classes/assign-students" },
+      ]
     },
     {
       name: "Subjects",
@@ -106,10 +121,10 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
       isOpen: openSubjects,
       onClick: () => setOpenSubjects(!openSubjects),
       children: [
-        { name: "All Subjects", path: "/subjects" },
         { name: "Add New Subject", path: "/subjects/add" },
+        { name: "All Subjects", path: "/subjects" },
         { name: "Assign Subject to Teacher", path: "/subjects/assign" },
-        { name: "Assign Subject to Class", path: "/subjects/class" },
+        { name: "Assign Subjects to Class", path: "/subjects/class" },
       ],
     },
     {
@@ -122,6 +137,7 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
         { name: "Attendance Dashboard", path: "/attendance" },
         { name: "Student Attendance", path: "/attendance/student" },
         { name: "Teacher Attendance", path: "/attendance/teacher" },
+        { name: "Leave Approvals", path: "/attendance/leaves" },
       ],
     },
     {
@@ -144,7 +160,7 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
         { name: "Application List", path: "/admission/application-list" }
       ],
     },
-     {
+    {
       name: "Exam Schedule",
       icon: <BiCalendarCheck />,
       hasSubmenu: true,
@@ -152,20 +168,34 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
       onClick: () => setOpenExamSchedule(!openExamSchedule),
       children: [
         { name: "Create Exam ", path: "/create-exam" },
-        { name: "Exam Timetable", path: "/exam-timetable" },
-        { name: "Student Exam Marks", path: "/exam-marks  " },
+        { name: "Exam Timetable View", path: "/exam-timetables" },
+        { name: "Student Exam Marks", path: "/exam-marks" },
         { name: "Student Exam Marks History", path: "/exam-history" }
       ],
     },
+    // {
+    //   name: "Classroom",
+    //   path: "/classroom",
+    //   icon: <BiBuilding />,
+    // },
+    // {
+    //   name: "Grades",
+    //   path: "/grades",
+    //   icon: <BiBarChart />,
+    // },
     {
-      name: "Classroom",
-      path: "/classroom",
-      icon: <BiBuilding />,
-    },
-    {
-      name: "Grades",
-      path: "/grades",
-      icon: <BiBarChart />,
+      name: "Fees & Dues",
+      icon: <BiMoney />,
+      hasSubmenu: true,
+      isOpen: openFees,
+      onClick: () => setOpenFees(!openFees),
+      children: [
+        { name: "Fee Structure", path: "/fees/structure" },
+        { name: "Fee Payments", path: "/fees/payment-status" },
+        { name: "Collect Fees", path: "/fees/collect" },
+        { name: "Fee Receipts", path: "/fees/receipts" },
+        { name: "Payment Methods", path: "/fees/payment-methods" },
+      ],
     },
 
   ];
@@ -294,9 +324,10 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
                     <ListItemText
                       primary={item.name}
                       primaryTypographyProps={{ fontSize: 16, fontWeight: 500 }}
+                      sx={{ flexGrow: 1 }}
                     />
                     {item.hasSubmenu &&
-                      (item.isOpen ? <BiChevronDown /> : <BiChevronRight />)}
+                      (item.isOpen ? <BiChevronDown size={20} style={{ marginLeft: 'auto', marginRight: '8px' }} /> : <BiChevronRight size={20} style={{ marginLeft: 'auto', marginRight: '8px' }} />)}
                   </>
                 )}
               </ListItemButton>

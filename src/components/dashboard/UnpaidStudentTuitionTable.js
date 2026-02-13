@@ -13,15 +13,9 @@ import {
 } from '@mui/material';
 import { BiDotsHorizontalRounded, BiPrinter } from 'react-icons/bi';
 
-const students = [
-    { id: '1001', name: 'Mark Willy', class: 'X-A', fees: '$500', rank: 1, img: 'MW' },
-    { id: '1002', name: 'Jessie Rose', class: 'X-B', fees: '$500', rank: 2, img: 'JR' },
-    { id: '1003', name: 'David Lee', class: 'X-A', fees: '$500', rank: 3, img: 'DL' },
-    { id: '1004', name: 'Emily Clark', class: 'X-C', fees: '$500', rank: 4, img: 'EC' },
-    { id: '1005', name: 'John Smith', class: 'X-B', fees: '$500', rank: 5, img: 'JS' },
-];
 
-const UnpaidStudentTuitionTable = () => {
+
+const UnpaidStudentTuitionTable = ({ students }) => {
     return (
         <TableContainer sx={{ overflowX: 'auto' }}>
             <Table sx={{ minWidth: 700 }}>
@@ -36,7 +30,7 @@ const UnpaidStudentTuitionTable = () => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {students.map((student) => (
+                    {students && students.map((student) => (
                         <TableRow key={student.id} hover>
                             <TableCell>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>

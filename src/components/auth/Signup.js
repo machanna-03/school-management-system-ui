@@ -3,14 +3,14 @@ import { Box, Typography, TextField, Button, Paper, InputAdornment, IconButton }
 import { useNavigate, Link } from 'react-router-dom';
 import { BiUser, BiLock, BiHide, BiShow, BiEnvelope, BiPhone } from 'react-icons/bi';
 import { motion } from 'framer-motion';
-import { useCookies } from 'react-cookie';
+// useCookies import removed
 import { notifications } from '@mantine/notifications';
 import { config } from '../../config/Config';
 import { invokeApi, apiList } from '../../services/ApiServices';
 
 const Signup = () => {
   const navigate = useNavigate();
-  const [cookies] = useCookies([config.cookieName]);
+  // cookies logic removed
 
   const [formData, setFormData] = useState({
     name: '',
@@ -37,10 +37,10 @@ const Signup = () => {
     };
 
     try {
+      // cookies argument removed
       let response = await invokeApi(
         config.getMySchool + apiList.signup,
-        params,
-        cookies
+        params
       );
 
       if (response?.status >= 200 && response?.status < 300) {

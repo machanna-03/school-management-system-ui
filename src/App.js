@@ -1,15 +1,27 @@
 import React from 'react';
+import '@mantine/core/styles.css';
+import '@mantine/notifications/styles.css';
+import { MantineProvider } from '@mantine/core';
+import { Notifications } from '@mantine/notifications';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
 import Students from './pages/students/Students';
 import StudentDetails from './pages/students/StudentDetails';
+import Parents from './pages/Parents';
 import CreateExam from './pages/exam/CreateExam';
 import ExamTimetable from './pages/exam/ExamTimetable';
+import ExamTimetables from './pages/exam/ExamTimetables';
 import StudentMarks from './pages/exam/StudentMarks';
 import StudentMarksHistory from './pages/exam/StudentMarksHistory';
-import Classroom from './pages/Classroom';
-import Grades from './pages/Grades';
+// import Classroom from './pages/Classroom';
+// import Grades from './pages/Grades';
+import FeePaymentStatus from './pages/FeeDues/FeePaymentStatus';
+import CollectFees from './pages/FeeDues/CollectFees';
+import FeeStructure from './pages/FeeDues/FeeStructure';
+import FeeReceipts from './pages/FeeDues/FeeReceipts';
+import PaymentMethods from './pages/FeeDues/PaymentMethods';
+import EditParent from './pages/EditParent';
 import AddStudent from './pages/students/AddStudent';
 import Teachers from './pages/teachers/Teachers';
 import TeacherDetails from './pages/teachers/TeacherDetails';
@@ -24,9 +36,11 @@ import Attendance from './pages/attendance/Attendance';
 import TeacherAttendance from './pages/attendance/TeacherAttendance';
 import TimeTable from './pages/timetable/TimeTable';
 import Login from './components/auth/Login';
+import Unauthorized from './pages/Unauthorized';
 // import Signup from './components/auth/Signup';
 import { AppProvider, useApp } from './context/AppContext';
 import { CookiesProvider } from 'react-cookie';
+import AssignStudents from './pages/classes/AssignStudents';
 import ParentLayout from './parentportal/layout/ParentLayout';
 import ParentDashboard from './parentportal/pages/ParentDashboard';
 import Homework from './parentportal/pages/Homework';
@@ -47,7 +61,8 @@ import ParentPerformance from './parentportal/pages/Performance';
 import StudentLayout from './studentportal/layout/StudentLayout';
 import StudentDashboard from './studentportal/pages/StudentDashboard';
 import StudentTimeTable from './studentportal/pages/StudentTimeTable';
-import StudentAttendance from './studentportal/pages/StudentAttendance';
+// Removed duplicate StudentAttendance import to avoid collision
+
 
 // Teacher Portal Imports
 import TeacherLayout from './teacherportal/layout/TeacherLayout';
@@ -58,14 +73,31 @@ import SubToClass from './pages/subjects/SubToClass';
 import LeaveApplicant from './parentportal/pages/SchoolLife/LeaveApplicant';
 import ApplicationForm from './pages/admission/ApplicationForm';
 import Admission from './pages/admission/Admission';
+import StudentAttendance from './pages/attendance/StudentAttendance';
+
+// Attendance & Leave Imports
+import AttendanceDashboard from './pages/attendance/AttendanceDashboard';
+import LeaveApprovals from './pages/attendance/LeaveApprovals';
+import LeaveApplication from './pages/attendance/LeaveApplication'; // For Teachers
+import StudentLeave from './studentportal/pages/StudentLeave';
+import MyAttendance from './studentportal/pages/MyAttendance';
 
 // Protected Route Component
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, allowedRoles }) => {
   const { state } = useApp();
 
   if (!state.isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
+
+  if (allowedRoles && state.currentUser) {
+    const userRoles = state.currentUser.roles || [state.currentUser.role];
+    const hasRole = userRoles.some(role => allowedRoles.includes(role));
+    if (!hasRole) {
+      return <Navigate to="/unauthorized" replace />;
+    }
+  }
+
   return children;
 };
 
@@ -75,17 +107,21 @@ const AppContent = () => {
     <Routes>
       {/* Public Routes */}
       <Route path="/login" element={<Login />} />
+      <Route path="/unauthorized" element={<Unauthorized />} />
 
-      {/* Protected Routes */}
+      {/* Protected Routes - Admin & Staff */}
       <Route path="/*" element={
-        <ProtectedRoute>
+        <ProtectedRoute allowedRoles={['SuperAdmin', 'Admin', 'Accountant', 'Receptionist', 'Librarian', 'Driver']}>
           <Layout>
             <Routes>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/students" element={<Students />} />
               <Route path="/students/details" element={<StudentDetails />} />
+              <Route path="/students/details/:id" element={<StudentDetails />} />
               <Route path="/students/add" element={<AddStudent />} />
+              <Route path="/students/edit/:id" element={<AddStudent />} />
+              <Route path="/parents" element={<Parents />} />
 
               {/* Users */}
               <Route path="/notifications" element={<NotificationPage />} />
@@ -94,29 +130,47 @@ const AppContent = () => {
               {/* Teacher Module */}
               <Route path="/teachers" element={<Teachers />} />
               <Route path="/teachers/details" element={<TeacherDetails />} />
+              <Route path="/teachers/details/:id" element={<TeacherDetails />} />
               <Route path="/teachers/add" element={<AddTeacher />} />
+              <Route path="/teachers/edit/:id" element={<AddTeacher />} />
+
+              <Route path="/parents" element={<Parents />} />
+              <Route path="/parents/edit/:id" element={<EditParent />} />
 
               {/* New Modules */}
               <Route path="/classes" element={<Classes />} />
               <Route path="/classes/add" element={<AddClass />} />
+              <Route path="/classes/edit/:id" element={<AddClass />} />
+              <Route path="/classes/edit/:id" element={<AddClass />} />
+              <Route path="/classes/assign-students" element={<AssignStudents />} />
+              <Route path="/classes/assign-students/:id" element={<AssignStudents />} />
+              <Route path="/classes/assign" element={<ClassToTeacher />} />
               <Route path="/classes/assign" element={<ClassToTeacher />} />
 
               <Route path="/subjects" element={<Subjects />} />
               <Route path="/subjects/add" element={<AddSubject />} />
+              <Route path="/subjects/edit/:id" element={<AddSubject />} />
               <Route path="/subjects/assign" element={<SubToTeacher />} />
               <Route path="/subjects/class" element={<SubToClass />} />
 
-              <Route path="/attendance" element={<Attendance />} />
+              <Route path="/attendance" element={<AttendanceDashboard />} />
               <Route path="/attendance/student" element={<StudentAttendance />} />
               <Route path="/attendance/teacher" element={<TeacherAttendance />} />
+              <Route path="/attendance/leaves" element={<LeaveApprovals />} />
 
               <Route path="/timetable" element={<TimeTable />} />
               <Route path="/create-exam" element={<CreateExam />} />
               <Route path="/exam-timetable" element={<ExamTimetable />} />
+              <Route path="/exam-timetables" element={<ExamTimetables />} />
               <Route path="/exam-marks" element={<StudentMarks />} />
               <Route path="/exam-history" element={<StudentMarksHistory />} />
-              <Route path="/classroom" element={<Classroom />} />
-              <Route path="/grades" element={<Grades />} />
+              {/* <Route path="/classroom" element={<Classroom />} /> */}
+              {/* <Route path="/grades" element={<Grades />} /> */}
+              <Route path="/fees/payment-status" element={<FeePaymentStatus />} />
+              <Route path="/fees/collect" element={<CollectFees />} />
+              <Route path="/fees/structure" element={<FeeStructure />} />
+              <Route path="/fees/receipts" element={<FeeReceipts />} />
+              <Route path="/fees/payments-methods" element={<PaymentMethods />} />
 
               <Route path="/admission" element={<Admission />} />
               <Route path="/admission/application-form" element={<ApplicationForm />} />
@@ -127,7 +181,7 @@ const AppContent = () => {
 
       {/* Parent Portal Routes */}
       <Route path="/parent/*" element={
-        <ProtectedRoute>
+        <ProtectedRoute allowedRoles={['Parent']}>
           <ParentLayout>
             <Routes>
               <Route path="/" element={<Navigate to="/parent/dashboard" replace />} />
@@ -166,38 +220,51 @@ const AppContent = () => {
 
       {/* Student Portal Routes */}
       <Route path="/student/*" element={
-        <StudentLayout>
-          <Routes>
-            <Route path="dashboard" element={<StudentDashboard />} />
-            <Route path="timetable" element={<StudentTimeTable />} />
-            <Route path="attendance" element={<StudentAttendance />} />
-          </Routes>
-        </StudentLayout>
+        <ProtectedRoute allowedRoles={['Student']}>
+          <StudentLayout>
+            <Routes>
+              <Route path="dashboard" element={<StudentDashboard />} />
+              <Route path="timetable" element={<StudentTimeTable />} />
+              <Route path="attendance" element={<MyAttendance />} />
+              <Route path="leave" element={<StudentLeave />} />
+            </Routes>
+          </StudentLayout>
+        </ProtectedRoute>
       } />
 
 
       {/* Teacher Portal Routes */}
       <Route path="/teacher/*" element={
-        <TeacherLayout>
-          <Routes>
-            <Route path="dashboard" element={<TeacherDashboard />} />
-          </Routes>
-        </TeacherLayout>
+        <ProtectedRoute allowedRoles={['Teacher']}>
+          <TeacherLayout>
+            <Routes>
+              <Route path="dashboard" element={<TeacherDashboard />} />
+              {/* Teacher can mark student attendance */}
+              <Route path="attendance/mark" element={<StudentAttendance />} />
+              <Route path="leave" element={<LeaveApplication />} />
+            </Routes>
+          </TeacherLayout>
+        </ProtectedRoute>
       } />
 
     </Routes>
   );
 }
 
+
+
 function App() {
   return (
-    <CookiesProvider>
-      <AppProvider>
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
-      </AppProvider>
-    </CookiesProvider>
+    <MantineProvider>
+      <Notifications />
+      <CookiesProvider>
+        <AppProvider>
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
+        </AppProvider>
+      </CookiesProvider>
+    </MantineProvider>
   );
 }
 export default App;
