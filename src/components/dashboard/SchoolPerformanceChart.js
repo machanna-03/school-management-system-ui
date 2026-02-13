@@ -10,28 +10,19 @@ import {
 } from 'recharts';
 import { Box, Typography } from '@mui/material';
 
-const data = [
-    { name: 'Week 01', thisWeek: 100, lastWeek: 480 },
-    { name: 'Week 02', thisWeek: 400, lastWeek: 150 },
-    { name: 'Week 03', thisWeek: 200, lastWeek: 400 },
-    { name: 'Week 04', thisWeek: 400, lastWeek: 100 },
-    { name: 'Week 05', thisWeek: 100, lastWeek: 480 },
-    { name: 'Week 06', thisWeek: 420, lastWeek: 100 },
-];
 
-const SchoolPerformanceChart = () => {
+
+const SchoolPerformanceChart = ({ data }) => {
     return (
         <Box sx={{ width: '100%', height: 350 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: '#4d44b5' }} />
                     <Typography variant="body2" color="text.secondary">This Week</Typography>
-                    <Typography variant="body2" fontWeight={600}>1.245</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: '#fb7d5b' }} />
                     <Typography variant="body2" color="text.secondary">Last Week</Typography>
-                    <Typography variant="body2" fontWeight={600}>1.356</Typography>
                 </Box>
             </Box>
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -9,283 +9,166 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Checkbox,
   Avatar,
-  Select,
-  MenuItem,
-  Stack,
   Chip,
-  Switch,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   TextField,
-  Grid,
+  Paper,
+  Stack,
+  FormControl,
+  Select,
+  MenuItem
 } from "@mui/material";
 import Card from "../../components/common/Card";
-import { BiCalendar } from "react-icons/bi";
+import api from '../../services/api';
+import { notifications } from '@mantine/notifications';
 
 const TeacherAttendance = () => {
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]); // YYYY-MM-DD
+  const [teachers, setTeachers] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  /* Add Teacher Dialog state */
-  const [openDialog, setOpenDialog] = useState(false);
+  useEffect(() => {
+    loadData();
+  }, [date]); // Reload when date changes
 
-  const [newTeacher, setNewTeacher] = useState({
-    id: "",
-    name: "",
-  });
-
-  /* Delete Teacher Dialog state */
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-
-  const [deleteTeacher, setDeleteTeacher] = useState({
-    id: "",
-    name: "",
-  });
-
-  /* Teachers list */
-  const [teachers, setTeachers] = useState([
-    {
-      id: "T001",
-      name: "John Doe",
-      subject: "Math",
-      status: true,
-      timeIn: "08:00 AM",
-      timeOut: "04:00 PM",
-      color: "#4d44b5",
-    },
-    {
-      id: "T002",
-      name: "Jane Smith",
-      subject: "Physics",
-      status: true,
-      timeIn: "08:15 AM",
-      timeOut: "04:00 PM",
-      color: "#fb7d5b",
-    },
-    {
-      id: "T003",
-      name: "Alice Johnson",
-      subject: "English",
-
-      status: false,
-      timeIn: "-",
-      timeOut: "-",
-      color: "#30c7ec",
-    },
-    {
-      id: "T004",
-      name: "Robert Brown",
-      subject: "History",
-      status: true,
-      timeIn: "07:55 AM",
-      timeOut: "03:30 PM",
-      color: "#fcc43e",
-    },
-  ]);
-
-  const handleAddTeacher = () => {
-    if (!newTeacher.id || !newTeacher.name) {
-      alert("Please enter Teacher ID and Name");
-      return;
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get(`/getTeacherAttendance?date=${date}`);
+      if (res.data.teachers) {
+        setTeachers(res.data.teachers);
+      }
+    } catch (error) {
+      console.error(error);
+      notifications.show({ title: 'Error', message: 'Failed to fetch teacher data', color: 'red' });
+    } finally {
+      setLoading(false);
     }
-
-    setTeachers([...teachers, newTeacher]);
-
-    alert("Teacher Added Successfully");
-
-    setNewTeacher({
-      id: "",
-      name: "",
-    });
-
-    setOpenDialog(false);
   };
 
-  const handleDeleteTeacher = () => {
-    const filtered = teachers.filter(
-      (teacher) =>
-        teacher.id !== deleteTeacher.id || teacher.name !== deleteTeacher.name,
-    );
+  const handleStatusChange = (index, value) => {
+    const updated = [...teachers];
+    updated[index].status = value;
+    setTeachers(updated);
+  };
 
-    if (filtered.length === teachers.length) {
-      alert("Teacher not found");
-      return;
+  const handleTimeChange = (index, field, value) => {
+    const updated = [...teachers];
+    updated[index][field] = value;
+    setTeachers(updated);
+  };
+
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      const payload = {
+        date: date,
+        teachers: teachers.map(t => ({
+          teacherId: t.teacher_id,
+          status: t.status,
+          checkIn: t.check_in !== '-' ? t.check_in : null,
+          checkOut: t.check_out !== '-' ? t.check_out : null
+        }))
+      };
+      await api.post('/markTeacherAttendance', payload);
+      notifications.show({ title: 'Success', message: 'Attendance Saved', color: 'green' });
+      loadData(); // Refresh
+    } catch (error) {
+      console.error(error);
+      notifications.show({ title: 'Error', message: 'Failed to save', color: 'red' });
+      setLoading(false);
     }
-
-    setTeachers(filtered);
-
-    alert("Teacher Deleted Successfully");
-
-    setDeleteTeacher({
-      id: "",
-      name: "",
-    });
-
-    setOpenDeleteDialog(false);
   };
 
   return (
     <Box>
-      {/* Header */}
-      <Box sx={{ mb: 4 }}>
-        {/* TOP ROW */}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: 2,
-          }}
-        >
-          {/* LEFT SIDE TITLE */}
-          <Typography variant="h4" color="text.primary">
-            Teacher Attendance
-          </Typography>
-
-          {/* RIGHT SIDE BUTTONS */}
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <Button
-              variant="contained"
-              sx={{ borderRadius: "30px", px: 4 }}
-              // onClick={() => setOpenDeleteDialog(true)}
-            >
-              Delete Teacher
-            </Button>
-
-            <Button
-              variant="contained"
-              sx={{ borderRadius: "30px", px: 4 }}
-              // onClick={() => setOpenDialog(true)}
-            >
-              New Teacher
-            </Button>
-          </Box>
-        </Box>
-
-        {/* DAILY LOG BELOW TITLE */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1 }}>
-          <Typography variant="body2" color="text.secondary">
-            Daily Log
-          </Typography>
-
-          <Typography variant="body2" color="text.secondary">
-            •
-          </Typography>
-
-          <Typography variant="body2" color="text.secondary">
-            {date.toDateString()}
-          </Typography>
-        </Box>
+      <Box sx={{ mb: 4, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Typography variant="h4" color="text.primary">Teacher Attendance</Typography>
       </Box>
 
       {/* Controls */}
-      <Box
-        sx={{
-          bgcolor: "white",
-          p: 3,
-          borderRadius: 4,
-          mb: 4,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          boxShadow: "0px 10px 40px 0px rgba(50, 50, 50, 0.08)",
-        }}
-      >
+      <Paper sx={{ p: 3, mb: 4, display: "flex", justifyContent: "space-between", alignItems: "center", borderRadius: 4 }}>
         <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-          <Button
-            variant="outlined"
-            startIcon={<BiCalendar />}
-            sx={{
-              color: "text.primary",
-              borderColor: "#c4c4c4",
-              borderRadius: 3,
-              px: 3,
-            }}
-          >
-            {date.toLocaleDateString()}
-          </Button>
+          <Typography>Select Date:</Typography>
+          <TextField
+            type="date"
+            size="small"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
         </Box>
-        <Button variant="contained" sx={{ borderRadius: "30px", px: 4 }}>
-          Download Report
+        <Button variant="contained" sx={{ borderRadius: "30px", px: 4 }} onClick={handleSave} disabled={loading}>
+          {loading ? 'Saving...' : 'Save Changes'}
         </Button>
-      </Box>
+      </Paper>
 
       {/* Teacher List */}
       <Card>
         <TableContainer>
           <Table>
             <TableHead>
-              <TableRow
-                sx={{ "& th": { fontWeight: 600, color: "text.secondary" } }}
-              >
+              <TableRow sx={{ "& th": { fontWeight: 600, color: "text.secondary" } }}>
                 <TableCell>Teacher ID</TableCell>
                 <TableCell>Name</TableCell>
-                <TableCell>Subject</TableCell>
+                <TableCell>Designation</TableCell>
                 <TableCell align="center">Status</TableCell>
                 <TableCell align="center">Check In</TableCell>
                 <TableCell align="center">Check Out</TableCell>
-                <TableCell align="right">Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {teachers.map((teacher, i) => (
-                <TableRow key={i} hover sx={{ "& td": { py: 2.5 } }}>
-                  <TableCell sx={{ color: "primary.main", fontWeight: 600 }}>
-                    {teacher.id}
-                  </TableCell>
+              {teachers.map((t, i) => (
+                <TableRow key={t.teacher_id} hover sx={{ "& td": { py: 2.5 } }}>
+                  <TableCell sx={{ color: "primary.main", fontWeight: 600 }}>#{t.teacher_id}</TableCell>
+
                   <TableCell>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                      <Avatar
-                        sx={{
-                          bgcolor: teacher.color,
-                          width: 36,
-                          height: 36,
-                          fontSize: 14,
-                        }}
-                      >
-                        {teacher.name.charAt(0)}
+                      <Avatar sx={{ bgcolor: "#4d44b5", width: 36, height: 36, fontSize: 14 }}>
+                        {t.name.charAt(0)}
                       </Avatar>
-                      <Typography
-                        variant="subtitle2"
-                        sx={{ fontWeight: 600, color: "#3d4465" }}
-                      >
-                        {teacher.name}
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, color: "#3d4465" }}>
+                        {t.name}
                       </Typography>
                     </Box>
                   </TableCell>
-                  <TableCell sx={{ color: "text.secondary" }}>
-                    {teacher.subject}
-                  </TableCell>
+
+                  <TableCell sx={{ color: "text.secondary" }}>{t.designation}</TableCell>
+
                   <TableCell align="center">
-                    <Chip
-                      label={teacher.status ? "Present" : "Absent"}
+                    <FormControl size="small">
+                      <Select
+                        value={t.status}
+                        onChange={(e) => handleStatusChange(i, e.target.value)}
+                        sx={{
+                          color: t.status === 'Present' ? 'green' : (t.status === 'Absent' ? 'red' : 'orange'),
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        <MenuItem value="Present">Present</MenuItem>
+                        <MenuItem value="Absent">Absent</MenuItem>
+                        <MenuItem value="Leave">Leave</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </TableCell>
+
+                  <TableCell align="center">
+                    <TextField
+                      type="time"
                       size="small"
-                      sx={{
-                        bgcolor: teacher.status ? "#e6fffa" : "#fff5f5",
-                        color: teacher.status ? "#369c5e" : "#ff5b5b",
-                        fontWeight: 600,
-                        minWidth: 80,
-                      }}
+                      value={t.check_in !== '-' ? t.check_in : ''}
+                      onChange={(e) => handleTimeChange(i, 'check_in', e.target.value)}
+                      disabled={t.status === 'Absent'}
                     />
                   </TableCell>
-                  <TableCell align="center" sx={{ color: "text.secondary" }}>
-                    {teacher.timeIn}
-                  </TableCell>
-                  <TableCell align="center" sx={{ color: "text.secondary" }}>
-                    {teacher.timeOut}
-                  </TableCell>
-                  <TableCell align="right">
-                    <Button
+
+                  <TableCell align="center">
+                    <TextField
+                      type="time"
                       size="small"
-                      variant="outlined"
-                      sx={{ borderRadius: 5 }}
-                    >
-                      Log Details
-                    </Button>
+                      value={t.check_out !== '-' ? t.check_out : ''}
+                      onChange={(e) => handleTimeChange(i, 'check_out', e.target.value)}
+                      disabled={t.status === 'Absent'}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
@@ -293,97 +176,6 @@ const TeacherAttendance = () => {
           </Table>
         </TableContainer>
       </Card>
-      <Dialog open={openDialog} fullWidth maxWidth="sm">
-        <DialogTitle>Add Teacher</DialogTitle>
-
-        <DialogContent>
-          <Grid container spacing={2} mt={1}>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Teacher ID"
-                value={newTeacher.id}
-                onChange={(e) =>
-                  setNewTeacher({
-                    ...newTeacher,
-                    id: e.target.value,
-                  })
-                }
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Teacher Name"
-                value={newTeacher.name}
-                onChange={(e) =>
-                  setNewTeacher({
-                    ...newTeacher,
-                    name: e.target.value,
-                  })
-                }
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-
-        <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-
-          <Button variant="contained" onClick={handleAddTeacher}>
-            Add Teacher
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog open={openDeleteDialog} fullWidth maxWidth="sm">
-        <DialogTitle>Delete Teacher</DialogTitle>
-
-        <DialogContent>
-          <Grid container spacing={2} mt={1}>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Teacher ID"
-                value={deleteTeacher.id}
-                onChange={(e) =>
-                  setDeleteTeacher({
-                    ...deleteTeacher,
-                    id: e.target.value,
-                  })
-                }
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Teacher Name"
-                value={deleteTeacher.name}
-                onChange={(e) =>
-                  setDeleteTeacher({
-                    ...deleteTeacher,
-                    name: e.target.value,
-                  })
-                }
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-
-        <DialogActions>
-          <Button onClick={() => setOpenDeleteDialog(false)}>Cancel</Button>
-
-          <Button
-            variant="contained"
-            color="error"
-            onClick={handleDeleteTeacher}
-          >
-            Delete Teacher
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 };
