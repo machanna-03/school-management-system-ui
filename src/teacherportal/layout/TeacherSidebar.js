@@ -33,9 +33,14 @@ const TeacherSidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
                     path: "/teacher/schedule"
                 },
                 {
-                    name: "Attendance",
+                    name: "Mark Attendance",
                     icon: <BiCalendarCheck />,
-                    path: "/teacher/attendance"
+                    path: "/teacher/attendance/mark"
+                },
+                {
+                    name: "Leave Application",
+                    icon: <BiMessageDetail />,
+                    path: "/teacher/leave"
                 }
             ],
         },

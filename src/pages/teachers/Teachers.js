@@ -1,121 +1,187 @@
-import React from 'react';
-import { Box, Typography, Button, Grid, InputBase, Select, MenuItem, Stack, IconButton, Avatar, Chip } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, Avatar, IconButton, InputBase, Select, MenuItem, Stack, Paper } from '@mui/material';
 import Card from '../../components/common/Card';
-import { BiSearch, BiPlus, BiDotsHorizontalRounded, BiUser, BiEnvelope } from 'react-icons/bi';
+import { BiPlus, BiSearch, BiDotsHorizontalRounded, BiPhone, BiEnvelope, BiShow, BiEdit, BiTrash } from 'react-icons/bi';
 import { Link } from 'react-router-dom';
+import api from '../../services/api';
 
 const Teachers = () => {
-    const teachers = [
-        { id: 1, name: 'Dimitres Viga', role: 'Teacher', subjects: ['Mathematics', 'Science', 'Art'], img: 'DV' },
-        { id: 2, name: 'Dimitres Viga', role: 'Teacher', subjects: ['Mathematics', 'Science', 'Art'], img: 'DV' },
-        { id: 3, name: 'Dimitres Viga', role: 'Teacher', subjects: ['Mathematics', 'Science', 'Art'], img: 'DV' },
-        { id: 4, name: 'Dimitres Viga', role: 'Teacher', subjects: ['Mathematics', 'Science', 'Art'], img: 'DV' },
-        { id: 5, name: 'Dimitres Viga', role: 'Teacher', subjects: ['Mathematics', 'Science', 'Art'], img: 'DV' },
-        { id: 6, name: 'Dimitres Viga', role: 'Teacher', subjects: ['Mathematics', 'Science', 'Art'], img: 'DV' },
-        { id: 7, name: 'Dimitres Viga', role: 'Teacher', subjects: ['Mathematics', 'Science', 'Art'], img: 'DV' },
-        { id: 8, name: 'Dimitres Viga', role: 'Teacher', subjects: ['Mathematics', 'Science', 'Art'], img: 'DV' },
-    ];
+    const [teachers, setTeachers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    useEffect(() => {
+        fetchTeachers();
+    }, []);
+
+    const fetchTeachers = async () => {
+        try {
+            const response = await api.get('/getTeachers');
+            if (response.data.teachers) {
+                setTeachers(response.data.teachers);
+            }
+        } catch (error) {
+            console.error("Failed to fetch teachers:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const filteredTeachers = teachers.filter(teacher =>
+        teacher.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        teacher.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const handleDelete = async (id) => {
+        if (window.confirm("Are you sure you want to delete this teacher?")) {
+            try {
+                await api.post('/deleteTeacher', { id });
+                // notifications.show({ title: 'Success', message: 'Teacher deleted successfully', color: 'green' });
+                fetchTeachers();
+            } catch (error) {
+                console.error("Failed to delete teacher:", error);
+                // notifications.show({ title: 'Error', message: 'Failed to delete teacher', color: 'red' });
+            }
+        }
+    };
 
     return (
         <Box>
-            {/* Top Bar with Search and Filters */}
-            <Box sx={{ bgcolor: 'white', p: 2, borderRadius: 3, mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-                <Box
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        bgcolor: 'background.default',
-                        px: 2,
-                        py: 1.5,
-                        borderRadius: '12px',
-                        width: 300,
-                    }}
-                >
-                    <BiSearch style={{ fontSize: 24, color: '#a098ae', marginRight: 10 }} />
-                    <InputBase
-                        placeholder="Search here..."
-                        sx={{ ml: 1, flex: 1, color: 'text.primary', fontSize: 16 }}
-                    />
-                </Box>
-
-                <Stack direction="row" spacing={2}>
-                    <Select value="newest" size="small" sx={{ borderRadius: 3, minWidth: 120, bgcolor: 'background.default', border: 'none', '& fieldset': { border: 'none' }, color: '#3d4465', fontWeight: 600 }}>
-                        <MenuItem value="newest">Newest</MenuItem>
-                        <MenuItem value="oldest">Oldest</MenuItem>
-                    </Select>
+            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="h4" color="text.primary" fontWeight="bold">Teachers</Typography>
+                <Box sx={{ display: 'flex', gap: 2 }}>
                     <Button
                         variant="contained"
                         component={Link}
                         to="/teachers/add"
-                        startIcon={<BiPlus size={22} />}
-                        sx={{ borderRadius: 3, textTransform: 'none', fontSize: 16, px: 3, bgcolor: '#4d44b5' }}
+                        startIcon={<BiPlus size={20} />}
+                        sx={{ bgcolor: '#4d44b5', borderRadius: 5, px: 3, '&:hover': { bgcolor: '#3d34a5' } }}
                     >
                         New Teacher
                     </Button>
-                </Stack>
+                </Box>
             </Box>
 
-            <Grid container spacing={3}>
-                {teachers.map((teacher, index) => (
-                    <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                        <Card sx={{ textAlign: 'center', p: 1, position: 'relative' }}>
-                            <IconButton sx={{ position: 'absolute', top: 10, right: 10, color: '#a098ae' }}>
-                                <BiDotsHorizontalRounded size={24} />
-                            </IconButton>
+            {/* Top Bar with Search */}
+            <Paper elevation={0} sx={{ p: 2, borderRadius: 4, mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        bgcolor: '#f0f1f5',
+                        px: 2,
+                        py: 1,
+                        borderRadius: '30px',
+                        width: 300,
+                    }}
+                >
+                    <BiSearch style={{ fontSize: 20, color: '#a1a5b7', marginRight: 10 }} />
+                    <InputBase
+                        placeholder="Search by name or email..."
+                        sx={{ ml: 1, flex: 1, color: 'text.primary', fontSize: 14 }}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </Box>
 
-                            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3, mb: 2 }}>
-                                <Avatar
-                                    sx={{ width: 100, height: 100, fontSize: 32 }}
-                                    src={`https://randomuser.me/api/portraits/med/men/${index + 20}.jpg`}
-                                />
-                            </Box>
+                <Stack direction="row" spacing={2}>
+                    <Select value="newest" size="small" sx={{ borderRadius: 5, minWidth: 120, bgcolor: '#f0f1f5', border: 'none', '& fieldset': { border: 'none' } }}>
+                        <MenuItem value="newest">Newest</MenuItem>
+                        <MenuItem value="oldest">Oldest</MenuItem>
+                    </Select>
+                </Stack>
+            </Paper>
 
-                            <Typography variant="h3" sx={{ fontWeight: 700, color: '#3d4465', mb: 0.5 }}>{teacher.name}</Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{teacher.role}</Typography>
-
-                            <Stack direction="row" justifyContent="center" spacing={1} sx={{ mb: 3 }}>
-                                <Chip label="Mathematics" size="small" sx={{ bgcolor: '#e6f7e9', color: '#2ecc71', fontWeight: 600, fontSize: 10, height: 24 }} />
-                                <Chip label="Science" size="small" sx={{ bgcolor: '#fff2e6', color: '#ff7e3e', fontWeight: 600, fontSize: 10, height: 24 }} />
-                                <Chip label="Art" size="small" sx={{ bgcolor: '#ffeaea', color: '#ff3d57', fontWeight: 600, fontSize: 10, height: 24 }} />
-                            </Stack>
-
-                            <Stack direction="row" spacing={2} justifyContent="center" sx={{ mb: 1 }}>
-                                <Button
-                                    variant="contained"
-                                    component={Link}
-                                    to={`/teachers/details`}
-                                    startIcon={<BiUser />}
-                                    sx={{
-                                        bgcolor: '#4d44b5',
-                                        borderRadius: 5,
-                                        textTransform: 'none',
-                                        minWidth: 100,
-                                        boxShadow: 'none',
-                                        '&:hover': { bgcolor: '#3d3495' }
-                                    }}
-                                >
-                                    Profile
-                                </Button>
-                                <Button
-                                    variant="contained"
-                                    startIcon={<BiEnvelope />}
-                                    sx={{
-                                        bgcolor: '#f0f1f5',
-                                        color: '#3d4465',
-                                        borderRadius: 5,
-                                        textTransform: 'none',
-                                        minWidth: 100,
-                                        boxShadow: 'none',
-                                        '&:hover': { bgcolor: '#e0e1e5' }
-                                    }}
-                                >
-                                    Chat
-                                </Button>
-                            </Stack>
-                        </Card>
-                    </Grid>
-                ))}
-            </Grid>
+            <Card>
+                <TableContainer>
+                    <Table sx={{ minWidth: 800 }}>
+                        <TableHead>
+                            <TableRow sx={{ '& th': { color: 'text.secondary', fontWeight: 600, borderBottom: 'none' } }}>
+                                <TableCell padding="checkbox"><Checkbox /></TableCell>
+                                <TableCell>Name</TableCell>
+                                <TableCell>Subject</TableCell>
+                                <TableCell>Class</TableCell>
+                                <TableCell>Email</TableCell>
+                                <TableCell>Gender</TableCell>
+                                <TableCell>Status</TableCell>
+                                <TableCell>Action</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {loading ? (
+                                <TableRow>
+                                    <TableCell colSpan={8} align="center" sx={{ py: 3 }}>Loading...</TableCell>
+                                </TableRow>
+                            ) : filteredTeachers.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={8} align="center" sx={{ py: 3 }}>No teachers found.</TableCell>
+                                </TableRow>
+                            ) : (
+                                filteredTeachers.map((teacher, i) => (
+                                    <TableRow
+                                        key={teacher.id}
+                                        hover
+                                        sx={{ '& td': { borderBottom: 'none', py: 2 } }}
+                                    >
+                                        <TableCell padding="checkbox"><Checkbox /></TableCell>
+                                        <TableCell>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                <Avatar
+                                                    sx={{ width: 45, height: 45, bgcolor: '#4d44b5', fontWeight: 700 }}
+                                                >
+                                                    {teacher.name?.charAt(0)}
+                                                </Avatar>
+                                                <Box>
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#3d4465' }}>{teacher.name}</Typography>
+                                                </Box>
+                                            </Box>
+                                        </TableCell>
+                                        <TableCell sx={{ color: 'text.secondary' }}>{teacher.designation}</TableCell>
+                                        <TableCell sx={{ color: 'text.secondary' }}>{teacher.department}</TableCell> {/* Mapping department as Class for now or logic needed */}
+                                        <TableCell sx={{ color: 'text.secondary' }}>{teacher.email}</TableCell>
+                                        <TableCell sx={{ color: 'text.secondary' }}>{teacher.gender}</TableCell>
+                                        <TableCell>
+                                            <Box sx={{ bgcolor: teacher.status === 'Active' ? '#e2fbd7' : '#ffeaea', color: teacher.status === 'Active' ? '#34c38f' : '#ff3d57', px: 2, py: 0.5, borderRadius: 5, fontSize: 12, fontWeight: 600, textAlign: 'center', display: 'inline-block' }}>
+                                                {teacher.status || 'Active'}
+                                            </Box>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Box sx={{ display: 'flex', gap: 1 }}>
+                                                <IconButton
+                                                    size="small"
+                                                    sx={{ bgcolor: '#e1f1ff', color: '#4d44b5' }}
+                                                    component={Link}
+                                                    to={`/teachers/details/${teacher.id}`}
+                                                    title="View"
+                                                >
+                                                    <BiShow />
+                                                </IconButton>
+                                                <IconButton
+                                                    size="small"
+                                                    sx={{ bgcolor: '#fff3e0', color: '#ff9800' }}
+                                                    component={Link}
+                                                    to={`/teachers/edit/${teacher.id}`}
+                                                    title="Edit"
+                                                >
+                                                    <BiEdit />
+                                                </IconButton>
+                                                <IconButton
+                                                    size="small"
+                                                    sx={{ bgcolor: '#ffebee', color: '#f44336' }}
+                                                    onClick={() => handleDelete(teacher.id)}
+                                                    title="Delete"
+                                                >
+                                                    <BiTrash />
+                                                </IconButton>
+                                            </Box>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Card>
         </Box>
     );
 };

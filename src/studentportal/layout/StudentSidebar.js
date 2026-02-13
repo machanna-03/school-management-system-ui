@@ -36,6 +36,11 @@ const StudentSidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
                     name: "Attendance",
                     icon: <BiCalendarCheck />,
                     path: "/student/attendance"
+                },
+                {
+                    name: "Leave Application",
+                    icon: <BiMessageDetail />,
+                    path: "/student/leave"
                 }
             ],
         },

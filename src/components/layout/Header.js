@@ -27,11 +27,14 @@ import {
     BiMenu,
 } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
+import { useCookies } from 'react-cookie';
+import { config } from '../../config/Config';
 
 const Header = ({ toggleSidebar, collapsed, handleDrawerToggle }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     const navigate = useNavigate();
+    const [cookies, setCookie, removeCookie] = useCookies([config.cookieName]);
     const handleAvatarClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -186,6 +189,11 @@ const Header = ({ toggleSidebar, collapsed, handleDrawerToggle }) => {
                     <Button
                         fullWidth
                         startIcon={<BiLogOut />}
+                        onClick={() => {
+                            removeCookie(config.cookieName, { path: '/' });
+                            localStorage.removeItem('userInfo');
+                            window.location.href = '/login';
+                        }}
                         sx={{
                             bgcolor: "#f3f4ff",
                             color: "#5b5fe3",

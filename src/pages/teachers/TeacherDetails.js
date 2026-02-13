@@ -1,13 +1,58 @@
-import React from 'react';
-import { Box, Typography, Grid, Avatar, IconButton, Stack } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { Box, Typography, Grid, Avatar, IconButton, Stack, Paper, Chip, CircularProgress, Divider } from '@mui/material';
 import Card from '../../components/common/Card';
-import { BiDotsHorizontalRounded, BiUser, BiMap, BiPhone, BiEnvelope } from 'react-icons/bi';
+import { BiDotsHorizontalRounded, BiUser, BiMap, BiPhone, BiEnvelope, BiArrowBack } from 'react-icons/bi';
+import api from '../../services/api';
 
 const TeacherDetails = () => {
+    const { id } = useParams();
+    const [teacher, setTeacher] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    // Default to ID 1 if no ID is provided
+    const teacherId = id || 1;
+
+    useEffect(() => {
+        fetchTeacherDetails();
+    }, [teacherId]);
+
+    const fetchTeacherDetails = async () => {
+        try {
+            console.log("Fetching details for teacher ID:", teacherId);
+            if (!teacherId || teacherId === 'undefined') {
+                console.error("Invalid Teacher ID:", teacherId);
+                setLoading(false);
+                return;
+            }
+            const response = await api.get(`/getTeacher/${teacherId}`);
+            if (response.data.teacher) {
+                setTeacher(response.data.teacher);
+            }
+        } catch (error) {
+            console.error("Failed to fetch teacher details:", error);
+            if (error.response) {
+                console.error("Error Status:", error.response.status);
+                console.error("Error Data:", error.response.data);
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}><CircularProgress /></Box>;
+    }
+
+    if (!teacher) {
+        return <Typography variant="h6" align="center" sx={{ mt: 10 }}>Teacher not found</Typography>;
+    }
+
     return (
         <Box>
-            <Box sx={{ mb: 4 }}>
-                <Typography variant="h1" color="text.primary">Teacher Details</Typography>
+            <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+                <IconButton component={Link} to="/teachers" sx={{ bgcolor: 'white' }}><BiArrowBack /></IconButton>
+                <Typography variant="h4" color="text.primary" fontWeight="bold">Teacher Details</Typography>
             </Box>
 
             <Card sx={{ overflow: 'hidden', p: 0 }}>
@@ -45,22 +90,26 @@ const TeacherDetails = () => {
                 <Box sx={{ px: 4, pb: 4, mt: -8 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <Avatar
-                            src="https://randomuser.me/api/portraits/women/44.jpg"
+                            src={`https://ui-avatars.com/api/?name=${teacher.name}&background=random&size=200`}
                             sx={{
                                 width: 150,
                                 height: 150,
                                 border: '5px solid white',
-                                boxShadow: '0 4px 18px rgba(0,0,0,0.1)'
+                                boxShadow: '0 4px 18px rgba(0,0,0,0.1)',
+                                fontSize: 50
                             }}
                         />
-                        <IconButton sx={{ mt: 9 }}>
+                        {/* <IconButton sx={{ mt: 9 }}>
                             <BiDotsHorizontalRounded size={30} color="#a098ae" />
-                        </IconButton>
+                        </IconButton> */}
                     </Box>
 
                     <Box sx={{ mt: 2 }}>
-                        <Typography variant="h3" sx={{ fontWeight: 700, color: '#3d4465', mb: 1 }}>Maria Historia</Typography>
-                        <Typography variant="body1" sx={{ color: '#4d44b5', fontWeight: 600 }}>History Teacher</Typography>
+                        <Typography variant="h3" sx={{ fontWeight: 700, color: '#3d4465', mb: 1 }}>{teacher.name}</Typography>
+                        <Stack direction="row" spacing={2} alignItems="center">
+                            <Typography variant="body1" sx={{ color: '#4d44b5', fontWeight: 600 }}>{teacher.designation || 'Teacher'}</Typography>
+                            <Chip label={teacher.department} size="small" sx={{ bgcolor: '#eee', fontWeight: 'bold' }} />
+                        </Stack>
                     </Box>
 
                     {/* Contact Icons Grid */}
@@ -71,8 +120,8 @@ const TeacherDetails = () => {
                                     <BiUser size={24} />
                                 </Box>
                                 <Box>
-                                    <Typography variant="body2" color="text.secondary">Parents:</Typography>
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#3d4465' }}>Justin Hope</Typography>
+                                    <Typography variant="body2" color="text.secondary">Gender:</Typography>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#3d4465' }}>{teacher.gender}</Typography>
                                 </Box>
                             </Stack>
                         </Grid>
@@ -83,7 +132,7 @@ const TeacherDetails = () => {
                                 </Box>
                                 <Box>
                                     <Typography variant="body2" color="text.secondary">Address:</Typography>
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#3d4465' }}>Jakarta, Indonesia</Typography>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#3d4465' }}>{teacher.city}, {teacher.country}</Typography>
                                 </Box>
                             </Stack>
                         </Grid>
@@ -94,7 +143,7 @@ const TeacherDetails = () => {
                                 </Box>
                                 <Box>
                                     <Typography variant="body2" color="text.secondary">Phone:</Typography>
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#3d4465' }}>+12 345 6789 0</Typography>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#3d4465' }}>{teacher.phone_number}</Typography>
                                 </Box>
                             </Stack>
                         </Grid>
@@ -105,7 +154,7 @@ const TeacherDetails = () => {
                                 </Box>
                                 <Box>
                                     <Typography variant="body2" color="text.secondary">Email:</Typography>
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#3d4465' }}>Historia@mail.com</Typography>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#3d4465' }}>{teacher.email}</Typography>
                                 </Box>
                             </Stack>
                         </Grid>
@@ -113,25 +162,16 @@ const TeacherDetails = () => {
 
                     <Box sx={{ my: 4, height: 1, bgcolor: '#f0f1f5' }} />
 
-                    {/* About & Education */}
+                    {/* About & Education - Placeholder for now until we have fields for it */}
                     <Box>
                         <Typography variant="h3" sx={{ fontWeight: 700, color: '#3d4465', mb: 2 }}>About</Typography>
                         <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                            {teacher.about || 'No details provided.'}
                         </Typography>
 
-                        <Typography variant="h3" sx={{ fontWeight: 700, color: '#3d4465', mt: 4, mb: 2 }}>Education:</Typography>
+                        <Typography variant="h3" sx={{ fontWeight: 700, color: '#3d4465', mt: 4, mb: 2 }}>Education / Qualification:</Typography>
                         <Box sx={{ pl: 2 }}>
-                            <Stack spacing={3}>
-                                <Box>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#3d4465' }}>• History Major, University Historia</Typography>
-                                    <Typography variant="body2" color="text.secondary" sx={{ ml: 2, mt: 0.5 }}>2013-2017</Typography>
-                                </Box>
-                                <Box>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#3d4465' }}>• Master of History, University Historia</Typography>
-                                    <Typography variant="body2" color="text.secondary" sx={{ ml: 2, mt: 0.5 }}>2013-2017</Typography>
-                                </Box>
-                            </Stack>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#3d4465' }}>• {teacher.qualification}</Typography>
                         </Box>
                     </Box>
 

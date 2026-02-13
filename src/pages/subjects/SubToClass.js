@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Paper,
@@ -19,50 +19,101 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-
-/* ---------- Static Data ---------- */
-const classes = ["Class 1", "Class 2"];
-const sections = ["A", "B"];
-const subjects = [
-  { id: 1, name: "Mathematics" },
-  { id: 2, name: "Physics" },
-  { id: 3, name: "Chemistry" },
-  { id: 4, name: "History" },
-  { id: 5, name: "Political Science" },
-];
+import api from '../../services/api';
+import { notifications } from '@mantine/notifications';
 
 export default function SubToClass() {
-  const [selectedClass, setSelectedClass] = useState("");
-  const [selectedSection, setSelectedSection] = useState("");
-  const [selectedSubjects, setSelectedSubjects] = useState([]);
+  const [classes, setClasses] = useState([]);
+  const [allSubjects, setAllSubjects] = useState([]);
 
-  const [list] = useState([
-    {
-      class: "Class 1",
-      section: "A",
-      subjects: "Mathematics, Physics",
-    },
-  ]);
+  const [selectedClassId, setSelectedClassId] = useState("");
+  const [selectedSubjectIds, setSelectedSubjectIds] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // For the list/table view
+  const [mappings, setMappings] = useState([]);
+
+  useEffect(() => {
+    fetchInitialData();
+    fetchMappings();
+  }, []);
+
+  const fetchInitialData = async () => {
+    try {
+      const subRes = await api.get('/getSubjects');
+      if (subRes.data.subjects) {
+        setAllSubjects(subRes.data.subjects);
+      }
+
+      const clsRes = await api.get('/getClasses');
+      if (clsRes.data.classes) {
+        // Extract unique classes (Grades)
+        const uniqueClasses = [];
+        const seen = new Set();
+        for (const item of clsRes.data.classes) {
+          if (!seen.has(item.class_id)) {
+            seen.add(item.class_id);
+            uniqueClasses.push({ id: item.class_id, name: item.class_name });
+          }
+        }
+        setClasses(uniqueClasses);
+      }
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchMappings = async () => {
+    try {
+      const res = await api.get('/getAllClassSubjects');
+      if (res.data.data) {
+        setMappings(res.data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch curriculum:", error);
+    }
+  };
 
   const handleSubjectChange = (id) => {
-    setSelectedSubjects((prev) =>
+    setSelectedSubjectIds((prev) =>
       prev.includes(id)
         ? prev.filter((s) => s !== id)
         : [...prev, id]
     );
   };
 
-  const selectedSubjectNames = subjects.filter((s) =>
-    selectedSubjects.includes(s.id)
-  );
-
-  const handleSave = () => {
-    console.log({
-      class: selectedClass,
-      section: selectedSection,
-      subjects: selectedSubjectNames.map((s) => s.name),
-    });
+  const handleSave = async () => {
+    if (!selectedClassId || selectedSubjectIds.length === 0) {
+      notifications.show({ title: 'Error', message: 'Select Class and Subjects', color: 'red' });
+      return;
+    }
+    setLoading(true);
+    try {
+      await api.post('/assignSubjectToClass', {
+        classId: selectedClassId,
+        subjectIds: selectedSubjectIds
+      });
+      notifications.show({ title: 'Success', message: 'Subjects Assigned to Curriculum', color: 'green' });
+      setSelectedClassId("");
+      setSelectedSubjectIds([]);
+      fetchMappings();
+    } catch (error) {
+      console.error(error);
+      notifications.show({ title: 'Error', message: 'Failed to assign subjects', color: 'red' });
+    } finally {
+      setLoading(false);
+    }
   };
+
+  // Group mappings by Class
+  const groupedMappings = mappings.reduce((acc, curr) => {
+    if (!acc[curr.class_name]) {
+      acc[curr.class_name] = [];
+    }
+    acc[curr.class_name].push(curr);
+    return acc;
+  }, {});
 
   return (
     <Grid container spacing={2}>
@@ -70,87 +121,45 @@ export default function SubToClass() {
       <Grid item xs={12} md={4}>
         <Paper sx={{ p: 3, borderRadius: 0 }}>
           <Typography variant="h6" mb={2}>
-            Assign Subject to Class
+            Assign Subject to Class (Curriculum)
           </Typography>
 
           <Stack spacing={2}>
             <TextField
               select
-              label="Class *"
-              value={selectedClass}
-              onChange={(e) => setSelectedClass(e.target.value)}
+              label="Select Grade *"
+              value={selectedClassId}
+              onChange={(e) => setSelectedClassId(e.target.value)}
               fullWidth
             >
               <MenuItem value="">Select</MenuItem>
               {classes.map((cls) => (
-                <MenuItem key={cls} value={cls}>
-                  {cls}
-                </MenuItem>
+                <MenuItem key={cls.id} value={cls.id}>{cls.name}</MenuItem>
               ))}
             </TextField>
 
-            <TextField
-              select
-              label="Section *"
-              value={selectedSection}
-              onChange={(e) => setSelectedSection(e.target.value)}
-              fullWidth
-            >
-              <MenuItem value="">Select</MenuItem>
-              {sections.map((sec) => (
-                <MenuItem key={sec} value={sec}>
-                  {sec}
-                </MenuItem>
-              ))}
-            </TextField>
 
             {/* SUBJECT DROPDOWN */}
-            <TextField
-              select
-              label="Subjects *"
-              fullWidth
-              value={selectedSubjects}   // ✅ REQUIRED
-              SelectProps={{
-                multiple: true,
-                renderValue: () => "Select Subjects",
-              }}
-            >
-              {subjects.map((sub) => (
-                <MenuItem
+            <Typography variant="subtitle2">Select Subjects *</Typography>
+            <Box sx={{ maxHeight: 300, overflowY: 'auto', border: '1px solid #eee', p: 1 }}>
+              {allSubjects.map((sub) => (
+                <FormControlLabel
                   key={sub.id}
-                  value={sub.id}
-                  onClick={() => handleSubjectChange(sub.id)}
-                >
-                  <Checkbox checked={selectedSubjects.includes(sub.id)} />
-                  <Typography>{sub.name}</Typography>
-                </MenuItem>
+                  control={
+                    <Checkbox
+                      checked={selectedSubjectIds.includes(sub.id)}
+                      onChange={() => handleSubjectChange(sub.id)}
+                    />
+                  }
+                  label={`${sub.name} (${sub.code})`}
+                  sx={{ display: 'block' }}
+                />
               ))}
-            </TextField>
-
-
-
-            {/* SELECTED SUBJECTS DISPLAY */}
-            {selectedSubjects.length > 0 && (
-              <Box>
-                <Typography variant="subtitle1">Selected Subjects</Typography>
-                {selectedSubjectNames.map((sub) => (
-                  <FormControlLabel
-                    key={sub.id}
-                    control={
-                      <Checkbox
-                        checked
-                        onChange={() => handleSubjectChange(sub.id)}
-                      />
-                    }
-                    label={sub.name}
-                  />
-                ))}
-              </Box>
-            )}
+            </Box>
 
             <Box textAlign="right">
-              <Button variant="contained" color="inherit" onClick={handleSave}>
-                Save
+              <Button variant="contained" color="primary" onClick={handleSave} disabled={loading}>
+                {loading ? 'Saving...' : 'Save'}
               </Button>
             </Box>
           </Stack>
@@ -161,35 +170,38 @@ export default function SubToClass() {
       <Grid item xs={12} md={8}>
         <Paper sx={{ p: 3, borderRadius: 0 }}>
           <Typography variant="h6" mb={2}>
-            Subject – Class List
+            Curriculum List
           </Typography>
 
           <Table size="small">
             <TableHead>
               <TableRow>
                 <TableCell>Class</TableCell>
-                <TableCell>Section</TableCell>
                 <TableCell>Subjects</TableCell>
-                <TableCell align="center">Action</TableCell>
+                <TableCell align="center">Total Subjects</TableCell>
               </TableRow>
             </TableHead>
 
             <TableBody>
-              {list.map((row, index) => (
-                <TableRow key={index}>
-                  <TableCell>{row.class}</TableCell>
-                  <TableCell>{row.section}</TableCell>
-                  <TableCell>{row.subjects}</TableCell>
-                  <TableCell align="center">
-                    <IconButton size="small">
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton size="small">
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </TableCell>
+              {Object.keys(groupedMappings).length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={3} align="center">No curriculum assigned yet.</TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                Object.keys(groupedMappings).map((className, index) => (
+                  <TableRow key={index}>
+                    <TableCell sx={{ fontWeight: 600 }}>{className}</TableCell>
+                    <TableCell>
+                      {groupedMappings[className].map(m => (
+                        <span key={m.subject_id} style={{ display: 'inline-block', background: '#f0f1f5', padding: '2px 8px', borderRadius: '4px', margin: '2px', fontSize: '12px' }}>
+                          {m.subject_name} ({m.subject_code})
+                        </span>
+                      ))}
+                    </TableCell>
+                    <TableCell align="center">{groupedMappings[className].length}</TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </Paper>
