@@ -11,22 +11,9 @@ import {
 } from 'recharts';
 import { Box, Typography, Button, Stack } from '@mui/material';
 
-const data = [
-    { name: 'Jan', projects: 75, revenue: 45, active: 30 },
-    { name: 'Feb', projects: 85, revenue: 65, active: 25 },
-    { name: 'Mar', projects: 70, revenue: 55, active: 45 },
-    { name: 'Apr', projects: 98, revenue: 75, active: 30 },
-    { name: 'May', projects: 50, revenue: 45, active: 25 },
-    { name: 'Jun', projects: 98, revenue: 55, active: 35 },
-    { name: 'Jul', projects: 80, revenue: 40, active: 20 },
-    { name: 'Aug', projects: 75, revenue: 60, active: 45 },
-    { name: 'Sep', projects: 95, revenue: 75, active: 35 },
-    { name: 'Oct', projects: 35, revenue: 45, active: 20 },
-    { name: 'Nov', projects: 75, revenue: 50, active: 35 },
-    { name: 'Dec', projects: 98, revenue: 40, active: 20 },
-];
 
-const SchoolOverviewChart = () => {
+
+const SchoolOverviewChart = ({ data }) => {
     return (
         <Box sx={{ width: '100%', height: 400 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>

@@ -12,15 +12,9 @@ import {
     LinearProgress
 } from '@mui/material';
 
-const teachers = [
-    { id: 1, name: 'Hanu', subject: 'Programming', qualification: 'B.Tech', performance: 80 },
-    { id: 2, name: 'Sarah', subject: 'English', qualification: 'M.A.', performance: 95 },
-    { id: 3, name: 'Mike', subject: 'Mathematics', qualification: 'M.Sc.', performance: 70 },
-    { id: 4, name: 'Emma', subject: 'Science', qualification: 'B.Sc.', performance: 85 },
-    { id: 5, name: 'John', subject: 'History', qualification: 'B.Ed.', performance: 60 },
-];
 
-const TeacherDetailsTable = () => {
+
+const TeacherDetailsTable = ({ teachers }) => {
     return (
         <TableContainer sx={{ overflowX: 'auto' }}>
             <Table sx={{ minWidth: 600 }}>

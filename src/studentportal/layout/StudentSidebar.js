@@ -36,6 +36,11 @@ const StudentSidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
                     name: "Attendance",
                     icon: <BiCalendarCheck />,
                     path: "/student/attendance"
+                },
+                {
+                    name: "Leave Application",
+                    icon: <BiMessageDetail />,
+                    path: "/student/leave"
                 }
             ],
         },
@@ -55,7 +60,12 @@ const StudentSidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
                 {
                     name: "Exam Schedule",
                     icon: <BiTime />,
-                    path: "/student/exams"
+                    path: "/student/examschedule"
+                },
+                {
+                    name: "Online Exams",
+                    icon: <BiCheckCircle />,
+                    path: "/student/online-exams"
                 },
                 {
                     name: "Results",

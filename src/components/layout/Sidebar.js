@@ -21,12 +21,12 @@ import {
   BiBookContent,
   BiCalendarCheck,
   BiBuilding,
-  BiBarChart,
   BiTime,
   BiChevronRight,
   BiChevronDown,
   BiUserPlus,
   BiX,
+  BiMoney,
 } from "react-icons/bi";
 import { Link, useLocation } from "react-router-dom";
 import logo from "../../assets/GMs-logo.png";
@@ -34,7 +34,7 @@ import logo from "../../assets/GMs-logo.png";
 const sidebarWidth = 280;
 
 const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
-  const [openDashboard, setOpenDashboard] = useState(false);
+  // const [openDashboard, setOpenDashboard] = useState(false); // Removed as Dashboard is now direct link
   const [openStudent, setOpenStudent] = useState(false);
   const [openTeacher, setOpenTeacher] = useState(false);
   const [openClasses, setOpenClasses] = useState(false);
@@ -43,8 +43,12 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
   const [openTimeTable, setOpenTimeTable] = useState(false);
   const [openAdmission, setOpenAdmission] = useState(false);
   const [openExamSchedule, setOpenExamSchedule] = useState(false);
-  const [openGrades, setOpenGrades] = useState(false);
-  const [openClassroom, setOpenClassroom] = useState(false);
+  // const [openGrades, setOpenGrades] = useState(false);
+  // const [openClassroom, setOpenClassroom] = useState(false);
+  const [openParents, setOpenParents] = useState(false);
+  const [openFees, setOpenFees] = useState(false);
+  const [openTransport, setOpenTransport] = useState(false);
+  const [openLibrary, setOpenLibrary] = useState(false);
 
   const location = useLocation();
   const theme = useTheme();
@@ -54,12 +58,17 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
     {
       name: "Dashboard",
       icon: <BiHomeAlt />,
+      path: "/dashboard",
+    },
+    {
+      name: "Admission",
+      icon: <BiUserPlus />,
       hasSubmenu: true,
-      isOpen: openDashboard,
-      onClick: () => setOpenDashboard(!openDashboard),
+      isOpen: openAdmission,
+      onClick: () => setOpenAdmission(!openAdmission),
       children: [
-        { name: "Dashboard", path: "/dashboard" },
-        { name: "Admin Dashboard", path: "/dashboard" },
+        { name: "Application Form", path: "/admission/application-form" },
+        { name: "Application List", path: "/admission/application-list" }
       ],
     },
     {
@@ -69,9 +78,20 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
       isOpen: openStudent,
       onClick: () => setOpenStudent(!openStudent),
       children: [
+        { name: "Add New Student", path: "/students/add" },
         { name: "All Students", path: "/students" },
         { name: "Student Details", path: "/students/details" },
-        { name: "Add New Student", path: "/students/add" },
+
+      ],
+    },
+    {
+      name: "Parents",
+      icon: <BiUser />,
+      hasSubmenu: true,
+      isOpen: openParents,
+      onClick: () => setOpenParents(!openParents),
+      children: [
+        { name: "All Parents", path: "/parents" },
       ],
     },
     {
@@ -81,9 +101,10 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
       hasSubmenu: true,
       onClick: () => setOpenTeacher(!openTeacher),
       children: [
+        { name: "Add New Teacher", path: "/teachers/add" },
         { name: "All Teachers", path: "/teachers" },
         { name: "Teacher Details", path: "/teachers/details" },
-        { name: "Add New Teacher", path: "/teachers/add" },
+
       ],
     },
 
@@ -94,10 +115,10 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
       isOpen: openClasses,
       onClick: () => setOpenClasses(!openClasses),
       children: [
-        { name: "All Classes", path: "/classes" },
         { name: "Add New Class", path: "/classes/add" },
-        { name: "Assign Class to Teacher", path: "/classes/assign" },
-      ],
+        { name: "All Classes", path: "/classes" },
+        { name: "Class Assignments", path: "/classes/assign-students" },
+      ]
     },
     {
       name: "Subjects",
@@ -106,22 +127,10 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
       isOpen: openSubjects,
       onClick: () => setOpenSubjects(!openSubjects),
       children: [
-        { name: "All Subjects", path: "/subjects" },
         { name: "Add New Subject", path: "/subjects/add" },
+        { name: "All Subjects", path: "/subjects" },
         { name: "Assign Subject to Teacher", path: "/subjects/assign" },
-        { name: "Assign Subject to Class", path: "/subjects/class" },
-      ],
-    },
-    {
-      name: "Attendance",
-      icon: <BiCalendarCheck />,
-      hasSubmenu: true,
-      isOpen: openAttendance,
-      onClick: () => setOpenAttendance(!openAttendance),
-      children: [
-        { name: "Attendance Dashboard", path: "/attendance" },
-        { name: "Student Attendance", path: "/attendance/student" },
-        { name: "Teacher Attendance", path: "/attendance/teacher" },
+        { name: "Assign Subjects to Class", path: "/subjects/class" },
       ],
     },
     {
@@ -133,18 +142,18 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
       children: [{ name: "View Time Table", path: "/timetable" }],
     },
     {
-      name: "Admission",
-      icon: <BiUserPlus />,
+      name: "Attendance",
+      icon: <BiCalendarCheck />,
       hasSubmenu: true,
-      isOpen: openAdmission,
-      onClick: () => setOpenAdmission(!openAdmission),
+      isOpen: openAttendance,
+      onClick: () => setOpenAttendance(!openAttendance),
       children: [
-        { name: "Admission", path: "/admission" },
-        { name: "Application Form", path: "/admission/application-form" },
-        { name: "Application List", path: "/admission/application-list" }
+        { name: "Student Attendance", path: "/attendance/student" },
+        { name: "Teacher Attendance", path: "/attendance/teacher" },
+        { name: "Leave Approvals", path: "/attendance/leaves" },
       ],
     },
-     {
+    {
       name: "Exam Schedule",
       icon: <BiCalendarCheck />,
       hasSubmenu: true,
@@ -152,21 +161,61 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
       onClick: () => setOpenExamSchedule(!openExamSchedule),
       children: [
         { name: "Create Exam ", path: "/create-exam" },
-        { name: "Exam Timetable", path: "/exam-timetable" },
-        { name: "Student Exam Marks", path: "/exam-marks  " },
-        { name: "Student Exam Marks History", path: "/exam-history" }
+        { name: "Exam Timetable View", path: "/exam-timetables" },
+        { name: "Student Exam Marks", path: "/exam-marks" },
+        { name: "Student Exam Marks History", path: "/exam-history" },
+        { name: "Online Exams", path: "/online-exam" }
       ],
     },
     {
-      name: "Classroom",
-      path: "/classroom",
-      icon: <BiBuilding />,
+      name: "Fees & Dues",
+      icon: <BiMoney />,
+      hasSubmenu: true,
+      isOpen: openFees,
+      onClick: () => setOpenFees(!openFees),
+      children: [
+        { name: "Fee Structure", path: "/fees/structure" },
+        { name: "Fee Payments", path: "/fees/payment-status" },
+        { name: "Collect Fees", path: "/fees/collect" },
+        { name: "Fee Receipts", path: "/fees/receipts" },
+        { name: "Payment Methods", path: "/fees/payment-methods" },
+      ],
     },
     {
-      name: "Grades",
-      path: "/grades",
-      icon: <BiBarChart />,
+      name: "Transport",
+      icon: <BiBuilding />,
+      hasSubmenu: true,
+      isOpen: openTransport,
+      onClick: () => setOpenTransport(!openTransport),
+      children: [
+        { name: "Route Management", path: "/transport/routes" },
+        { name: "Bus Management", path: "/transport/buses" },
+        { name: "Assignments", path: "/transport/assignments" },
+      ],
+      path: "/transport"
     },
+    {
+      name: "Library",
+      icon: <BiBook />,
+      hasSubmenu: true,
+      isOpen: openLibrary,
+      onClick: () => setOpenLibrary(!openLibrary),
+      children: [
+        { name: "Circulation", path: "/library/circulation" }
+      ],
+      path: '/library'
+    },
+    // {
+    //   name: "Classroom",
+    //   path: "/classroom",
+    //   icon: <BiBuilding />,
+    // },
+    // {
+    //   name: "Grades",
+    //   path: "/grades",
+    //   icon: <BiBarChart />,
+    // },
+
 
   ];
 
@@ -174,8 +223,8 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
     <Box
       sx={{
         height: "100%",
-        bgcolor: "#4d44b5",
-        color: "#c0beea",
+        bgcolor: theme.palette.mode === 'light' ? theme.palette.primary.main : theme.palette.background.paper,
+        color: theme.palette.mode === 'light' ? "#c0beea" : theme.palette.text.secondary,
         display: "flex",
         flexDirection: "column",
         overflowY: "auto",
@@ -184,6 +233,7 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
           width: 0,
         },
         scrollbarWidth: "none",
+        borderRight: theme.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.05)' : 'none',
       }}
     >
       {/* Logo Section */}
@@ -201,12 +251,14 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
           sx={{
             width: collapsed && !isMobile ? 40 : 64,
             height: collapsed && !isMobile ? 40 : 64,
-            bgcolor: "#fefefe",
+            bgcolor: theme.palette.mode === 'light' ? "#fefefe" : theme.palette.background.default,
             borderRadius: "12px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            boxShadow: "0 4px 10px rgba(251, 125, 91, 0.4)",
+            boxShadow: theme.palette.mode === 'light'
+              ? "0 4px 10px rgba(251, 125, 91, 0.4)"
+              : "0 4px 10px rgba(0, 0, 0, 0.2)",
             flexShrink: 0,
             overflow: "hidden",
             transition: "all 0.3s ease",
@@ -230,7 +282,7 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
               variant="h4"
               sx={{
                 fontWeight: 700,
-                color: "#fff",
+                color: theme.palette.mode === 'light' ? "#fff" : theme.palette.text.primary,
                 fontSize: "24px",
                 whiteSpace: "nowrap",
               }}
@@ -254,7 +306,7 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
           <React.Fragment key={index}>
             <ListItem disablePadding sx={{ mb: 0.5, display: "block" }}>
               <ListItemButton
-                component={item.path ? Link : "button"}
+                component={item.path ? Link : "div"}
                 to={item.path || undefined}
                 onClick={item.hasSubmenu ? item.onClick : undefined}
                 sx={{
@@ -265,16 +317,16 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
                   py: 1.2,
                   bgcolor:
                     location.pathname === item.path
-                      ? "rgba(255,255,255,0.15)"
+                      ? (theme.palette.mode === 'light' ? "rgba(255,255,255,0.15)" : theme.palette.action.selected)
                       : "transparent",
                   color:
                     location.pathname === item.path
-                      ? "#fff"
-                      : "#c0beea",
+                      ? (theme.palette.mode === 'light' ? "#fff" : theme.palette.primary.main)
+                      : (theme.palette.mode === 'light' ? "#c0beea" : theme.palette.text.secondary),
                   justifyContent: collapsed && !isMobile ? "center" : "initial",
                   "&:hover": {
-                    bgcolor: "rgba(255,255,255,0.05)",
-                    color: "#fff",
+                    bgcolor: theme.palette.mode === 'light' ? "rgba(255,255,255,0.05)" : theme.palette.action.hover,
+                    color: theme.palette.mode === 'light' ? "#fff" : theme.palette.text.primary,
                   },
                 }}
               >
@@ -294,9 +346,10 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
                     <ListItemText
                       primary={item.name}
                       primaryTypographyProps={{ fontSize: 16, fontWeight: 500 }}
+                      sx={{ flexGrow: 1 }}
                     />
                     {item.hasSubmenu &&
-                      (item.isOpen ? <BiChevronDown /> : <BiChevronRight />)}
+                      (item.isOpen ? <BiChevronDown size={20} style={{ marginLeft: 'auto' }} /> : <BiChevronRight size={20} style={{ marginLeft: 'auto' }} />)}
                   </>
                 )}
               </ListItemButton>
@@ -316,8 +369,12 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
                         sx={{
                           pl: 9,
                           py: 1,
-                          color: isActive ? "#fff" : "#c0beea",
-                          "&:hover": { color: "#fff" },
+                          color: isActive
+                            ? (theme.palette.mode === 'light' ? "#fff" : theme.palette.primary.main)
+                            : (theme.palette.mode === 'light' ? "#c0beea" : theme.palette.text.secondary),
+                          "&:hover": {
+                            color: theme.palette.mode === 'light' ? "#fff" : theme.palette.text.primary
+                          },
                         }}
                       >
                         <ListItemText
@@ -340,7 +397,7 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
       {/* Footer Text */}
       {(!collapsed || isMobile) && (
         <Box sx={{ p: 4, textAlign: "center", mt: "auto", mb: 2 }}>
-          <Typography variant="caption" sx={{ color: "#8d87d3" }}>
+          <Typography variant="caption" sx={{ color: theme.palette.mode === 'light' ? "#8d87d3" : theme.palette.text.disabled }}>
             - School Admission Dashboard
             <br />
           </Typography>
@@ -379,7 +436,7 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
           top: 0,
           left: 0,
           borderRight: "none",
-          bgcolor: "#4d44b5",
+          bgcolor: theme.palette.mode === 'light' ? theme.palette.primary.main : theme.palette.background.paper,
           zIndex: 1200
         }}
       >
