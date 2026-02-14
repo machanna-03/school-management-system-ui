@@ -1,5 +1,3 @@
-import axios from "axios";
-import { config } from "../config/Config";
 import api from "./api"; // Import the new axios instance
 
 
@@ -17,6 +15,16 @@ export const invokeApi = async (url, params, cookies) => {
         return await api.post(url, params);
     } catch (error) {
         // Return the error response to maintain backward compatibility with components checks
+        return error.response || { status: 500, data: { responseMessage: "Network Error" } };
+    }
+};
+
+export const invokePostApi = invokeApi;
+
+export const invokePutApi = async (url, params) => {
+    try {
+        return await api.put(url, params);
+    } catch (error) {
         return error.response || { status: 500, data: { responseMessage: "Network Error" } };
     }
 };
@@ -80,7 +88,22 @@ export const apiList = {
     addExamSchedule: "/addExamSchedule",
     getExamSchedule: "/getExamSchedule", // Appended with /:id
     enterMarks: "/enterMarks",
-    getStudentMarks: "/getStudentMarks", // Appended with /:examId/:studentId
+    getStudentMarks: "/getStudentMarks",
+
+    // Transport Module
+    getRoutes: "/transport/routes",
+    addRoute: "/transport/addRoute",
+    getStops: "/transport/stops", // requires /{route_id}
+    addStop: "/transport/addStop",
+    getBuses: "/transport/buses",
+    addBus: "/transport/addBus",
+    updateBusLocation: "/transport/updateLocation",
+    assignTransport: "/transport/assignMember",
+    getAssignments: "/transport/assignments",
+    deleteRoute: "/transport/deleteRoute",
+    deleteStop: "/transport/deleteStop",
+    deleteBus: "/transport/deleteBus",
+    deleteAssignment: "/transport/deleteAssignment",
 
     // Classes & Subjects (if missing)
     getClasses: "/getClasses", // Returns sections
@@ -118,4 +141,13 @@ export const apiList = {
     addGrade: "/addGrade",
     getGrades: "/getGrades",
     deleteGrade: "/deleteGrade",
+
+    // Online Exams
+    addQuestion: "/addQuestion",
+    getQuestions: "/getQuestions", // /{schedule_id}
+    submitExam: "/submitExam",
+    getOnlineExamResult: "/getOnlineExamResult",
+    updateQuestion: "/updateQuestion",
+    deleteQuestion: "/deleteQuestion", // /{id}
+    getQuestion: "/getQuestion", // /{id}
 };
