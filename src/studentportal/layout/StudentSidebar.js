@@ -63,6 +63,11 @@ const StudentSidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
                     path: "/student/exams"
                 },
                 {
+                    name: "Online Exams",
+                    icon: <BiCheckCircle />,
+                    path: "/student/online-exams"
+                },
+                {
                     name: "Results",
                     icon: <BiBarChartAlt2 />,
                     path: "/student/results"

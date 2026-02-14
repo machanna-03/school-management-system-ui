@@ -49,6 +49,7 @@ const CreateExam = () => {
     classId: "",
     startDate: "",
     endDate: "",
+    examMode: "Offline"
   });
 
   // Timetable State: Array of manual entries
@@ -157,7 +158,8 @@ const CreateExam = () => {
         class_id: examData.classId,
         start_date: examData.startDate,
         end_date: examData.endDate,
-        exam_type_id: examData.examTypeId
+        exam_type_id: examData.examTypeId,
+        exam_mode: examData.examMode
       };
 
       let examResponse = await invokeApi(config.getMySchool + apiList.createExam, examPayload);
@@ -255,6 +257,19 @@ const CreateExam = () => {
                     <MenuItem value="2023-2024">2023 - 2024</MenuItem>
                     <MenuItem value="2024-2025">2024 - 2025</MenuItem>
                     <MenuItem value="2025-2026">2025 - 2026</MenuItem>
+                  </TextField>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    select
+                    label="Exam Mode"
+                    name="examMode"
+                    value={examData.examMode || 'Offline'}
+                    onChange={handleExamDataChange}
+                  >
+                    <MenuItem value="Offline">Offline</MenuItem>
+                    <MenuItem value="Online">Online</MenuItem>
                   </TextField>
                 </Grid>
                 <Grid item xs={12} sm={6}>

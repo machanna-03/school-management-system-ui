@@ -1,5 +1,6 @@
 import React from 'react';
 import '@mantine/core/styles.css';
+import { ThemeContextProvider } from './context/ThemeContext';
 import '@mantine/notifications/styles.css';
 import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
@@ -14,6 +15,8 @@ import ExamTimetable from './pages/exam/ExamTimetable';
 import ExamTimetables from './pages/exam/ExamTimetables';
 import StudentMarks from './pages/exam/StudentMarks';
 import StudentMarksHistory from './pages/exam/StudentMarksHistory';
+import OnlineExamDashboard from './pages/exam/OnlineExamDashboard';
+import AddQuestions from './pages/exam/AddQuestions';
 // import Classroom from './pages/Classroom';
 // import Grades from './pages/Grades';
 import FeePaymentStatus from './pages/FeeDues/FeePaymentStatus';
@@ -32,7 +35,7 @@ import Classes from './pages/classes/Classes';
 import AddClass from './pages/classes/AddClass';
 import Subjects from './pages/subjects/Subjects';
 import AddSubject from './pages/subjects/AddSubject';
-import Attendance from './pages/attendance/Attendance';
+// import Attendance from './pages/attendance/Attendance';
 import TeacherAttendance from './pages/attendance/TeacherAttendance';
 import TimeTable from './pages/timetable/TimeTable';
 import Login from './components/auth/Login';
@@ -61,6 +64,8 @@ import ParentPerformance from './parentportal/pages/Performance';
 import StudentLayout from './studentportal/layout/StudentLayout';
 import StudentDashboard from './studentportal/pages/StudentDashboard';
 import StudentTimeTable from './studentportal/pages/StudentTimeTable';
+import StudentOnlineExams from './studentportal/pages/OnlineExams';
+import TakeExam from './studentportal/pages/TakeExam';
 // Removed duplicate StudentAttendance import to avoid collision
 
 
@@ -72,7 +77,7 @@ import SubToTeacher from './pages/subjects/SubToTeacher';
 import SubToClass from './pages/subjects/SubToClass';
 import LeaveApplicant from './parentportal/pages/SchoolLife/LeaveApplicant';
 import ApplicationForm from './pages/admission/ApplicationForm';
-import Admission from './pages/admission/Admission';
+// import Admission from './pages/admission/Admission';
 import StudentAttendance from './pages/attendance/StudentAttendance';
 
 // Attendance & Leave Imports
@@ -81,6 +86,16 @@ import LeaveApprovals from './pages/attendance/LeaveApprovals';
 import LeaveApplication from './pages/attendance/LeaveApplication'; // For Teachers
 import StudentLeave from './studentportal/pages/StudentLeave';
 import MyAttendance from './studentportal/pages/MyAttendance';
+
+// Transport Module
+import TransportDashboard from './pages/transport/TransportDashboard';
+import RouteManagement from './pages/transport/RouteManagement';
+import BusManagement from './pages/transport/BusManagement';
+import StudentBusAssignment from './pages/transport/StudentBusAssignment';
+
+// Library Imports
+import LibraryDashboard from './pages/library/LibraryDashboard';
+import LibraryCirculation from './pages/library/LibraryCirculation';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -164,6 +179,11 @@ const AppContent = () => {
               <Route path="/exam-timetables" element={<ExamTimetables />} />
               <Route path="/exam-marks" element={<StudentMarks />} />
               <Route path="/exam-history" element={<StudentMarksHistory />} />
+
+              {/* Online Exam Admin Routes */}
+              <Route path="/online-exam" element={<OnlineExamDashboard />} />
+              <Route path="/online-exam/questions/:scheduleId" element={<AddQuestions />} />
+
               {/* <Route path="/classroom" element={<Classroom />} /> */}
               {/* <Route path="/grades" element={<Grades />} /> */}
               <Route path="/fees/payment-status" element={<FeePaymentStatus />} />
@@ -172,8 +192,18 @@ const AppContent = () => {
               <Route path="/fees/receipts" element={<FeeReceipts />} />
               <Route path="/fees/payments-methods" element={<PaymentMethods />} />
 
-              <Route path="/admission" element={<Admission />} />
+              {/* <Route path="/admission" element={<Admission />} /> */}
               <Route path="/admission/application-form" element={<ApplicationForm />} />
+
+              {/* Transport Module */}
+              <Route path="/transport" element={<TransportDashboard />} />
+              <Route path="/transport/routes" element={<RouteManagement />} />
+              <Route path="/transport/buses" element={<BusManagement />} />
+              <Route path="/transport/assignments" element={<StudentBusAssignment />} />
+
+              {/* Library Module */}
+              <Route path="/library" element={<LibraryDashboard />} />
+              <Route path="/library/circulation" element={<LibraryCirculation />} />
             </Routes>
           </Layout>
         </ProtectedRoute>
@@ -227,6 +257,8 @@ const AppContent = () => {
               <Route path="timetable" element={<StudentTimeTable />} />
               <Route path="attendance" element={<MyAttendance />} />
               <Route path="leave" element={<StudentLeave />} />
+              <Route path="online-exams" element={<StudentOnlineExams />} />
+              <Route path="take-exam/:examId/:scheduleId" element={<TakeExam />} />
             </Routes>
           </StudentLayout>
         </ProtectedRoute>
@@ -253,15 +285,18 @@ const AppContent = () => {
 
 
 
+
 function App() {
   return (
     <MantineProvider>
       <Notifications />
       <CookiesProvider>
         <AppProvider>
-          <BrowserRouter>
-            <AppContent />
-          </BrowserRouter>
+          <ThemeContextProvider>
+            <BrowserRouter>
+              <AppContent />
+            </BrowserRouter>
+          </ThemeContextProvider>
         </AppProvider>
       </CookiesProvider>
     </MantineProvider>
