@@ -25,6 +25,11 @@ import FeeStructure from './pages/FeeDues/FeeStructure';
 import FeeReceipts from './pages/FeeDues/FeeReceipts';
 import PaymentMethods from './pages/FeeDues/PaymentMethods';
 import EditParent from './pages/EditParent';
+import FeeStructure from './pages/feemanagement/FeeStructure';
+import PaymentMethod from './pages/feemanagement/PaymentMethods';
+import FeeDues from './pages/feemanagement/FeeDues';
+import FeeReceipts from './pages/feemanagement/FeeReceipts';
+import CollectFees from './pages/feemanagement/CollectFees';
 import AddStudent from './pages/students/AddStudent';
 import Teachers from './pages/teachers/Teachers';
 import TeacherDetails from './pages/teachers/TeacherDetails';
@@ -173,7 +178,6 @@ const AppContent = () => {
               <Route path="/attendance/student" element={<StudentAttendance />} />
               <Route path="/attendance/teacher" element={<TeacherAttendance />} />
               <Route path="/attendance/leaves" element={<LeaveApprovals />} />
-
               <Route path="/timetable" element={<TimeTable />} />
               <Route path="/create-exam" element={<CreateExam />} />
               <Route path="/exam-timetable" element={<ExamTimetable />} />
