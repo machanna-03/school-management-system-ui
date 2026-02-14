@@ -64,6 +64,7 @@ import ParentPerformance from './parentportal/pages/Performance';
 import StudentLayout from './studentportal/layout/StudentLayout';
 import StudentDashboard from './studentportal/pages/StudentDashboard';
 import StudentTimeTable from './studentportal/pages/StudentTimeTable';
+import StudentExamSchedule from './studentportal/pages/StudentExamSchedule';
 import StudentOnlineExams from './studentportal/pages/OnlineExams';
 import TakeExam from './studentportal/pages/TakeExam';
 // Removed duplicate StudentAttendance import to avoid collision
@@ -257,6 +258,7 @@ const AppContent = () => {
               <Route path="timetable" element={<StudentTimeTable />} />
               <Route path="attendance" element={<MyAttendance />} />
               <Route path="leave" element={<StudentLeave />} />
+              <Route path="examschedule" element={<StudentExamSchedule />} />
               <Route path="online-exams" element={<StudentOnlineExams />} />
               <Route path="take-exam/:examId/:scheduleId" element={<TakeExam />} />
             </Routes>
