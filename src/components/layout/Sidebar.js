@@ -21,6 +21,8 @@ import {
   BiBookContent,
   BiCalendarCheck,
   BiBuilding,
+  BiBarChart,
+  BiDollar,
   BiTime,
   BiChevronRight,
   BiChevronDown,
@@ -43,6 +45,7 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
   const [openTimeTable, setOpenTimeTable] = useState(false);
   const [openAdmission, setOpenAdmission] = useState(false);
   const [openExamSchedule, setOpenExamSchedule] = useState(false);
+  const [openFeeManagement, setOpenFeeManagement] = useState(false);
   // const [openGrades, setOpenGrades] = useState(false);
   // const [openClassroom, setOpenClassroom] = useState(false);
   const [openParents, setOpenParents] = useState(false);
@@ -216,6 +219,20 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
     //   icon: <BiBarChart />,
     // },
 
+     {
+      name: "Fee Management",
+      icon: <BiDollar />,
+      hasSubmenu: true,
+      isOpen: openFeeManagement,
+      onClick: () => setOpenFeeManagement(!openFeeManagement),
+      children: [
+        { name: "Fee Structure", path: "/fee-structure" },
+        { name: "Fee Dues", path: "/fee-dues" },
+        { name: "Fee Receipts", path: "/fee-receipts" },
+        { name: "Collect Fee", path: "/collect-fee" },
+        { name: "Payment Method", path: "/payment-method" },
+      ],
+    },
 
   ];
 
