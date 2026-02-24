@@ -26,6 +26,11 @@ import FeeStructure from './pages/FeeDues/FeeStructure';
 import FeeReceipts from './pages/FeeDues/FeeReceipts';
 import PaymentMethods from './pages/FeeDues/PaymentMethods';
 import EditParent from './pages/EditParent';
+import FeeStructure from './pages/feemanagement/FeeStructure';
+import PaymentMethod from './pages/feemanagement/PaymentMethods';
+import FeeDues from './pages/feemanagement/FeeDues';
+import FeeReceipts from './pages/feemanagement/FeeReceipts';
+import CollectFees from './pages/feemanagement/CollectFees';
 import AddStudent from './pages/students/AddStudent';
 import Teachers from './pages/teachers/Teachers';
 import TeacherDetails from './pages/teachers/TeacherDetails';
@@ -65,6 +70,7 @@ import ParentPerformance from './parentportal/pages/Performance';
 import StudentLayout from './studentportal/layout/StudentLayout';
 import StudentDashboard from './studentportal/pages/StudentDashboard';
 import StudentTimeTable from './studentportal/pages/StudentTimeTable';
+import StudentExamSchedule from './studentportal/pages/StudentExamSchedule';
 import StudentOnlineExams from './studentportal/pages/OnlineExams';
 import TakeExam from './studentportal/pages/TakeExam';
 // Removed duplicate StudentAttendance import to avoid collision
@@ -184,7 +190,6 @@ const AppContent = () => {
               <Route path="/attendance/student" element={<StudentAttendance />} />
               <Route path="/attendance/teacher" element={<TeacherAttendance />} />
               <Route path="/attendance/leaves" element={<LeaveApprovals />} />
-
               <Route path="/timetable" element={<TimeTable />} />
               <Route path="/create-exam" element={<CreateExam />} />
               <Route path="/exam-timetable" element={<ExamTimetable />} />
@@ -275,6 +280,7 @@ const AppContent = () => {
               <Route path="timetable" element={<StudentTimeTable />} />
               <Route path="attendance" element={<MyAttendance />} />
               <Route path="leave" element={<StudentLeave />} />
+              <Route path="examschedule" element={<StudentExamSchedule />} />
               <Route path="online-exams" element={<StudentOnlineExams />} />
               <Route path="take-exam/:scheduleId" element={<TakeExam />} />
             </Routes>
