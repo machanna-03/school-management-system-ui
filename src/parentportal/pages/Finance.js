@@ -4,16 +4,16 @@ import { BiMoney, BiHistory, BiReceipt, BiCreditCard, BiDownload, BiCalendar, Bi
 import { useLocation, useNavigate } from 'react-router-dom';
 import { invokeGetApi, apiList } from '../../services/ApiServices';
 import { config } from '../../config/Config';
+import { useStudent } from '../layout/ParentLayout';
 
 const Finance = ({ initialTab = 'fees' }) => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { selectedStudent } = useStudent();
 
     const [feeAssignments, setFeeAssignments] = useState([]);
     const [receipts, setReceipts] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    const studentId = localStorage.getItem('student_id') || 1; // Fallback for dev
+    const [loading, setLoading] = useState(false);
 
     // Map routes to tab values
     const getTabFromPath = (path) => {
@@ -31,15 +31,17 @@ const Finance = ({ initialTab = 'fees' }) => {
     }, [location.pathname]);
 
     useEffect(() => {
-        fetchData();
-    }, [studentId]);
+        if (selectedStudent?.id) {
+            fetchData(selectedStudent.id);
+        }
+    }, [selectedStudent]);
 
-    const fetchData = async () => {
+    const fetchData = async (sid) => {
         setLoading(true);
         try {
             const [feeRes, receiptRes] = await Promise.all([
-                invokeGetApi(`${config.getMySchool}${apiList.getStudentFeeDetails}/${studentId}`),
-                invokeGetApi(`${config.getMySchool}${apiList.getFeeReceipts}`, { student_id: studentId, limit: 100 })
+                invokeGetApi(`${config.getMySchool}${apiList.getStudentFeeDetails}/${sid}`),
+                invokeGetApi(`${config.getMySchool}${apiList.getFeeReceipts}`, { student_id: sid, limit: 100 })
             ]);
 
             if (feeRes.status === 200) setFeeAssignments(feeRes.data || []);
@@ -62,45 +64,75 @@ const Finance = ({ initialTab = 'fees' }) => {
             const jsPDF = jspdfModule.default;
             const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a5' });
 
-            // Header
-            pdf.setFillColor(77, 68, 181);
-            pdf.rect(0, 0, 148, 30, 'F');
-            pdf.setTextColor(255, 255, 255);
-            pdf.setFontSize(16);
-            pdf.text('FEE RECEIPT', 74, 15, { align: 'center' });
-            pdf.setFontSize(10);
-            pdf.text('Official Payment Confirmation', 74, 22, { align: 'center' });
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
 
-            // Content
-            pdf.setTextColor(48, 57, 114);
-            pdf.setFontSize(10);
+            // Add Border
+            pdf.setDrawColor(77, 68, 181);
+            pdf.setLineWidth(0.5);
+            pdf.rect(5, 5, pageWidth - 10, pageHeight - 10);
+
+            // --- Header ---
             pdf.setFont('helvetica', 'bold');
-            pdf.text('Receipt Details', 15, 40);
-            pdf.setDrawColor(224, 226, 255);
-            pdf.line(15, 42, 133, 42);
+            pdf.setFontSize(16);
+            pdf.setTextColor(48, 57, 114);
+            pdf.text("ABC PUBLIC SCHOOL", pageWidth / 2, 15, { align: 'center' });
+
+            pdf.setFontSize(8);
+            pdf.setFont('helvetica', 'normal');
+            pdf.setTextColor(100);
+            pdf.text("Official Fee Receipt", pageWidth / 2, 20, { align: 'center' });
+
+            pdf.line(10, 25, pageWidth - 10, 25);
+
+            // --- Receipt Info ---
+            pdf.setFontSize(9);
+            pdf.setTextColor(50);
+            pdf.text(`Receipt No: #${receipt.id}`, 10, 32);
+            pdf.text(`Date: ${receipt.payment_date}`, pageWidth - 40, 32);
+
+            // --- Student Info Box ---
+            pdf.setFillColor(248, 249, 253);
+            pdf.rect(10, 38, pageWidth - 20, 25, 'F');
+
+            pdf.setFont('helvetica', 'bold');
+            pdf.text("STUDENT DETAILS", 15, 43);
+            pdf.setFont('helvetica', 'normal');
+            const studentName = localStorage.getItem('user_name') || 'Student';
+            pdf.text(`Name: ${receipt.student_name || studentName}`, 15, 48);
+            pdf.text(`Class: ${receipt.class_name || '-'}`, 15, 53);
+            pdf.text(`ID: ${selectedStudent?.id || '-'}`, 15, 58);
+
+            // --- Payment Details Table ---
+            const tableY = 70;
+            pdf.setFillColor(77, 68, 181);
+            pdf.rect(10, tableY, pageWidth - 20, 8, 'F');
+            pdf.setTextColor(255);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text("DESCRIPTION", 15, tableY + 5.5);
+            pdf.text("AMOUNT", pageWidth - 30, tableY + 5.5);
+
+            pdf.setTextColor(50);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text(receipt.category_name || "School Fees", 15, tableY + 15);
+            pdf.text(`${receipt.paid_amount || '0'}`, pageWidth - 30, tableY + 15);
+
+            pdf.line(10, tableY + 20, pageWidth - 10, tableY + 20);
+
+            // --- Total ---
+            pdf.setFontSize(11);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text("TOTAL PAID:", 15, tableY + 30);
+            pdf.text(`${receipt.paid_amount || '0'}`, pageWidth - 30, tableY + 30);
+
+            // --- Footer ---
+            pdf.setFontSize(8);
+            pdf.setFont('helvetica', 'italic');
+            pdf.setTextColor(150);
+            pdf.text('Thank you for your payment.', pageWidth / 2, pageHeight - 20, { align: 'center' });
 
             pdf.setFont('helvetica', 'normal');
-            pdf.text(`Student: ${receipt.student_name}`, 15, 50);
-            pdf.text(`Roll No: ${receipt.roll_number || '-'}`, 15, 56);
-            pdf.text(`Class: ${receipt.class_name || '-'}`, 15, 62);
-
-            pdf.text(`Receipt ID: ${receipt.id}`, 80, 50);
-            pdf.text(`Date: ${receipt.payment_date}`, 80, 56);
-            pdf.text(`Method: ${receipt.payment_mode}`, 80, 62);
-
-            // Amount Box
-            pdf.setFillColor(244, 245, 255);
-            pdf.rect(15, 75, 118, 20, 'F');
-            pdf.setFont('helvetica', 'bold');
-            pdf.setFontSize(12);
-            pdf.text('Total Amount Paid:', 25, 87);
-            pdf.text(`INR ${receipt.paid_amount}`, 123, 87, { align: 'right' });
-
-            // Footer
-            pdf.setFontSize(8);
-            pdf.setTextColor(160, 152, 174);
-            pdf.text('Thank you for your payment.', 74, 130, { align: 'center' });
-            pdf.text('This is a system generated document.', 74, 135, { align: 'center' });
+            pdf.text("This is an electronically generated receipt.", pageWidth / 2, pageHeight - 15, { align: 'center' });
 
             pdf.save(`Receipt-${receipt.id}.pdf`);
         } catch (err) {

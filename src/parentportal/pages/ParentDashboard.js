@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
     Box,
     Grid,
@@ -37,6 +37,7 @@ import {
 } from 'recharts';
 import { invokeGetApi, apiList } from '../../services/ApiServices';
 import { config } from '../../config/Config';
+import { useStudent } from '../layout/ParentLayout';
 
 const quickActions = [
     { label: "Check Reports", icon: <BiBook />, color: "#303972", path: "/parent/report-cards" },
@@ -45,9 +46,7 @@ const quickActions = [
 ];
 
 const ParentDashboard = () => {
-    const location = useLocation();
-    const [students, setStudents] = useState([]);
-    const [selectedStudent, setSelectedStudent] = useState(null);
+    const { students, selectedStudent, setSelectedStudent } = useStudent();
     const [stats, setStats] = useState({
         academics: { overall: "0%", grade: "-", lastTest: "-" },
         fees: { paid: "₹0", due: "₹0" },
@@ -55,33 +54,11 @@ const ParentDashboard = () => {
     });
     const [schedule, setSchedule] = useState([]);
     const [notifications, setNotifications] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    const parentId = localStorage.getItem('user_id');
+    const [loading, setLoading] = useState(false); // Context handles initial loading
 
     useEffect(() => {
-        fetchStudents();
         fetchNotifications();
     }, []);
-
-    const fetchStudents = async () => {
-        try {
-            // In a real scenario, this would fetch students linked to parentId
-            // For now, let's fetch students for a generic class or all students if needed
-            let response = await invokeGetApi(config.getMySchool + apiList.getStudents, { limit: 10 });
-            if (response.status === 200) {
-                const fetchedStudents = response.data.students || [];
-                setStudents(fetchedStudents);
-                if (fetchedStudents.length > 0) {
-                    setSelectedStudent(fetchedStudents[0]);
-                }
-            }
-        } catch (error) {
-            console.error("Error fetching students:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const fetchNotifications = async () => {
         try {

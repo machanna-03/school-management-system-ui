@@ -9,6 +9,7 @@ import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
 import Students from './pages/students/Students';
 import StudentDetails from './pages/students/StudentDetails';
+import IdCardGenerator from './pages/students/IdCardGenerator';
 import Parents from './pages/Parents';
 import CreateExam from './pages/exam/CreateExam';
 import ExamTimetable from './pages/exam/ExamTimetable';
@@ -146,6 +147,7 @@ const AppContent = () => {
               <Route path="/students/details/:id" element={<StudentDetails />} />
               <Route path="/students/add" element={<AddStudent />} />
               <Route path="/students/edit/:id" element={<AddStudent />} />
+              <Route path="/students/id-cards" element={<IdCardGenerator />} />
               <Route path="/parents" element={<Parents />} />
 
               {/* Users */}

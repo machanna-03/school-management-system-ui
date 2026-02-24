@@ -1,8 +1,12 @@
 import React from 'react';
 import { Box, Typography, Card, CardContent, Grid, Chip, Stack, Button } from '@mui/material';
 import { BiBook, BiTime, BiCheckCircle } from 'react-icons/bi';
+import { useStudent } from '../layout/ParentLayout';
 
 const Homework = () => {
+    const { selectedStudent } = useStudent();
+    const studentName = selectedStudent?.name || 'Student';
+
     const assignments = [
         {
             id: 1,
@@ -36,7 +40,7 @@ const Homework = () => {
     return (
         <Box>
             <Typography variant="h5" sx={{ color: '#303972', fontWeight: 700, mb: 3 }}>
-                Homework & Assignments
+                Homework & Assignments for {studentName}
             </Typography>
 
             <Grid container spacing={3}>

@@ -70,6 +70,7 @@ export const apiList = {
     updateUser: "/updateUser",
     updateUserRoles: "/updateUserRoles",
     deleteUser: "/deleteUser",
+    getStudentsByParent: "/getStudentsByParent",
 
     //Sign-Up
     signup: "/register",
@@ -116,6 +117,7 @@ export const apiList = {
     assignStudentsToSection: "/assignStudentsToSection",
     updateStudent: "/updateStudent",
     deleteStudent: "/deleteStudent",
+    getStudentsByClass: "/getStudents",
     getClassList: "/getClassList", // Returns classes table
     getSubjects: "/getSubjects",
     getClassSubjects: "/getClassSubjects",

@@ -1,33 +1,69 @@
-import React, { useState } from 'react';
-import { Box, Typography, Card, CardContent, Grid, Button, ButtonGroup, Chip, Stack, LinearProgress } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, Card, CardContent, Grid, Button, ButtonGroup, Chip, Stack, LinearProgress, CircularProgress } from '@mui/material';
 import { BiCalendar, BiBarChartAlt2, BiCheckCircle, BiXCircle, BiTimeFive } from 'react-icons/bi';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, Legend } from 'recharts';
 import dayjs from 'dayjs';
+import { useStudent } from '../layout/ParentLayout';
+import { invokeGetApi, apiList } from '../../services/ApiServices';
+import { config } from '../../config/Config';
 
 const ParentAttendance = () => {
+    const { selectedStudent } = useStudent();
     const [viewMode, setViewMode] = useState('calendar'); // 'calendar', 'report'
     const [currentDate, setCurrentDate] = useState(dayjs());
+    const [attendanceData, setAttendanceData] = useState({});
+    const [stats, setStats] = useState({
+        totalDays: 0,
+        present: 0,
+        absent: 0,
+        late: 0,
+        percent: 0
+    });
+    const [loading, setLoading] = useState(false);
 
-    // Mock Attendance Data
-    // Status: 'present', 'absent', 'late', 'holiday', 'weekend'
-    const attendanceData = {
-        '2024-02-01': 'present',
-        '2024-02-02': 'present',
-        '2024-02-05': 'present',
-        '2024-02-06': 'late',
-        '2024-02-07': 'present',
-        '2024-02-08': 'absent',
-        '2024-02-09': 'present',
-        '2024-02-12': 'present',
-        '2024-02-13': 'present',
-    };
+    useEffect(() => {
+        if (selectedStudent) {
+            fetchAttendance();
+        }
+    }, [selectedStudent, currentDate]);
 
-    const stats = {
-        totalDays: 20,
-        present: 16,
-        absent: 1,
-        late: 3,
-        percent: 85
+    const fetchAttendance = async () => {
+        setLoading(true);
+        try {
+            const fromDate = currentDate.startOf('month').format('YYYY-MM-DD');
+            const toDate = currentDate.endOf('month').format('YYYY-MM-DD');
+
+            const response = await invokeGetApi(config.getMySchool + apiList.getAttendanceReport, {
+                student_id: selectedStudent.id,
+                from_date: fromDate,
+                to_date: toDate
+            });
+
+            if (response.status === 200) {
+                const data = response.data;
+                // Convert chart array to map for calendar
+                const attMap = {};
+                (data.chart || []).forEach(day => {
+                    let status = 'absent';
+                    if (day.present > 0) status = 'present';
+                    else if (day.late > 0) status = 'late';
+                    attMap[day.date] = status;
+                });
+                setAttendanceData(attMap);
+
+                setStats({
+                    totalDays: data.summary.total_records,
+                    present: data.summary.total_present,
+                    absent: data.summary.total_absent,
+                    late: (data.chart || []).reduce((acc, curr) => acc + curr.late, 0),
+                    percent: data.summary.overall_pct
+                });
+            }
+        } catch (error) {
+            console.error("Error fetching attendance:", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const doughnutData = [

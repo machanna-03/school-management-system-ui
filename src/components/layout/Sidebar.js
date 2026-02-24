@@ -80,6 +80,7 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
       children: [
         { name: "Add New Student", path: "/students/add" },
         { name: "All Students", path: "/students" },
+        { name: "ID Card Generator", path: "/students/id-cards" },
         // { name: "Student Details", path: "/students/details" },
 
       ],
