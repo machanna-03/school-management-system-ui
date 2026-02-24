@@ -20,8 +20,7 @@ const ParentLayout = ({ children }) => {
     const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
 
-    const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
-    const parentId = userInfo.id;
+    const parentId = localStorage.getItem('user_id');
 
     useEffect(() => {
         if (!parentId) {

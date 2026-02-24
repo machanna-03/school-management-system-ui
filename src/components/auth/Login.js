@@ -53,7 +53,6 @@ const Login = () => {
 
           const userData = {
             id: response.data.userId,
-            name: response.data.name,
             email: email,
             role: primaryRole,
             roles: roles,
