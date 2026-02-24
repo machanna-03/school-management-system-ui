@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, Avatar, IconButton, InputBase, Select, MenuItem, Stack, Paper } from '@mui/material';
+import { Box, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Checkbox, Avatar, IconButton, InputBase, Select, MenuItem, Stack, Paper } from '@mui/material';
 import Card from '../../components/common/Card';
 import { BiPlus, BiSearch, BiDotsHorizontalRounded, BiPhone, BiEnvelope, BiShow, BiEdit, BiTrash } from 'react-icons/bi';
 import { Link } from 'react-router-dom';
@@ -10,21 +10,41 @@ const Teachers = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
 
+    // Pagination State
+    const [page, setPage] = useState(0); // MUI is 0-indexed
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [totalCount, setTotalCount] = useState(0);
+
     useEffect(() => {
         fetchTeachers();
-    }, []);
+    }, [page, rowsPerPage]);
 
     const fetchTeachers = async () => {
+        setLoading(true);
         try {
-            const response = await api.get('/getTeachers');
+            const response = await api.get(`/getTeachers?page=${page + 1}&limit=${rowsPerPage}`);
             if (response.data.teachers) {
                 setTeachers(response.data.teachers);
+                if (response.data.pagination) {
+                    setTotalCount(response.data.pagination.total_count);
+                } else {
+                    setTotalCount(response.data.teachers.length);
+                }
             }
         } catch (error) {
             console.error("Failed to fetch teachers:", error);
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
     };
 
     const filteredTeachers = teachers.filter(teacher =>
@@ -47,7 +67,7 @@ const Teachers = () => {
 
     return (
         <Box>
-            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ mb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="h4" color="text.primary" fontWeight="bold">Teachers</Typography>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                     <Button
@@ -92,19 +112,30 @@ const Teachers = () => {
                 </Stack>
             </Paper>
 
+            <Paper sx={{ mb: 2 }}>
+                <TablePagination
+                    component="div"
+                    count={parseInt(totalCount, 10)}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    rowsPerPage={rowsPerPage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    rowsPerPageOptions={[5, 10, 25, 50]}
+                />
+            </Paper>
             <Card>
                 <TableContainer>
                     <Table sx={{ minWidth: 800 }}>
                         <TableHead>
-                            <TableRow sx={{ '& th': { color: 'text.secondary', fontWeight: 600, borderBottom: 'none' } }}>
-                                <TableCell padding="checkbox"><Checkbox /></TableCell>
-                                <TableCell>Name</TableCell>
-                                <TableCell>Subject</TableCell>
-                                <TableCell>Class</TableCell>
-                                <TableCell>Email</TableCell>
-                                <TableCell>Gender</TableCell>
-                                <TableCell>Status</TableCell>
-                                <TableCell>Action</TableCell>
+                            <TableRow sx={{ bgcolor: '#f4f5ff' }}>
+                                <TableCell padding="checkbox" sx={{ borderBottom: '2px solid #e0e2ff' }}><Checkbox /></TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Name</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Subject</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Class</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Email</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Gender</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Status</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Action</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -121,7 +152,12 @@ const Teachers = () => {
                                     <TableRow
                                         key={teacher.id}
                                         hover
-                                        sx={{ '& td': { borderBottom: 'none', py: 2 } }}
+                                        sx={{
+                                            bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                                            '& td': { borderBottom: '1px solid #eef0fb', py: 1.4 },
+                                            '&:hover': { bgcolor: '#f0f1ff !important' },
+                                            '&:last-child td': { borderBottom: 0 }
+                                        }}
                                     >
                                         <TableCell padding="checkbox"><Checkbox /></TableCell>
                                         <TableCell>

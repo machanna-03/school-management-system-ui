@@ -18,7 +18,8 @@ import {
     Dialog,
     DialogTitle,
     DialogContent,
-    DialogActions
+    DialogActions,
+    TablePagination
 } from "@mui/material";
 import { BiPlus, BiTrash, BiEdit, BiMap } from "react-icons/bi";
 import { invokeGetApi, invokeApi, apiList } from "../../services/ApiServices";
@@ -34,6 +35,11 @@ const RouteManagement = () => {
         end_location: ""
     });
 
+    // Pagination State
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [totalCount, setTotalCount] = useState(0);
+
     // Stops Management within Route
     const [openStopsDialog, setOpenStopsDialog] = useState(false);
     const [selectedRoute, setSelectedRoute] = useState(null);
@@ -47,17 +53,31 @@ const RouteManagement = () => {
 
     useEffect(() => {
         fetchRoutes();
-    }, []);
+    }, [page, rowsPerPage]);
 
     const fetchRoutes = async () => {
         try {
-            let response = await invokeGetApi(config.getMySchool + apiList.getRoutes, {});
+            let response = await invokeGetApi(`${config.getMySchool + apiList.getRoutes}?page=${page + 1}&limit=${rowsPerPage}`, {});
             if (response.status === 200 && response.data.responseCode === "200") {
                 setRoutes(response.data.routes || []);
+                if (response.data.pagination) {
+                    setTotalCount(response.data.pagination.total_count);
+                } else {
+                    setTotalCount(response.data.routes.length);
+                }
             }
         } catch (error) {
             console.error("Error fetching routes:", error);
         }
+    };
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
     };
 
     const handleChange = (e) => {
@@ -168,37 +188,59 @@ const RouteManagement = () => {
             </Box>
 
             {/* Routes Table */}
-            <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 2, border: "1px solid #e0e0e0" }}>
-                <Table>
-                    <TableHead sx={{ bgcolor: "#f8f9fa" }}>
-                        <TableRow>
-                            <TableCell><b>Route Name</b></TableCell>
-                            <TableCell><b>Route Number</b></TableCell>
-                            <TableCell><b>Start</b></TableCell>
-                            <TableCell><b>End</b></TableCell>
-                            <TableCell><b>Actions</b></TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {routes.map((route) => (
-                            <TableRow key={route.id}>
-                                <TableCell>{route.route_name}</TableCell>
-                                <TableCell>{route.route_number}</TableCell>
-                                <TableCell>{route.start_location}</TableCell>
-                                <TableCell>{route.end_location}</TableCell>
-                                <TableCell>
-                                    <IconButton color="primary" onClick={() => handleOpenStops(route)}>
-                                        <BiMap />
-                                    </IconButton>
-                                    <IconButton color="error" onClick={() => handleDeleteRoute(route.id)}>
-                                        <BiTrash />
-                                    </IconButton>
-                                </TableCell>
+            <Paper sx={{ mb: 2 }}>
+                <TablePagination
+                    component="div"
+                    count={parseInt(totalCount, 10)}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    rowsPerPage={rowsPerPage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    rowsPerPageOptions={[5, 10, 25, 50]}
+                />
+            </Paper>
+            <Paper elevation={0} sx={{ borderRadius: 2, border: "1px solid #e0e0e0", overflow: 'hidden' }}>
+                <TableContainer>
+                    <Table>
+                        <TableHead>
+                            <TableRow sx={{ bgcolor: '#f4f5ff' }}>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Route Name</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Route Number</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Start</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>End</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Actions</TableCell>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                        </TableHead>
+                        <TableBody>
+                            {routes.map((route, i) => (
+                                <TableRow
+                                    key={route.id}
+                                    hover
+                                    sx={{
+                                        bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                                        '& td': { borderBottom: '1px solid #eef0fb', py: 1.4 },
+                                        '&:hover': { bgcolor: '#f0f1ff !important' },
+                                        '&:last-child td': { borderBottom: 0 }
+                                    }}
+                                >
+                                    <TableCell>{route.route_name}</TableCell>
+                                    <TableCell>{route.route_number}</TableCell>
+                                    <TableCell>{route.start_location}</TableCell>
+                                    <TableCell>{route.end_location}</TableCell>
+                                    <TableCell>
+                                        <IconButton color="primary" onClick={() => handleOpenStops(route)}>
+                                            <BiMap />
+                                        </IconButton>
+                                        <IconButton color="error" onClick={() => handleDeleteRoute(route.id)}>
+                                            <BiTrash />
+                                        </IconButton>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Paper>
 
             {/* Add Route Dialog */}
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
@@ -273,17 +315,25 @@ const RouteManagement = () => {
                     <TableContainer component={Paper} elevation={0} variant="outlined">
                         <Table size="small">
                             <TableHead>
-                                <TableRow>
-                                    <TableCell>Order</TableCell>
-                                    <TableCell>Stop Name</TableCell>
-                                    <TableCell>Fee</TableCell>
-                                    <TableCell>Time</TableCell>
-                                    <TableCell>Action</TableCell>
+                                <TableRow sx={{ bgcolor: '#f4f5ff' }}>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 1 }}>Order</TableCell>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 1 }}>Stop Name</TableCell>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 1 }}>Fee</TableCell>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 1 }}>Time</TableCell>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 1 }}>Action</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {stops.map((stop) => (
-                                    <TableRow key={stop.id}>
+                                {stops.map((stop, i) => (
+                                    <TableRow
+                                        key={stop.id}
+                                        sx={{
+                                            bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                                            '& td': { borderBottom: '1px solid #eef0fb', py: 1 },
+                                            '&:hover': { bgcolor: '#f0f1ff !important' },
+                                            '&:last-child td': { borderBottom: 0 }
+                                        }}
+                                    >
                                         <TableCell>{stop.stop_order}</TableCell>
                                         <TableCell>{stop.stop_name}</TableCell>
                                         <TableCell>{stop.pickup_fee}</TableCell>

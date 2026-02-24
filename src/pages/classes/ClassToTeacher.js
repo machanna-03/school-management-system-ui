@@ -146,7 +146,7 @@ export default function ClassToTeacher() {
 
           <TableBody>
             {list.map((row, index) => (
-              <TableRow key={index}>
+              <TableRow key={index} hover sx={{ '& td': { borderBottom: '1px solid #f0f1f5' } }}>
                 <TableCell>{row.class}</TableCell>
                 <TableCell>{row.section}</TableCell>
                 <TableCell>{row.teacher}</TableCell>

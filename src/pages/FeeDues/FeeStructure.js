@@ -14,7 +14,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper
+  Paper,
+  TablePagination,
 } from "@mui/material";
 import { BiSave, BiEdit } from "react-icons/bi";
 import { apiList, invokeApi, invokeGetApi } from "../../services/ApiServices";
@@ -41,10 +42,15 @@ const FeeStructure = () => {
   const [feeRecords, setFeeRecords] = useState([]); // To display list below
   const [searchQuery, setSearchQuery] = useState(""); // Search State
 
+  // Pagination State
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
+
   useEffect(() => {
     fetchClasses();
     fetchFeeRecords();
-  }, []);
+  }, [page, rowsPerPage]);
 
   const fetchClasses = async () => {
     try {
@@ -57,11 +63,30 @@ const FeeStructure = () => {
 
   const fetchFeeRecords = async () => {
     try {
-      const res = await invokeGetApi(apiList.getFeeStructures);
-      // We might need to filter or adjust this based on what the API actually returns
-      // For now, assuming it returns structures that we can map to the table
-      if (Array.isArray(res.data)) setFeeRecords(res.data);
+      const res = await invokeGetApi(`${apiList.getFeeStructures}?page=${page + 1}&limit=${rowsPerPage}`);
+      if (res.status === 200) {
+        if (res.data.structures) {
+          setFeeRecords(res.data.structures);
+          if (res.data.pagination) {
+            setTotalCount(res.data.pagination.total_count);
+          } else {
+            setTotalCount(res.data.structures.length);
+          }
+        } else if (Array.isArray(res.data)) {
+          setFeeRecords(res.data);
+          setTotalCount(res.data.length);
+        }
+      }
     } catch (e) { }
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
   };
 
   const handleChange = (e) => {
@@ -94,7 +119,7 @@ const FeeStructure = () => {
 
       const res = await invokeApi(apiList.saveStudentFeeStructure, payload); // New Endpoint we will add
 
-      if (res.status === 200) {
+      if (res.status === 200 && (res.data?.responseCode === '200' || !res.data?.responseCode)) {
         notifications.show({ title: 'Success', message: 'Fee Structure Saved', color: 'green' });
         // Reset form
         setFormData({
@@ -111,7 +136,7 @@ const FeeStructure = () => {
         });
         fetchFeeRecords();
       } else {
-        notifications.show({ title: 'Error', message: res.data?.error || 'Failed to save', color: 'red' });
+        notifications.show({ title: 'Error', message: res.data?.responseMessage || res.data?.error || 'Failed to save', color: 'red' });
       }
     } catch (error) {
       notifications.show({ title: 'Error', message: 'Failed to save fee structure', color: 'red' });
@@ -288,18 +313,29 @@ const FeeStructure = () => {
           <Button variant="contained" onClick={() => { }}>Search</Button>
         </Box>
       </Box>
+      <Paper sx={{ mb: 2 }}>
+        <TablePagination
+          component="div"
+          count={parseInt(totalCount, 10)}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          rowsPerPageOptions={[5, 10, 25, 50]}
+        />
+      </Paper>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Roll Number</TableCell>
-              <TableCell>Class</TableCell>
-              <TableCell>Section</TableCell>
-              <TableCell>Academic Year</TableCell>
-              <TableCell>Grand Total</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Actions</TableCell>
+            <TableRow sx={{ bgcolor: '#f4f5ff' }}>
+              <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Name</TableCell>
+              <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Roll Number</TableCell>
+              <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Class</TableCell>
+              <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Section</TableCell>
+              <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Academic Year</TableCell>
+              <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Grand Total</TableCell>
+              <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Status</TableCell>
+              <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -311,7 +347,16 @@ const FeeStructure = () => {
                 return name.includes(query);
               })
               .map((row, index) => (
-                <TableRow key={index}>
+                <TableRow
+                  key={index}
+                  hover
+                  sx={{
+                    bgcolor: index % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                    '& td': { borderBottom: '1px solid #eef0fb', py: 1.4 },
+                    '&:hover': { bgcolor: '#f0f1ff !important' },
+                    '&:last-child td': { borderBottom: 0 }
+                  }}
+                >
                   <TableCell>{row.student_name || row.structure_name || '-'}</TableCell>
                   <TableCell>{row.roll_number || '-'}</TableCell>
                   <TableCell>{row.class_name}</TableCell>

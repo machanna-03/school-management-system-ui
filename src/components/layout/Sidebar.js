@@ -71,7 +71,7 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
       onClick: () => setOpenAdmission(!openAdmission),
       children: [
         { name: "Application Form", path: "/admission/application-form" },
-        { name: "Application List", path: "/admission/application-list" }
+        { name: "Application List", path: "/admission/list" }
       ],
     },
     {
@@ -83,19 +83,14 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
       children: [
         { name: "Add New Student", path: "/students/add" },
         { name: "All Students", path: "/students" },
-        { name: "Student Details", path: "/students/details" },
+        // { name: "Student Details", path: "/students/details" },
 
       ],
     },
     {
       name: "Parents",
       icon: <BiUser />,
-      hasSubmenu: true,
-      isOpen: openParents,
-      onClick: () => setOpenParents(!openParents),
-      children: [
-        { name: "All Parents", path: "/parents" },
-      ],
+      path: "/parents"
     },
     {
       name: "Teacher",
@@ -106,7 +101,7 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
       children: [
         { name: "Add New Teacher", path: "/teachers/add" },
         { name: "All Teachers", path: "/teachers" },
-        { name: "Teacher Details", path: "/teachers/details" },
+        // { name: "Teacher Details", path: "/teachers/details" },
 
       ],
     },
@@ -139,11 +134,9 @@ const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
     {
       name: "Time Table",
       icon: <BiTime />,
-      hasSubmenu: true,
-      isOpen: openTimeTable,
-      onClick: () => setOpenTimeTable(!openTimeTable),
-      children: [{ name: "View Time Table", path: "/timetable" }],
+      path: "/timetable"
     },
+
     {
       name: "Attendance",
       icon: <BiCalendarCheck />,

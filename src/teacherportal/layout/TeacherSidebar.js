@@ -22,57 +22,23 @@ const TeacherSidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
         {
             header: "MAIN MENU",
             items: [
-                {
-                    name: "Dashboard",
-                    icon: <BiHomeAlt />,
-                    path: "/teacher/dashboard",
-                },
-                {
-                    name: "My Schedule",
-                    icon: <BiTime />,
-                    path: "/teacher/schedule"
-                },
-                {
-                    name: "Mark Attendance",
-                    icon: <BiCalendarCheck />,
-                    path: "/teacher/attendance/mark"
-                },
-                {
-                    name: "Leave Application",
-                    icon: <BiMessageDetail />,
-                    path: "/teacher/leave"
-                }
+                { name: "Dashboard", icon: <BiHomeAlt />, path: "/teacher/dashboard" },
+                { name: "Timetable", icon: <BiTime />, path: "/teacher/timetable" },
+                { name: "Mark Attendance", icon: <BiCalendarCheck />, path: "/teacher/attendance" },
+                { name: "Leave Application", icon: <BiMessageDetail />, path: "/teacher/leave" },
             ],
         },
         {
             header: "ACADEMICS",
             items: [
-                {
-                    name: "My Students",
-                    icon: <BiUser />,
-                    path: "/teacher/students"
-                },
-                {
-                    name: "My Classes",
-                    icon: <BiGroup />,
-                    path: "/teacher/classes"
-                },
-                {
-                    name: "Grading & Results",
-                    icon: <BiPencil />,
-                    path: "/teacher/grading"
-                },
-                {
-                    name: "Assignments",
-                    icon: <BiBook />,
-                    path: "/teacher/assignments"
-                }
+                { name: "My Classes", icon: <BiGroup />, path: "/teacher/classes" },
+                { name: "Student Marks", icon: <BiPencil />, path: "/teacher/marks" },
             ],
         },
         {
             header: "COMMUNICATION",
             items: [
-                { name: "Messages", icon: <BiMessageDetail />, path: "/teacher/messages" },
+                { name: "Notifications", icon: <BiMessageDetail />, path: "/notifications" },
             ]
         }
     ];

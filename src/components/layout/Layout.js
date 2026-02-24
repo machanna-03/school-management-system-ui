@@ -37,7 +37,7 @@ const Layout = ({ children }) => {
                     collapsed={collapsed}
                     handleDrawerToggle={handleDrawerToggle}
                 />
-                <Box component="div" sx={{ p: { xs: 2, md: '30px 40px' }, flexGrow: 1 }}>
+                <Box component="div" sx={{ p: { xs: 2, md: '10px 40px' }, flexGrow: 1 }}>
                     {children}
                 </Box>
             </Box>

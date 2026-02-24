@@ -2,10 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Box, Typography, Card, CardContent, Grid, Button, Chip, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, InputAdornment, Tabs, Tab } from '@mui/material';
 import { BiMoney, BiHistory, BiReceipt, BiCreditCard, BiDownload, BiCalendar, BiCheckCircle, BiTimeFive } from 'react-icons/bi';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { invokeGetApi, apiList } from '../../services/ApiServices';
+import { config } from '../../config/Config';
 
 const Finance = ({ initialTab = 'fees' }) => {
     const navigate = useNavigate();
     const location = useLocation();
+
+    const [feeAssignments, setFeeAssignments] = useState([]);
+    const [receipts, setReceipts] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const studentId = localStorage.getItem('student_id') || 1; // Fallback for dev
 
     // Map routes to tab values
     const getTabFromPath = (path) => {
@@ -22,51 +30,104 @@ const Finance = ({ initialTab = 'fees' }) => {
         setActiveTab(getTabFromPath(location.pathname));
     }, [location.pathname]);
 
+    useEffect(() => {
+        fetchData();
+    }, [studentId]);
+
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const [feeRes, receiptRes] = await Promise.all([
+                invokeGetApi(`${config.getMySchool}${apiList.getStudentFeeDetails}/${studentId}`),
+                invokeGetApi(`${config.getMySchool}${apiList.getFeeReceipts}`, { student_id: studentId, limit: 100 })
+            ]);
+
+            if (feeRes.status === 200) setFeeAssignments(feeRes.data || []);
+            if (receiptRes.status === 200) setReceipts(receiptRes.data.receipts || []);
+        } catch (err) {
+            console.error("Error fetching finance data:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleTabChange = (event, newValue) => {
         setActiveTab(newValue);
         navigate(`/parent/${newValue}`);
     };
 
-    // Mock Data
-    const feeDetails = {
-        totalDue: 5000,
-        currency: '₹',
-        dueDate: '15 Feb 2024',
-        breakdown: [
-            { id: 1, title: 'Tuition Fee (Term 2)', amount: 15000, status: 'Paid' },
-            { id: 2, title: 'Transport Fee (Feb)', amount: 2500, status: 'Pending' },
-            { id: 3, title: 'Annual Day Contribution', amount: 1000, status: 'Pending' },
-            { id: 4, title: 'Library Fine', amount: 1500, status: 'Pending' },
-        ]
+    const handleDownloadReceipt = async (receipt) => {
+        try {
+            const jspdfModule = await import('jspdf');
+            const jsPDF = jspdfModule.default;
+            const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a5' });
+
+            // Header
+            pdf.setFillColor(77, 68, 181);
+            pdf.rect(0, 0, 148, 30, 'F');
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(16);
+            pdf.text('FEE RECEIPT', 74, 15, { align: 'center' });
+            pdf.setFontSize(10);
+            pdf.text('Official Payment Confirmation', 74, 22, { align: 'center' });
+
+            // Content
+            pdf.setTextColor(48, 57, 114);
+            pdf.setFontSize(10);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('Receipt Details', 15, 40);
+            pdf.setDrawColor(224, 226, 255);
+            pdf.line(15, 42, 133, 42);
+
+            pdf.setFont('helvetica', 'normal');
+            pdf.text(`Student: ${receipt.student_name}`, 15, 50);
+            pdf.text(`Roll No: ${receipt.roll_number || '-'}`, 15, 56);
+            pdf.text(`Class: ${receipt.class_name || '-'}`, 15, 62);
+
+            pdf.text(`Receipt ID: ${receipt.id}`, 80, 50);
+            pdf.text(`Date: ${receipt.payment_date}`, 80, 56);
+            pdf.text(`Method: ${receipt.payment_mode}`, 80, 62);
+
+            // Amount Box
+            pdf.setFillColor(244, 245, 255);
+            pdf.rect(15, 75, 118, 20, 'F');
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(12);
+            pdf.text('Total Amount Paid:', 25, 87);
+            pdf.text(`INR ${receipt.paid_amount}`, 123, 87, { align: 'right' });
+
+            // Footer
+            pdf.setFontSize(8);
+            pdf.setTextColor(160, 152, 174);
+            pdf.text('Thank you for your payment.', 74, 130, { align: 'center' });
+            pdf.text('This is a system generated document.', 74, 135, { align: 'center' });
+
+            pdf.save(`Receipt-${receipt.id}.pdf`);
+        } catch (err) {
+            console.error("Receipt PDF generation failed:", err);
+        }
     };
 
-    const transactions = [
-        { id: 'TXN12345', date: '05 Jan 2024', amount: 15000, description: 'Tuition Fee (Term 2)', status: 'Success' },
-        { id: 'TXN12344', date: '10 Dec 2023', amount: 2500, description: 'Transport Fee (Dec)', status: 'Success' },
-        { id: 'TXN12343', date: '10 Nov 2023', amount: 2500, description: 'Transport Fee (Nov)', status: 'Success' },
-    ];
 
-    const receipts = [
-        { id: 'RCP-2024-001', date: '05 Jan 2024', amount: 15000, items: 'Tuition Fee (Term 2)' },
-        { id: 'RCP-2023-012', date: '10 Dec 2023', amount: 2500, items: 'Transport Fee (Dec)' },
-        { id: 'RCP-2023-011', date: '10 Nov 2023', amount: 2500, items: 'Transport Fee (Nov)' },
-    ];
+    const totalDue = feeAssignments.reduce((acc, curr) => acc + (Number(curr.amount) - Number(curr.paid_amount || 0)), 0);
+    const currency = '₹';
+
+    if (loading) return <Box sx={{ p: 4, textAlign: 'center' }}>Loading Finance Details...</Box>;
 
     const renderFeeDetails = () => (
         <Box>
-            <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid container spacing={3} sx={{ mb: 1 }}>
                 <Grid item xs={12} md={6}>
                     <Card sx={{ borderRadius: 4, bgcolor: '#4d44b5', color: 'white', overflow: 'hidden', position: 'relative' }}>
                         <CardContent sx={{ p: 4 }}>
                             <Box sx={{ position: 'relative', zIndex: 1 }}>
                                 <Typography variant="body1" sx={{ fontWeight: 500, opacity: 0.9, mb: 1 }}>Total Amount Due</Typography>
-                                <Typography variant="h3" sx={{ fontWeight: 700, mb: 2 }}>{feeDetails.currency} {feeDetails.totalDue.toLocaleString()}</Typography>
+                                <Typography variant="h3" sx={{ fontWeight: 700, mb: 2 }}>{currency} {totalDue.toLocaleString()}</Typography>
                                 <Chip
-                                    label={`Due by: ${feeDetails.dueDate}`}
+                                    label={`Balance Amount`}
                                     sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontWeight: 600 }}
                                 />
                             </Box>
-                            {/* Decorative Circle */}
                             <Box sx={{ position: 'absolute', right: -20, bottom: -20, width: 150, height: 150, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.1)' }} />
                         </CardContent>
                     </Card>
@@ -77,12 +138,11 @@ const Finance = ({ initialTab = 'fees' }) => {
                             <Button
                                 variant="contained"
                                 size="large"
-                                onClick={() => navigate('/parent/quickpay')}
+                                onClick={() => setActiveTab('quickpay')}
                                 sx={{
                                     bgcolor: '#fb7d5b',
                                     borderRadius: 3,
-                                    px: 5,
-                                    py: 1.5,
+                                    px: 5, py: 1.5,
                                     fontSize: '1.1rem',
                                     fontWeight: 700,
                                     textTransform: 'none',
@@ -103,29 +163,35 @@ const Finance = ({ initialTab = 'fees' }) => {
                 <CardContent sx={{ p: 0 }}>
                     <TableContainer>
                         <Table>
-                            <TableHead sx={{ bgcolor: '#f9fafb' }}>
+                            <TableHead sx={{ bgcolor: '#f4f5ff' }}>
                                 <TableRow>
-                                    <TableCell sx={{ fontWeight: 700, color: '#A098AE' }}>Description</TableCell>
-                                    <TableCell sx={{ fontWeight: 700, color: '#A098AE', textAlign: 'right' }}>Amount</TableCell>
-                                    <TableCell sx={{ fontWeight: 700, color: '#A098AE', textAlign: 'center' }}>Status</TableCell>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', py: 2 }}>Fee Type</TableCell>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', py: 2, textAlign: 'right' }}>Total</TableCell>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', py: 2, textAlign: 'right' }}>Paid</TableCell>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', py: 2, textAlign: 'right' }}>Balance</TableCell>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', py: 2, textAlign: 'center' }}>Status</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {feeDetails.breakdown.map((item) => (
-                                    <TableRow key={item.id}>
-                                        <TableCell sx={{ fontWeight: 600, color: '#303972' }}>{item.title}</TableCell>
-                                        <TableCell sx={{ fontWeight: 600, color: '#303972', textAlign: 'right' }}>{feeDetails.currency} {item.amount.toLocaleString()}</TableCell>
-                                        <TableCell sx={{ textAlign: 'center' }}>
-                                            <Chip
-                                                label={item.status}
-                                                size="small"
-                                                color={item.status === 'Paid' ? 'success' : 'warning'}
-                                                variant={item.status === 'Paid' ? 'filled' : 'outlined'}
-                                                sx={{ fontWeight: 600, minWidth: 80 }}
-                                            />
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
+                                {feeAssignments.map((item, i) => {
+                                    const balance = Number(item.amount) - Number(item.paid_amount || 0);
+                                    return (
+                                        <TableRow key={item.id} sx={{ bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff' }}>
+                                            <TableCell sx={{ fontWeight: 600, color: '#303972' }}>{item.category_name}</TableCell>
+                                            <TableCell sx={{ textAlign: 'right' }}>{currency} {Number(item.amount).toLocaleString()}</TableCell>
+                                            <TableCell sx={{ textAlign: 'right' }}>{currency} {Number(item.paid_amount || 0).toLocaleString()}</TableCell>
+                                            <TableCell sx={{ textAlign: 'right', fontWeight: 700, color: balance > 0 ? '#fb7d5b' : '#4caf50' }}>{currency} {balance.toLocaleString()}</TableCell>
+                                            <TableCell sx={{ textAlign: 'center' }}>
+                                                <Chip
+                                                    label={balance <= 0 ? 'Paid' : 'Pending'}
+                                                    size="small"
+                                                    color={balance <= 0 ? 'success' : 'warning'}
+                                                    sx={{ fontWeight: 600, minWidth: 80 }}
+                                                />
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
                             </TableBody>
                         </Table>
                     </TableContainer>
@@ -136,40 +202,33 @@ const Finance = ({ initialTab = 'fees' }) => {
 
     const renderPaymentHistory = () => (
         <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-                <Typography variant="h6" sx={{ color: '#303972', fontWeight: 700 }}>Recent Transactions</Typography>
-                <Button startIcon={<BiCalendar />} variant="outlined" sx={{ borderRadius: 2, textTransform: 'none' }}>Filter Date</Button>
-            </Box>
+            <Typography variant="h6" sx={{ color: '#303972', fontWeight: 700, mb: 3 }}>Recent Transactions</Typography>
             <Card sx={{ borderRadius: 4, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
                 <CardContent sx={{ p: 0 }}>
                     <TableContainer>
                         <Table>
-                            <TableHead sx={{ bgcolor: '#f9fafb' }}>
+                            <TableHead sx={{ bgcolor: '#f4f5ff' }}>
                                 <TableRow>
-                                    <TableCell sx={{ fontWeight: 700, color: '#A098AE' }}>Transaction ID</TableCell>
-                                    <TableCell sx={{ fontWeight: 700, color: '#A098AE' }}>Date</TableCell>
-                                    <TableCell sx={{ fontWeight: 700, color: '#A098AE' }}>Description</TableCell>
-                                    <TableCell sx={{ fontWeight: 700, color: '#A098AE', textAlign: 'right' }}>Amount</TableCell>
-                                    <TableCell sx={{ fontWeight: 700, color: '#A098AE', textAlign: 'center' }}>Status</TableCell>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', py: 2 }}>Receipt No</TableCell>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', py: 2 }}>Date</TableCell>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', py: 2 }}>Mode</TableCell>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', py: 2, textAlign: 'right' }}>Amount</TableCell>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', py: 2, textAlign: 'center' }}>Status</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {transactions.map((txn) => (
-                                    <TableRow key={txn.id}>
-                                        <TableCell sx={{ fontWeight: 500, color: '#4d44b5' }}>{txn.id}</TableCell>
-                                        <TableCell sx={{ color: '#A098AE' }}>{txn.date}</TableCell>
-                                        <TableCell sx={{ fontWeight: 600, color: '#303972' }}>{txn.description}</TableCell>
-                                        <TableCell sx={{ fontWeight: 600, color: '#303972', textAlign: 'right' }}>{feeDetails.currency} {txn.amount.toLocaleString()}</TableCell>
+                                {receipts.map((txn, i) => (
+                                    <TableRow key={txn.id} sx={{ bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff' }}>
+                                        <TableCell sx={{ fontWeight: 500, color: '#4d44b5' }}>#{txn.id}</TableCell>
+                                        <TableCell sx={{ color: '#A098AE' }}>{txn.payment_date}</TableCell>
+                                        <TableCell sx={{ fontWeight: 600, color: '#303972' }}>{txn.payment_mode}</TableCell>
+                                        <TableCell sx={{ fontWeight: 600, color: '#303972', textAlign: 'right' }}>{currency} {Number(txn.paid_amount).toLocaleString()}</TableCell>
                                         <TableCell sx={{ textAlign: 'center' }}>
-                                            <Chip
-                                                label={txn.status}
-                                                size="small"
-                                                color="success"
-                                                sx={{ fontWeight: 600, borderRadius: 1 }}
-                                            />
+                                            <Chip label="Success" size="small" color="success" sx={{ fontWeight: 600 }} />
                                         </TableCell>
                                     </TableRow>
                                 ))}
+                                {receipts.length === 0 && <TableRow><TableCell colSpan={5} align="center">No transactions found</TableCell></TableRow>}
                             </TableBody>
                         </Table>
                     </TableContainer>
@@ -191,17 +250,18 @@ const Finance = ({ initialTab = 'fees' }) => {
                                         <Box sx={{ bgcolor: '#4d44b520', p: 1, borderRadius: '50%', mr: 2, color: '#4d44b5' }}>
                                             <BiReceipt size={24} />
                                         </Box>
-                                        <Typography variant="h6" sx={{ fontWeight: 700, color: '#303972' }}>{receipt.items}</Typography>
+                                        <Typography variant="h6" sx={{ fontWeight: 700, color: '#303972' }}>#{receipt.id}</Typography>
                                     </Box>
-                                    <Typography variant="body2" color="text.secondary" sx={{ ml: 7 }}>Date: {receipt.date}</Typography>
-                                    <Typography variant="body2" color="text.secondary" sx={{ ml: 7 }}>ID: {receipt.id}</Typography>
+                                    <Typography variant="body2" color="text.secondary" sx={{ ml: 7 }}>Date: {receipt.payment_date}</Typography>
+                                    <Typography variant="body2" color="text.secondary" sx={{ ml: 7 }}>Mode: {receipt.payment_mode}</Typography>
                                 </Box>
                                 <Box sx={{ textAlign: 'right' }}>
-                                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#4d44b5', mb: 1 }}>{feeDetails.currency} {receipt.amount.toLocaleString()}</Typography>
+                                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#4d44b5', mb: 1 }}>{currency} {Number(receipt.paid_amount).toLocaleString()}</Typography>
                                     <Button
                                         variant="outlined"
                                         size="small"
                                         startIcon={<BiDownload />}
+                                        onClick={() => handleDownloadReceipt(receipt)}
                                         sx={{ borderRadius: 2, textTransform: 'none' }}
                                     >
                                         Download
@@ -211,6 +271,7 @@ const Finance = ({ initialTab = 'fees' }) => {
                         </Card>
                     </Grid>
                 ))}
+                {receipts.length === 0 && <Grid item xs={12}><Typography align="center">No receipts found</Typography></Grid>}
             </Grid>
         </Box>
     );
@@ -224,23 +285,23 @@ const Finance = ({ initialTab = 'fees' }) => {
 
                     <Box sx={{ mb: 4, bgcolor: '#f9fafb', p: 3, borderRadius: 3 }}>
                         <Typography variant="subtitle2" sx={{ color: '#A098AE', mb: 1 }}>Pending Amount</Typography>
-                        <Typography variant="h4" sx={{ color: '#303972', fontWeight: 700 }}>{feeDetails.currency} {feeDetails.totalDue.toLocaleString()}</Typography>
+                        <Typography variant="h4" sx={{ color: '#303972', fontWeight: 700 }}>{currency} {totalDue.toLocaleString()}</Typography>
                     </Box>
 
                     <Stack spacing={3}>
                         <TextField
                             fullWidth
                             label="Amount to Pay"
-                            defaultValue={feeDetails.totalDue}
+                            defaultValue={totalDue}
                             InputProps={{
-                                startAdornment: <InputAdornment position="start">{feeDetails.currency}</InputAdornment>,
+                                startAdornment: <InputAdornment position="start">{currency}</InputAdornment>,
                             }}
                             sx={{ borderRadius: 3 }}
                         />
                         <TextField
                             fullWidth
                             label="Remarks (Optional)"
-                            placeholder="e.g. Tuition Fee for March"
+                            placeholder="e.g. Tuition Fee Payment"
                         />
 
                         <Button
@@ -261,16 +322,11 @@ const Finance = ({ initialTab = 'fees' }) => {
                             Proceed to Pay
                         </Button>
                     </Stack>
-
-                    <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', gap: 2 }}>
-                        <Box component="img" src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" sx={{ h: 20 }} />
-                        <Box component="img" src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" sx={{ h: 20 }} />
-                        <Box component="img" src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" sx={{ h: 20 }} />
-                    </Box>
                 </CardContent>
             </Card>
         </Box>
     );
+
 
     return (
         <Box>

@@ -150,15 +150,23 @@ const StudentLeave = () => {
                         <TableContainer>
                             <Table size="small">
                                 <TableHead>
-                                    <TableRow>
-                                        <TableCell>Type</TableCell>
-                                        <TableCell>Dates</TableCell>
-                                        <TableCell>Status</TableCell>
+                                    <TableRow sx={{ bgcolor: '#f4f5ff' }}>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Type</TableCell>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Dates</TableCell>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Status</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {leaves.map((leave) => (
-                                        <TableRow key={leave.id}>
+                                    {leaves.map((leave, i) => (
+                                        <TableRow
+                                            key={leave.id}
+                                            sx={{
+                                                bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                                                '& td': { borderBottom: '1px solid #eef0fb', py: 1.4 },
+                                                '&:hover': { bgcolor: '#f0f1ff !important' },
+                                                '&:last-child td': { borderBottom: 0 }
+                                            }}
+                                        >
                                             <TableCell>{leave.leave_type}</TableCell>
                                             <TableCell>
                                                 <Typography variant="caption">{leave.start_date}</Typography>

@@ -336,19 +336,27 @@ const CreateExam = () => {
 
                 <TableContainer component={Paper} elevation={1} sx={{ maxHeight: 500 }}>
                   <Table stickyHeader size="small">
-                    <TableHead>
+                    <TableHead sx={{ bgcolor: '#f4f5ff' }}>
                       <TableRow>
-                        <TableCell width="25%">Subject</TableCell>
-                        <TableCell width="20%">Date</TableCell>
-                        <TableCell width="15%">Start Time</TableCell>
-                        <TableCell width="15%">End Time</TableCell>
-                        <TableCell width="20%">Marks (Total/Pass)</TableCell>
-                        <TableCell width="5%">Action</TableCell>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }} width="25%">Subject</TableCell>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }} width="20%">Date</TableCell>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }} width="15%">Start Time</TableCell>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }} width="15%">End Time</TableCell>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }} width="20%">Marks (Total/Pass)</TableCell>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2, textAlign: 'center' }} width="5%">Action</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {timetable.map((row, index) => (
-                        <TableRow key={index}>
+                        <TableRow
+                          key={index}
+                          sx={{
+                            bgcolor: index % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                            '& td': { borderBottom: '1px solid #eef0fb', py: 1.2 },
+                            '&:hover': { bgcolor: '#f0f1ff !important' },
+                            '&:last-child td': { borderBottom: 0 }
+                          }}
+                        >
                           <TableCell>
                             <TextField
                               fullWidth
@@ -445,20 +453,29 @@ const CreateExam = () => {
                 {/* Filter only scheduled items for preview */}
                 <TableContainer component={Paper} variant="outlined">
                   <Table size="small">
-                    <TableHead>
+                    <TableHead sx={{ bgcolor: '#f4f5ff' }}>
                       <TableRow>
-                        <TableCell>Subject</TableCell>
-                        <TableCell>Date & Time</TableCell>
-                        <TableCell>Marks</TableCell>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Subject</TableCell>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Date & Time</TableCell>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Marks</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {timetable.filter(r => r.subjectName && r.date).length === 0 ? (
                         <TableRow><TableCell colSpan={3} align="center">No subjects scheduled properly.</TableCell></TableRow>
                       ) : (
-                        timetable.filter(r => r.subjectName && r.date).map((row, idx) => {
+                        timetable.filter(r => r.subjectName && r.date).map((row, i) => {
                           return (
-                            <TableRow key={idx}>
+                            <TableRow
+                              key={i}
+                              hover
+                              sx={{
+                                bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                                '& td': { borderBottom: '1px solid #eef0fb', py: 1.4 },
+                                '&:hover': { bgcolor: '#f0f1ff !important' },
+                                '&:last-child td': { borderBottom: 0 }
+                              }}
+                            >
                               <TableCell>{row.subjectName}</TableCell>
                               <TableCell>{row.date} {row.startTime && `(${row.startTime} - ${row.endTime})`}</TableCell>
                               <TableCell>{row.passingMarks}/{row.totalMarks}</TableCell>

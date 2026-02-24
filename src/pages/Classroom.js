@@ -140,12 +140,12 @@ const Classroom = () => {
 
           <TableContainer component={Paper} elevation={0} sx={{ border: "1px solid #e0e0e0" }}>
             <Table size="small">
-              <TableHead sx={{ bgcolor: "#f1f1f1" }}>
-                <TableRow>
-                  <TableCell><b>ID</b></TableCell>
-                  <TableCell><b>Room Name</b></TableCell>
-                  <TableCell><b>Capacity</b></TableCell>
-                  <TableCell align="center"><b>Action</b></TableCell>
+              <TableHead>
+                <TableRow sx={{ bgcolor: '#f4f5ff' }}>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>ID</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Room Name</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Capacity</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Action</TableCell>
                 </TableRow>
               </TableHead>
 
@@ -155,8 +155,17 @@ const Classroom = () => {
                     <TableCell colSpan={4} align="center">No Classrooms Found</TableCell>
                   </TableRow>
                 ) : (
-                  classrooms.map((row) => (
-                    <TableRow key={row.id}>
+                  classrooms.map((row, i) => (
+                    <TableRow
+                      key={row.id}
+                      hover
+                      sx={{
+                        bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                        '& td': { borderBottom: '1px solid #eef0fb', py: 1.4 },
+                        '&:hover': { bgcolor: '#f0f1ff !important' },
+                        '&:last-child td': { borderBottom: 0 }
+                      }}
+                    >
                       <TableCell>{row.id}</TableCell>
                       <TableCell>{row.room_name}</TableCell>
                       <TableCell>{row.capacity}</TableCell>

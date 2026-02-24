@@ -14,7 +14,8 @@ import {
   TableRow,
   Paper,
   Stack,
-  IconButton
+  IconButton,
+  TablePagination
 } from "@mui/material";
 import { Delete as DeleteIcon } from '@mui/icons-material';
 import { notifications } from '@mantine/notifications';
@@ -28,19 +29,38 @@ const Grades = () => {
   const [grades, setGrades] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // Pagination State
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
+
   useEffect(() => {
     fetchGrades();
-  }, []);
+  }, [page, rowsPerPage]);
 
   const fetchGrades = async () => {
     try {
-      let response = await invokeGetApi(config.getMySchool + apiList.getGrades, {});
+      let response = await invokeGetApi(`${config.getMySchool + apiList.getGrades}?page=${page + 1}&limit=${rowsPerPage}`);
       if (response.status === 200 && response.data.responseCode === "200") {
         setGrades(response.data.grades || []);
+        if (response.data.pagination) {
+          setTotalCount(response.data.pagination.total_count);
+        } else {
+          setTotalCount(response.data.grades.length);
+        }
       }
     } catch (error) {
       console.error("Error fetching grades:", error);
     }
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
   };
 
   const handleSubmit = async (e) => {
@@ -155,13 +175,13 @@ const Grades = () => {
 
           <TableContainer component={Paper} elevation={0} sx={{ border: "1px solid #e0e0e0" }}>
             <Table size="small">
-              <TableHead sx={{ bgcolor: "#f1f1f1" }}>
-                <TableRow>
-                  <TableCell><b>ID</b></TableCell>
-                  <TableCell><b>Grade</b></TableCell>
-                  <TableCell><b>Admission Fee (₹)</b></TableCell>
-                  <TableCell><b>Hall Charge (%)</b></TableCell>
-                  <TableCell align="center"><b>Action</b></TableCell>
+              <TableHead>
+                <TableRow sx={{ bgcolor: '#f4f5ff' }}>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>ID</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Grade</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Admission Fee (₹)</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Hall Charge (%)</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Action</TableCell>
                 </TableRow>
               </TableHead>
 
@@ -171,8 +191,17 @@ const Grades = () => {
                     <TableCell colSpan={5} align="center">No Grades Found</TableCell>
                   </TableRow>
                 ) : (
-                  grades.map((row) => (
-                    <TableRow key={row.id}>
+                  grades.map((row, i) => (
+                    <TableRow
+                      key={row.id}
+                      hover
+                      sx={{
+                        bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                        '& td': { borderBottom: '1px solid #eef0fb', py: 1.4 },
+                        '&:hover': { bgcolor: '#f0f1ff !important' },
+                        '&:last-child td': { borderBottom: 0 }
+                      }}
+                    >
                       <TableCell>{row.id}</TableCell>
                       <TableCell>{row.grade_name}</TableCell>
                       <TableCell>{row.admission_fee}</TableCell>
@@ -199,6 +228,15 @@ const Grades = () => {
               </TableBody>
             </Table>
           </TableContainer>
+          <TablePagination
+            component="div"
+            count={parseInt(totalCount, 10)}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[5, 10, 25, 50]}
+          />
         </CardContent>
       </Card>
     </Box>

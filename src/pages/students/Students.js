@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, Avatar, IconButton, InputBase, Select, MenuItem, Stack, Paper } from '@mui/material';
+import { Box, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Checkbox, Avatar, IconButton, InputBase, Select, MenuItem, Stack, Paper } from '@mui/material';
 import Card from '../../components/common/Card';
 import { BiPlus, BiSearch, BiDotsHorizontalRounded, BiPhone, BiEnvelope, BiShow, BiEdit, BiTrash } from 'react-icons/bi';
 import { Link, useLocation } from 'react-router-dom';
@@ -12,6 +12,11 @@ const Students = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedClass, setSelectedClass] = useState('');
 
+    // Pagination State
+    const [page, setPage] = useState(0); // MUI is 0-indexed
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [totalCount, setTotalCount] = useState(0);
+
     const location = useLocation();
 
     useEffect(() => {
@@ -22,13 +27,23 @@ const Students = () => {
         }
         fetchStudents();
         fetchClasses();
-    }, [location.search]);
+    }, [location.search, page, rowsPerPage, selectedClass]); // Re-fetch when class filter changes
 
     const fetchStudents = async () => {
+        setLoading(true);
         try {
-            const response = await api.get('/getStudents');
+            // API expects 1-indexed page, and supports optional class filter
+            const params = new URLSearchParams({ page: page + 1, limit: rowsPerPage });
+            if (selectedClass) params.append('class', selectedClass);
+            const response = await api.get(`/getStudents?${params.toString()}`);
             if (response.data.students) {
                 setStudents(response.data.students);
+                // If backend returns pagination metadata
+                if (response.data.pagination) {
+                    setTotalCount(response.data.pagination.total_count);
+                } else {
+                    setTotalCount(response.data.students.length);
+                }
             }
         } catch (error) {
             console.error("Failed to fetch students:", error);
@@ -50,6 +65,15 @@ const Students = () => {
         } catch (error) {
             console.error("Failed to fetch classes:", error);
         }
+    };
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
     };
 
     const filteredStudents = students.filter(student => {
@@ -81,7 +105,7 @@ const Students = () => {
 
     return (
         <Box>
-            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ mb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="h4" color="text.primary" fontWeight="bold">Students</Typography>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                     <Button
@@ -142,18 +166,29 @@ const Students = () => {
                 </Stack>
             </Paper>
 
+            <Paper sx={{ mb: 2 }}>
+                <TablePagination
+                    component="div"
+                    count={parseInt(totalCount, 10)}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    rowsPerPage={rowsPerPage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    rowsPerPageOptions={[5, 10, 25, 50]}
+                />
+            </Paper>
             <Card>
                 <TableContainer>
                     <Table sx={{ minWidth: 800 }}>
                         <TableHead>
-                            <TableRow sx={{ '& th': { color: 'text.secondary', fontWeight: 600, borderBottom: 'none' } }}>
-                                <TableCell>Name</TableCell>
-                                <TableCell>ID</TableCell>
-                                <TableCell>Class</TableCell>
-                                <TableCell>Parent</TableCell>
-                                <TableCell>City</TableCell>
-                                <TableCell>Contact</TableCell>
-                                <TableCell>Action</TableCell>
+                            <TableRow sx={{ bgcolor: '#f4f5ff' }}>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Name</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>ID</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Class</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Parent</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>City</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Contact</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Action</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -170,7 +205,12 @@ const Students = () => {
                                     <TableRow
                                         key={std.id}
                                         hover
-                                        sx={{ '& td': { borderBottom: 'none', py: 2 } }}
+                                        sx={{
+                                            bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                                            '& td': { borderBottom: '1px solid #eef0fb', py: 1.4 },
+                                            '&:hover': { bgcolor: '#f0f1ff !important' },
+                                            '&:last-child td': { borderBottom: 0 }
+                                        }}
                                     >
                                         <TableCell>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
