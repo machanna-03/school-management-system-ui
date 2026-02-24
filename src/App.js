@@ -1,331 +1,443 @@
-import React from 'react';
-import '@mantine/core/styles.css';
-import { ThemeContextProvider } from './context/ThemeContext';
-import '@mantine/notifications/styles.css';
-import { MantineProvider } from '@mantine/core';
-import { Notifications } from '@mantine/notifications';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Layout from './components/layout/Layout';
-import Dashboard from './pages/Dashboard';
-import Students from './pages/students/Students';
-import StudentDetails from './pages/students/StudentDetails';
-import IdCardGenerator from './pages/students/IdCardGenerator';
-import Parents from './pages/Parents';
-import CreateExam from './pages/exam/CreateExam';
-import ExamTimetable from './pages/exam/ExamTimetable';
-import ExamTimetables from './pages/exam/ExamTimetables';
-import StudentMarks from './pages/exam/StudentMarks';
-import StudentMarksHistory from './pages/exam/StudentMarksHistory';
-import OnlineExamDashboard from './pages/exam/OnlineExamDashboard';
-import AddQuestions from './pages/exam/AddQuestions';
-// import Classroom from './pages/Classroom';
-// import Grades from './pages/Grades';
-import FeePaymentStatus from './pages/FeeDues/FeePaymentStatus';
-import CollectFees from './pages/FeeDues/CollectFees';
-import FeeStructure from './pages/FeeDues/FeeStructure';
-import FeeReceipts from './pages/FeeDues/FeeReceipts';
-import PaymentMethods from './pages/FeeDues/PaymentMethods';
-import EditParent from './pages/EditParent';
-import FeeStructure from './pages/feemanagement/FeeStructure';
-import PaymentMethod from './pages/feemanagement/PaymentMethods';
-import FeeDues from './pages/feemanagement/FeeDues';
-import FeeReceipts from './pages/feemanagement/FeeReceipts';
-import CollectFees from './pages/feemanagement/CollectFees';
-import AddStudent from './pages/students/AddStudent';
-import Teachers from './pages/teachers/Teachers';
-import TeacherDetails from './pages/teachers/TeacherDetails';
-import AddTeacher from './pages/teachers/AddTeacher';
-import NotificationPage from './pages/Notifications/NotificationPage';
-import Profile from './pages/User/Profile';
-import Classes from './pages/classes/Classes';
-import AddClass from './pages/classes/AddClass';
-import Subjects from './pages/subjects/Subjects';
-import AddSubject from './pages/subjects/AddSubject';
-// import Attendance from './pages/attendance/Attendance';
-import TeacherAttendance from './pages/attendance/TeacherAttendance';
-import TimeTable from './pages/timetable/TimeTable';
-import Login from './components/auth/Login';
-import Unauthorized from './pages/Unauthorized';
-// import Signup from './components/auth/Signup';
-import { AppProvider, useApp } from './context/AppContext';
-import { CookiesProvider } from 'react-cookie';
-import AssignStudents from './pages/classes/AssignStudents';
-import ParentLayout from './parentportal/layout/ParentLayout';
-import ParentDashboard from './parentportal/pages/ParentDashboard';
-import Homework from './parentportal/pages/Homework';
-import SubjectAnalysis from './parentportal/pages/SubjectAnalysis';
-import WeeklyProgress from './parentportal/pages/WeeklyProgress';
-import ParentTimetable from './parentportal/pages/ParentTimetable';
-import ParentAttendance from './parentportal/pages/ParentAttendance';
-import ParentFinance from './parentportal/pages/Finance';
-import ParentCommunication from './parentportal/pages/Communication';
-import ParentSettings from './parentportal/pages/Settings';
-import ParentExamSchedule from './parentportal/pages/ExamSchedule';
-import ParentAchievements from './parentportal/pages/Achievements';
-import ParentReportCards from './parentportal/pages/ReportCards';
-import ParentPerformance from './parentportal/pages/Performance';
+import React, { useState } from "react";
+import {
+  Box,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+  Collapse,
+  Drawer,
+  IconButton,
+  useTheme,
+  useMediaQuery,
+} from "@mui/material";
+import {
+  BiHomeAlt,
+  BiUser,
+  BiChalkboard,
+  BiBook,
+  BiBookContent,
+  BiCalendarCheck,
+  BiBuilding,
+  BiTime,
+  BiChevronRight,
+  BiChevronDown,
+  BiUserPlus,
+  BiX,
+  BiMoney,
+} from "react-icons/bi";
+import { Link, useLocation } from "react-router-dom";
+import logo from "../../assets/GMs-logo.png";
+
+const sidebarWidth = 280;
+
+const Sidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
+  // const [openDashboard, setOpenDashboard] = useState(false); // Removed as Dashboard is now direct link
+  const [openStudent, setOpenStudent] = useState(false);
+  const [openTeacher, setOpenTeacher] = useState(false);
+  const [openClasses, setOpenClasses] = useState(false);
+  const [openSubjects, setOpenSubjects] = useState(false);
+  const [openAttendance, setOpenAttendance] = useState(false);
+  const [openTimeTable, setOpenTimeTable] = useState(false);
+  const [openAdmission, setOpenAdmission] = useState(false);
+  const [openExamSchedule, setOpenExamSchedule] = useState(false);
+  // const [openGrades, setOpenGrades] = useState(false);
+  // const [openClassroom, setOpenClassroom] = useState(false);
+  const [openParents, setOpenParents] = useState(false);
+  const [openFees, setOpenFees] = useState(false);
+  const [openTransport, setOpenTransport] = useState(false);
+  const [openLibrary, setOpenLibrary] = useState(false);
+
+  const location = useLocation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md")); // Tablet portrait & Mobile (< 900px)
+
+  const menuItems = [
+    {
+      name: "Dashboard",
+      icon: <BiHomeAlt />,
+      path: "/dashboard",
+    },
+    {
+      name: "Admission",
+      icon: <BiUserPlus />,
+      hasSubmenu: true,
+      isOpen: openAdmission,
+      onClick: () => setOpenAdmission(!openAdmission),
+      children: [
+        { name: "Application Form", path: "/admission/application-form" },
+        { name: "Application List", path: "/admission/list" }
+      ],
+    },
+    {
+      name: "Student",
+      icon: <BiUser />,
+      hasSubmenu: true,
+      isOpen: openStudent,
+      onClick: () => setOpenStudent(!openStudent),
+      children: [
+        { name: "Add New Student", path: "/students/add" },
+        { name: "All Students", path: "/students" },
+        { name: "ID Card Generator", path: "/students/id-cards" },
+        // { name: "Student Details", path: "/students/details" },
+
+      ],
+    },
+    {
+      name: "Parents",
+      icon: <BiUser />,
+      path: "/parents"
+    },
+    {
+      name: "Teacher",
+      icon: <BiChalkboard />,
+      isOpen: openTeacher,
+      hasSubmenu: true,
+      onClick: () => setOpenTeacher(!openTeacher),
+      children: [
+        { name: "Add New Teacher", path: "/teachers/add" },
+        { name: "All Teachers", path: "/teachers" },
+        // { name: "Teacher Details", path: "/teachers/details" },
+
+      ],
+    },
+
+    {
+      name: "Classes",
+      icon: <BiBookContent />,
+      hasSubmenu: true,
+      isOpen: openClasses,
+      onClick: () => setOpenClasses(!openClasses),
+      children: [
+        { name: "Add New Class", path: "/classes/add" },
+        { name: "All Classes", path: "/classes" },
+        { name: "Class Assignments", path: "/classes/assign-students" },
+      ]
+    },
+    {
+      name: "Subjects",
+      icon: <BiBook />,
+      hasSubmenu: true,
+      isOpen: openSubjects,
+      onClick: () => setOpenSubjects(!openSubjects),
+      children: [
+        { name: "Add New Subject", path: "/subjects/add" },
+        { name: "All Subjects", path: "/subjects" },
+        { name: "Assign Subject to Teacher", path: "/subjects/assign" },
+        { name: "Assign Subjects to Class", path: "/subjects/class" },
+      ],
+    },
+    {
+      name: "Time Table",
+      icon: <BiTime />,
+      path: "/timetable"
+    },
+
+    {
+      name: "Attendance",
+      icon: <BiCalendarCheck />,
+      hasSubmenu: true,
+      isOpen: openAttendance,
+      onClick: () => setOpenAttendance(!openAttendance),
+      children: [
+        { name: "Student Attendance", path: "/attendance/student" },
+        { name: "Teacher Attendance", path: "/attendance/teacher" },
+        { name: "Leave Approvals", path: "/attendance/leaves" },
+      ],
+    },
+    {
+      name: "Exam Schedule",
+      icon: <BiCalendarCheck />,
+      hasSubmenu: true,
+      isOpen: openExamSchedule,
+      onClick: () => setOpenExamSchedule(!openExamSchedule),
+      children: [
+        { name: "Create Exam ", path: "/create-exam" },
+        { name: "Exam Timetable View", path: "/exam-timetables" },
+        { name: "Student Exam Marks", path: "/exam-marks" },
+        { name: "Student Exam Marks History", path: "/exam-history" },
+        { name: "Online Exams", path: "/online-exam" }
+      ],
+    },
+    {
+      name: "Fees & Dues",
+      icon: <BiMoney />,
+      hasSubmenu: true,
+      isOpen: openFees,
+      onClick: () => setOpenFees(!openFees),
+      children: [
+        { name: "Fee Structure", path: "/fees/structure" },
+        { name: "Fee Payments", path: "/fees/payment-status" },
+        { name: "Collect Fees", path: "/fees/collect" },
+        { name: "Fee Receipts", path: "/fees/receipts" },
+        { name: "Payment Methods", path: "/fees/payment-methods" },
+      ],
+    },
+    {
+      name: "Transport",
+      icon: <BiBuilding />,
+      hasSubmenu: true,
+      isOpen: openTransport,
+      onClick: () => setOpenTransport(!openTransport),
+      children: [
+        { name: "Route Management", path: "/transport/routes" },
+        { name: "Bus Management", path: "/transport/buses" },
+        { name: "Assignments", path: "/transport/assignments" },
+      ],
+      path: "/transport"
+    },
+    {
+      name: "Library",
+      icon: <BiBook />,
+      hasSubmenu: true,
+      isOpen: openLibrary,
+      onClick: () => setOpenLibrary(!openLibrary),
+      children: [
+        { name: "Circulation", path: "/library/circulation" }
+      ],
+      path: '/library'
+    },
+    // {
+    //   name: "Classroom",
+    //   path: "/classroom",
+    //   icon: <BiBuilding />,
+    // },
+    // {
+    //   name: "Grades",
+    //   path: "/grades",
+    //   icon: <BiBarChart />,
+    // },
 
 
-// Student Portal Imports
-import StudentLayout from './studentportal/layout/StudentLayout';
-import StudentDashboard from './studentportal/pages/StudentDashboard';
-import StudentTimeTable from './studentportal/pages/StudentTimeTable';
-import StudentExamSchedule from './studentportal/pages/StudentExamSchedule';
-import StudentOnlineExams from './studentportal/pages/OnlineExams';
-import TakeExam from './studentportal/pages/TakeExam';
-// Removed duplicate StudentAttendance import to avoid collision
+  ];
 
+  const drawerContent = (
+    <Box
+      sx={{
+        height: "100%",
+        bgcolor: theme.palette.mode === 'light' ? theme.palette.primary.main : theme.palette.background.paper,
+        color: theme.palette.mode === 'light' ? "#c0beea" : theme.palette.text.secondary,
+        display: "flex",
+        flexDirection: "column",
+        overflowY: "auto",
+        overflowX: "hidden",
+        "&::-webkit-scrollbar": {
+          width: 0,
+        },
+        scrollbarWidth: "none",
+        borderRight: theme.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.05)' : 'none',
+      }}
+    >
+      {/* Logo Section */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          px: collapsed && !isMobile ? 2.5 : 3, // Adjust padding when collapsed on desktop
+          minHeight: 90,
+          transition: "padding 0.3s",
+        }}
+      >
+        <Box
+          sx={{
+            width: collapsed && !isMobile ? 40 : 64,
+            height: collapsed && !isMobile ? 40 : 64,
+            bgcolor: theme.palette.mode === 'light' ? "#fefefe" : theme.palette.background.default,
+            borderRadius: "12px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: theme.palette.mode === 'light'
+              ? "0 4px 10px rgba(251, 125, 91, 0.4)"
+              : "0 4px 10px rgba(0, 0, 0, 0.2)",
+            flexShrink: 0,
+            overflow: "hidden",
+            transition: "all 0.3s ease",
+          }}
+        >
+          <Box
+            component="img"
+            src={logo}
+            alt="logo"
+            sx={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+            }}
+          />
+        </Box>
 
-// Teacher Portal Imports
-import TeacherLayout from './teacherportal/layout/TeacherLayout';
-import TeacherDashboard from './teacherportal/pages/TeacherDashboard';
-import TeacherClasses from './teacherportal/pages/TeacherClasses';
-import TeacherAttendancePage from './teacherportal/pages/TeacherAttendancePage';
-import TeacherTimetable from './teacherportal/pages/TeacherTimetable';
-import TeacherMarks from './teacherportal/pages/TeacherMarks';
+        {(!collapsed || isMobile) && (
+          <Box sx={{ flexGrow: 1 }}>
+            <Typography
+              variant="h4"
+              sx={{
+                fontWeight: 700,
+                color: theme.palette.mode === 'light' ? "#fff" : theme.palette.text.primary,
+                fontSize: "24px",
+                whiteSpace: "nowrap",
+              }}
+            >
+              GetMySchool
+            </Typography>
+          </Box>
+        )}
 
-// Reports & Settings
-import Reports from './pages/Reports';
-import Settings from './pages/Settings';
-import ClassToTeacher from './pages/classes/ClassToTeacher';
-import SubToTeacher from './pages/subjects/SubToTeacher';
-import SubToClass from './pages/subjects/SubToClass';
-import LeaveApplicant from './parentportal/pages/SchoolLife/LeaveApplicant';
-import ApplicationForm from './pages/admission/ApplicationForm';
-import Admission from './pages/admission/Admission';
-import AdmissionList from './pages/admission/AdmissionList';
-import StudentAttendance from './pages/attendance/StudentAttendance';
+        {/* Close Button for Mobile */}
+        {isMobile && (
+          <IconButton onClick={handleDrawerToggle} sx={{ color: "white", ml: "auto" }}>
+            <BiX />
+          </IconButton>
+        )}
+      </Box>
 
-// Attendance & Leave Imports
-import AttendanceDashboard from './pages/attendance/AttendanceDashboard';
-import LeaveApprovals from './pages/attendance/LeaveApprovals';
-import LeaveApplication from './pages/attendance/LeaveApplication'; // For Teachers
-import StudentLeave from './studentportal/pages/StudentLeave';
-import MyAttendance from './studentportal/pages/MyAttendance';
+      {/* Navigation List */}
+      <List sx={{ px: 2, pb: 10 }}>
+        {menuItems.map((item, index) => (
+          <React.Fragment key={index}>
+            <ListItem disablePadding sx={{ mb: 0.5, display: "block" }}>
+              <ListItemButton
+                component={item.path ? Link : "div"}
+                to={item.path || undefined}
+                onClick={item.hasSubmenu ? item.onClick : undefined}
+                sx={{
+                  borderRadius: "0 50px 50px 0",
+                  ml: -2,
+                  pl: 4,
+                  px: 2,
+                  py: 1.2,
+                  bgcolor:
+                    location.pathname === item.path
+                      ? (theme.palette.mode === 'light' ? "rgba(255,255,255,0.15)" : theme.palette.action.selected)
+                      : "transparent",
+                  color:
+                    location.pathname === item.path
+                      ? (theme.palette.mode === 'light' ? "#fff" : theme.palette.primary.main)
+                      : (theme.palette.mode === 'light' ? "#c0beea" : theme.palette.text.secondary),
+                  justifyContent: collapsed && !isMobile ? "center" : "initial",
+                  "&:hover": {
+                    bgcolor: theme.palette.mode === 'light' ? "rgba(255,255,255,0.05)" : theme.palette.action.hover,
+                    color: theme.palette.mode === 'light' ? "#fff" : theme.palette.text.primary,
+                  },
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    color: "inherit",
+                    minWidth: 34,
+                    fontSize: 24,
+                    justifyContent: "center",
+                    mr: collapsed && !isMobile ? 0 : 2,
+                  }}
+                >
+                  {item.icon}
+                </ListItemIcon>
+                {(!collapsed || isMobile) && (
+                  <>
+                    <ListItemText
+                      primary={item.name}
+                      primaryTypographyProps={{ fontSize: 16, fontWeight: 500 }}
+                      sx={{ flexGrow: 1 }}
+                    />
+                    {item.hasSubmenu &&
+                      (item.isOpen ? <BiChevronDown size={20} style={{ marginLeft: 'auto' }} /> : <BiChevronRight size={20} style={{ marginLeft: 'auto' }} />)}
+                  </>
+                )}
+              </ListItemButton>
+            </ListItem>
 
-// Transport Module
-import TransportDashboard from './pages/transport/TransportDashboard';
-import RouteManagement from './pages/transport/RouteManagement';
-import BusManagement from './pages/transport/BusManagement';
-import StudentBusAssignment from './pages/transport/StudentBusAssignment';
+            {/* Submenu */}
+            {(!collapsed || isMobile) && item.hasSubmenu && (
+              <Collapse in={item.isOpen} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                  {item.children.map((child, idx) => {
+                    const isActive = location.pathname === child.path;
+                    return (
+                      <ListItemButton
+                        key={idx}
+                        component={Link}
+                        to={child.path || "#"}
+                        sx={{
+                          pl: 9,
+                          py: 1,
+                          color: isActive
+                            ? (theme.palette.mode === 'light' ? "#fff" : theme.palette.primary.main)
+                            : (theme.palette.mode === 'light' ? "#c0beea" : theme.palette.text.secondary),
+                          "&:hover": {
+                            color: theme.palette.mode === 'light' ? "#fff" : theme.palette.text.primary
+                          },
+                        }}
+                      >
+                        <ListItemText
+                          primary={child.name}
+                          primaryTypographyProps={{
+                            fontSize: 14,
+                            fontWeight: 400,
+                          }}
+                        />
+                      </ListItemButton>
+                    );
+                  })}
+                </List>
+              </Collapse>
+            )}
+          </React.Fragment>
+        ))}
+      </List>
 
-// Library Imports
-import LibraryDashboard from './pages/library/LibraryDashboard';
-import LibraryCirculation from './pages/library/LibraryCirculation';
-import LibraryBooks from './pages/library/LibraryBooks';
+      {/* Footer Text */}
+      {(!collapsed || isMobile) && (
+        <Box sx={{ p: 4, textAlign: "center", mt: "auto", mb: 2 }}>
+          <Typography variant="caption" sx={{ color: theme.palette.mode === 'light' ? "#8d87d3" : theme.palette.text.disabled }}>
+            - School Admission Dashboard
+            <br />
+          </Typography>
+        </Box>
+      )}
+    </Box>
+  );
 
-// Protected Route Component
-const ProtectedRoute = ({ children, allowedRoles }) => {
-  const { state } = useApp();
+  return (
+    <Box component="nav" sx={{ width: { md: collapsed ? 80 : sidebarWidth }, flexShrink: { md: 0 } }}>
+      {/* Mobile / Tablet Portrait Drawer */}
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={handleDrawerToggle}
+        ModalProps={{
+          keepMounted: true, // Better open performance on mobile.
+        }}
+        sx={{
+          display: { xs: "block", md: "none" },
+          "& .MuiDrawer-paper": { boxSizing: "border-box", width: sidebarWidth, border: "none" },
+        }}
+      >
+        {drawerContent}
+      </Drawer>
 
-  if (!state.isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (allowedRoles && state.currentUser) {
-    const userRoles = state.currentUser.roles || [state.currentUser.role];
-    const hasRole = userRoles.some(role => allowedRoles.includes(role));
-    if (!hasRole) {
-      return <Navigate to="/unauthorized" replace />;
-    }
-  }
-
-  return children;
+      {/* Desktop / Tablet Landscape Box (Reverted from Permanent Drawer) */}
+      <Box
+        sx={{
+          display: { xs: "none", md: "block" },
+          width: collapsed ? 80 : sidebarWidth,
+          transition: "width 0.3s",
+          overflowX: "hidden",
+          height: "100vh",
+          position: "fixed", // Keeping it fixed to ensure it stays in place
+          top: 0,
+          left: 0,
+          borderRight: "none",
+          bgcolor: theme.palette.mode === 'light' ? theme.palette.primary.main : theme.palette.background.paper,
+          zIndex: 1200
+        }}
+      >
+        {drawerContent}
+      </Box>
+    </Box>
+  );
 };
 
-// Main App Content with Logic
-const AppContent = () => {
-  return (
-    <Routes>
-      {/* Public Routes */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/unauthorized" element={<Unauthorized />} />
-
-      {/* Protected Routes - Admin & Staff */}
-      <Route path="/*" element={
-        <ProtectedRoute allowedRoles={['SuperAdmin', 'Admin', 'Accountant', 'Receptionist', 'Librarian', 'Driver']}>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/students" element={<Students />} />
-              <Route path="/students/details" element={<StudentDetails />} />
-              <Route path="/students/details/:id" element={<StudentDetails />} />
-              <Route path="/students/add" element={<AddStudent />} />
-              <Route path="/students/edit/:id" element={<AddStudent />} />
-              <Route path="/students/id-cards" element={<IdCardGenerator />} />
-              <Route path="/parents" element={<Parents />} />
-
-              {/* Users */}
-              <Route path="/notifications" element={<NotificationPage />} />
-              <Route path="/profile" element={<Profile />} />
-
-              {/* Teacher Module */}
-              <Route path="/teachers" element={<Teachers />} />
-              <Route path="/teachers/details" element={<TeacherDetails />} />
-              <Route path="/teachers/details/:id" element={<TeacherDetails />} />
-              <Route path="/teachers/add" element={<AddTeacher />} />
-              <Route path="/teachers/edit/:id" element={<AddTeacher />} />
-
-              <Route path="/parents" element={<Parents />} />
-              <Route path="/parents/edit/:id" element={<EditParent />} />
-
-              {/* New Modules */}
-              <Route path="/classes" element={<Classes />} />
-              <Route path="/classes/add" element={<AddClass />} />
-              <Route path="/classes/edit/:id" element={<AddClass />} />
-              <Route path="/classes/edit/:id" element={<AddClass />} />
-              <Route path="/classes/assign-students" element={<AssignStudents />} />
-              <Route path="/classes/assign-students/:id" element={<AssignStudents />} />
-              <Route path="/classes/assign" element={<ClassToTeacher />} />
-              <Route path="/classes/assign" element={<ClassToTeacher />} />
-
-              <Route path="/subjects" element={<Subjects />} />
-              <Route path="/subjects/add" element={<AddSubject />} />
-              <Route path="/subjects/edit/:id" element={<AddSubject />} />
-              <Route path="/subjects/assign" element={<SubToTeacher />} />
-              <Route path="/subjects/class" element={<SubToClass />} />
-
-              <Route path="/attendance" element={<AttendanceDashboard />} />
-              <Route path="/attendance/student" element={<StudentAttendance />} />
-              <Route path="/attendance/teacher" element={<TeacherAttendance />} />
-              <Route path="/attendance/leaves" element={<LeaveApprovals />} />
-              <Route path="/timetable" element={<TimeTable />} />
-              <Route path="/create-exam" element={<CreateExam />} />
-              <Route path="/exam-timetable" element={<ExamTimetable />} />
-              <Route path="/exam-timetables" element={<ExamTimetables />} />
-              <Route path="/exam-marks" element={<StudentMarks />} />
-              <Route path="/exam-history" element={<StudentMarksHistory />} />
-
-              {/* Online Exam Admin Routes */}
-              <Route path="/online-exam" element={<OnlineExamDashboard />} />
-              <Route path="/online-exam/questions/:scheduleId" element={<AddQuestions />} />
-
-              {/* <Route path="/classroom" element={<Classroom />} /> */}
-              {/* <Route path="/grades" element={<Grades />} /> */}
-              <Route path="/fees/payment-status" element={<FeePaymentStatus />} />
-              <Route path="/fees/collect" element={<CollectFees />} />
-              <Route path="/fees/structure" element={<FeeStructure />} />
-              <Route path="/fees/receipts" element={<FeeReceipts />} />
-              <Route path="/fees/payments-methods" element={<PaymentMethods />} />
-
-              <Route path="/admission" element={<Admission />} />
-              <Route path="/admission/application-form" element={<ApplicationForm />} />
-              <Route path="/admission/list" element={<AdmissionList />} />
-
-              {/* Transport Module */}
-              <Route path="/transport" element={<TransportDashboard />} />
-              <Route path="/transport/routes" element={<RouteManagement />} />
-              <Route path="/transport/buses" element={<BusManagement />} />
-              <Route path="/transport/assignments" element={<StudentBusAssignment />} />
-
-              {/* Library Module */}
-              <Route path="/library" element={<LibraryDashboard />} />
-              <Route path="/library/circulation" element={<LibraryCirculation />} />
-              <Route path="/library/books" element={<LibraryBooks />} />
-
-              {/* Reports & Settings */}
-              <Route path="/reports" element={<Reports />} />
-              <Route path="/settings" element={<Settings />} />
-            </Routes>
-          </Layout>
-        </ProtectedRoute>
-      } />
-
-      {/* Parent Portal Routes */}
-      <Route path="/parent/*" element={
-        <ProtectedRoute allowedRoles={['Parent']}>
-          <ParentLayout>
-            <Routes>
-              <Route path="/" element={<Navigate to="/parent/dashboard" replace />} />
-              <Route path="/dashboard" element={<ParentDashboard />} />
-              <Route path="/children" element={<div style={{ padding: 20 }}><h2>My Children</h2><p>Coming soon...</p></div>} />
-              <Route path="/academics" element={<div style={{ padding: 20 }}><h2>Academics</h2><p>Coming soon...</p></div>} />
-              <Route path="/homework" element={<Homework />} />
-              <Route path="/weekly-progress" element={<WeeklyProgress />} />
-              <Route path="/subject-analysis" element={<SubjectAnalysis />} />
-              <Route path="/attendance" element={<ParentAttendance />} />
-              <Route path="/timetable" element={<ParentTimetable />} />
-              <Route path="/exam-schedule" element={<ParentExamSchedule />} />
-              <Route path="/achievements" element={<ParentAchievements />} />
-              <Route path="/report-cards" element={<ParentReportCards />} />
-              <Route path="/performance" element={<ParentPerformance />} />
-              <Route path="/fees" element={<ParentFinance initialTab="fees" />} />
-              <Route path="/payments" element={<ParentFinance initialTab="payments" />} />
-              <Route path="/receipts" element={<ParentFinance initialTab="receipts" />} />
-              <Route path="/quickpay" element={<ParentFinance initialTab="quickpay" />} />
-              <Route path="/teachers" element={<ParentCommunication initialTab="teachers" />} />
-              <Route path="/office" element={<ParentCommunication initialTab="office" />} />
-              <Route path="/messages" element={<ParentCommunication initialTab="messages" />} />
-              <Route path="/announcements" element={<ParentCommunication initialTab="announcements" />} />
-              <Route path="/events" element={<ParentCommunication initialTab="events" />} />
-              <Route path="/ptm" element={<ParentCommunication initialTab="ptm" />} />
-              <Route path="/settings" element={<ParentSettings initialTab="profile" />} />
-              <Route path="/profile" element={<ParentSettings initialTab="profile" />} />
-              <Route path="/security" element={<ParentSettings initialTab="security" />} />
-              <Route path="/notifications" element={<ParentSettings initialTab="notifications" />} />
-              <Route path="/help" element={<ParentSettings initialTab="help" />} />
-              <Route path="/leave" element={<LeaveApplicant />} />
-            </Routes>
-          </ParentLayout>
-        </ProtectedRoute>
-      } />
-
-      {/* Student Portal Routes */}
-      <Route path="/student/*" element={
-        <ProtectedRoute allowedRoles={['Student']}>
-          <StudentLayout>
-            <Routes>
-              <Route path="dashboard" element={<StudentDashboard />} />
-              <Route path="timetable" element={<StudentTimeTable />} />
-              <Route path="attendance" element={<MyAttendance />} />
-              <Route path="leave" element={<StudentLeave />} />
-              <Route path="examschedule" element={<StudentExamSchedule />} />
-              <Route path="online-exams" element={<StudentOnlineExams />} />
-              <Route path="take-exam/:scheduleId" element={<TakeExam />} />
-            </Routes>
-          </StudentLayout>
-        </ProtectedRoute>
-      } />
-
-
-      {/* Teacher Portal Routes */}
-      <Route path="/teacher/*" element={
-        <ProtectedRoute allowedRoles={['Teacher']}>
-          <TeacherLayout>
-            <Routes>
-              <Route path="dashboard" element={<TeacherDashboard />} />
-              <Route path="classes" element={<TeacherClasses />} />
-              <Route path="attendance" element={<TeacherAttendancePage />} />
-              <Route path="timetable" element={<TeacherTimetable />} />
-              <Route path="marks" element={<TeacherMarks />} />
-              <Route path="leave" element={<LeaveApplication />} />
-            </Routes>
-          </TeacherLayout>
-        </ProtectedRoute>
-      } />
-
-    </Routes>
-  );
-}
-
-
-
-
-function App() {
-  return (
-    <MantineProvider>
-      <Notifications />
-      <CookiesProvider>
-        <AppProvider>
-          <ThemeContextProvider>
-            <BrowserRouter>
-              <AppContent />
-            </BrowserRouter>
-          </ThemeContextProvider>
-        </AppProvider>
-      </CookiesProvider>
-    </MantineProvider>
-  );
-}
-export default App;
+export default Sidebar;
