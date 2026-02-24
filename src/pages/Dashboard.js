@@ -42,11 +42,13 @@ const Dashboard = () => {
     { title: 'Earnings', count: data?.stats?.earnings || 0, color: '#30c7ec', icon: <BiMoney /> },
     { title: 'Classes', count: data?.stats?.classes || 0, color: '#4d44b5', icon: <BiBook /> },
     { title: 'Subjects', count: data?.stats?.subjects || 0, color: '#fb7d5b', icon: <BiCalendar /> },
+    { title: 'Pending Admissions', count: data?.stats?.pending_admissions ?? 0, color: '#ff7043', icon: <BiDish /> },
+    { title: "Today's Attendance", count: `${data?.stats?.today_attendance_pct ?? 0}%`, color: '#43a047', icon: <BiCalendar /> },
   ];
 
   return (
     <Box>
-      <Box sx={{ mb: 4 }}>
+      <Box sx={{ mb: 1 }}>
         <Typography variant="h1" color="text.primary">Dashboard</Typography>
       </Box>
 

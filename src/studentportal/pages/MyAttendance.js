@@ -85,17 +85,26 @@ const MyAttendance = () => {
                         <TableContainer>
                             <Table>
                                 <TableHead>
-                                    <TableRow>
-                                        <TableCell>Date</TableCell>
-                                        <TableCell>Status</TableCell>
-                                        <TableCell>Check In</TableCell>
-                                        <TableCell>Check Out</TableCell>
-                                        <TableCell>Remarks</TableCell>
+                                    <TableRow sx={{ bgcolor: '#f4f5ff' }}>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Date</TableCell>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Status</TableCell>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Check In</TableCell>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Check Out</TableCell>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Remarks</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {attendance.map((row, index) => (
-                                        <TableRow key={index} hover>
+                                    {attendance.map((row, i) => (
+                                        <TableRow
+                                            key={i}
+                                            hover
+                                            sx={{
+                                                bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                                                '& td': { borderBottom: '1px solid #eef0fb', py: 1.4 },
+                                                '&:hover': { bgcolor: '#f0f1ff !important' },
+                                                '&:last-child td': { borderBottom: 0 }
+                                            }}
+                                        >
                                             <TableCell>{row.date}</TableCell>
                                             <TableCell>
                                                 <Chip

@@ -82,7 +82,7 @@ const TeacherAttendance = () => {
 
   return (
     <Box>
-      <Box sx={{ mb: 4, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <Box sx={{ mb: 1, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Typography variant="h4" color="text.primary">Teacher Attendance</Typography>
       </Box>
 
@@ -106,19 +106,28 @@ const TeacherAttendance = () => {
       <Card>
         <TableContainer>
           <Table>
-            <TableHead>
-              <TableRow sx={{ "& th": { fontWeight: 600, color: "text.secondary" } }}>
-                <TableCell>Teacher ID</TableCell>
-                <TableCell>Name</TableCell>
-                <TableCell>Designation</TableCell>
-                <TableCell align="center">Status</TableCell>
-                <TableCell align="center">Check In</TableCell>
-                <TableCell align="center">Check Out</TableCell>
+            <TableHead sx={{ bgcolor: '#f4f5ff' }}>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Teacher ID</TableCell>
+                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Name</TableCell>
+                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Designation</TableCell>
+                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2, textAlign: 'center' }}>Status</TableCell>
+                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2, textAlign: 'center' }}>Check In</TableCell>
+                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2, textAlign: 'center' }}>Check Out</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {teachers.map((t, i) => (
-                <TableRow key={t.teacher_id} hover sx={{ "& td": { py: 2.5 } }}>
+                <TableRow
+                  key={t.teacher_id}
+                  hover
+                  sx={{
+                    bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                    '& td': { borderBottom: '1px solid #eef0fb', py: 1.4 },
+                    '&:hover': { bgcolor: '#f0f1ff !important' },
+                    '&:last-child td': { borderBottom: 0 }
+                  }}
+                >
                   <TableCell sx={{ color: "primary.main", fontWeight: 600 }}>#{t.teacher_id}</TableCell>
 
                   <TableCell>

@@ -23,7 +23,7 @@ import { notifications } from '@mantine/notifications';
 const LeaveApplication = () => {
     const [cookies] = useCookies(['user']);
     const [leaves, setLeaves] = useState([]);
-    
+
     // Form State
     const [leaveType, setLeaveType] = useState('Casual');
     const [startDate, setStartDate] = useState('');
@@ -39,7 +39,7 @@ const LeaveApplication = () => {
         if (!cookies.user?.id) return;
         try {
             const res = await api.get(`/getLeaves?userId=${cookies.user.id}&role=teacher`); // Assuming 'teacher' role text
-            if(res.data.leaves) {
+            if (res.data.leaves) {
                 setLeaves(res.data.leaves);
             }
         } catch (e) {
@@ -49,7 +49,7 @@ const LeaveApplication = () => {
 
     const handleApply = async () => {
         if (!startDate || !endDate || !reason) {
-            notifications.show({title: 'Error', message: 'Please fill all fields', color: 'red'});
+            notifications.show({ title: 'Error', message: 'Please fill all fields', color: 'red' });
             return;
         }
 
@@ -70,14 +70,14 @@ const LeaveApplication = () => {
                 totalDays,
                 reason
             });
-            notifications.show({title: 'Success', message: 'Leave Application Submitted', color: 'green'});
+            notifications.show({ title: 'Success', message: 'Leave Application Submitted', color: 'green' });
             setReason('');
             setStartDate('');
             setEndDate('');
             fetchLeaves();
         } catch (error) {
             console.error(error);
-            notifications.show({title: 'Error', message: 'Failed to submit', color: 'red'});
+            notifications.show({ title: 'Error', message: 'Failed to submit', color: 'red' });
         } finally {
             setLoading(false);
         }
@@ -86,17 +86,17 @@ const LeaveApplication = () => {
     return (
         <Box>
             <Typography variant="h4" gutterBottom>Leave Application</Typography>
-            
+
             <Grid container spacing={4}>
                 {/* Application Form */}
                 <Grid item xs={12} md={4}>
                     <Paper sx={{ p: 3, borderRadius: 3 }}>
                         <Typography variant="h6" gutterBottom>Apply for Leave</Typography>
                         <Stack spacing={3} mt={2}>
-                            <TextField 
-                                select 
-                                label="Leave Type" 
-                                value={leaveType} 
+                            <TextField
+                                select
+                                label="Leave Type"
+                                value={leaveType}
                                 onChange={(e) => setLeaveType(e.target.value)}
                                 fullWidth
                                 size="small"
@@ -107,31 +107,31 @@ const LeaveApplication = () => {
                                 <MenuItem value="Emergency">Emergency</MenuItem>
                             </TextField>
 
-                            <TextField 
-                                type="date" 
-                                label="Start Date" 
-                                InputLabelProps={{ shrink: true }} 
-                                value={startDate} 
+                            <TextField
+                                type="date"
+                                label="Start Date"
+                                InputLabelProps={{ shrink: true }}
+                                value={startDate}
                                 onChange={(e) => setStartDate(e.target.value)}
                                 fullWidth
                                 size="small"
                             />
 
-                            <TextField 
-                                type="date" 
-                                label="End Date" 
-                                InputLabelProps={{ shrink: true }} 
-                                value={endDate} 
+                            <TextField
+                                type="date"
+                                label="End Date"
+                                InputLabelProps={{ shrink: true }}
+                                value={endDate}
                                 onChange={(e) => setEndDate(e.target.value)}
                                 fullWidth
                                 size="small"
                             />
 
-                            <TextField 
-                                multiline 
-                                rows={4} 
-                                label="Reason" 
-                                value={reason} 
+                            <TextField
+                                multiline
+                                rows={4}
+                                label="Reason"
+                                value={reason}
                                 onChange={(e) => setReason(e.target.value)}
                                 fullWidth
                             />
@@ -149,27 +149,36 @@ const LeaveApplication = () => {
                         <Typography variant="h6" gutterBottom>My Leaves</Typography>
                         <TableContainer>
                             <Table>
-                                <TableHead>
+                                <TableHead sx={{ bgcolor: '#f4f5ff' }}>
                                     <TableRow>
-                                        <TableCell>Type</TableCell>
-                                        <TableCell>From</TableCell>
-                                        <TableCell>To</TableCell>
-                                        <TableCell>Days</TableCell>
-                                        <TableCell>Status</TableCell>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Type</TableCell>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>From</TableCell>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>To</TableCell>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Days</TableCell>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Status</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {leaves.map((leave) => (
-                                        <TableRow key={leave.id}>
+                                    {leaves.map((leave, i) => (
+                                        <TableRow
+                                            key={leave.id}
+                                            hover
+                                            sx={{
+                                                bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                                                '& td': { borderBottom: '1px solid #eef0fb', py: 1.4 },
+                                                '&:hover': { bgcolor: '#f0f1ff !important' },
+                                                '&:last-child td': { borderBottom: 0 }
+                                            }}
+                                        >
                                             <TableCell>{leave.leave_type}</TableCell>
                                             <TableCell>{leave.start_date}</TableCell>
                                             <TableCell>{leave.end_date}</TableCell>
                                             <TableCell>{leave.total_days}</TableCell>
                                             <TableCell>
-                                                <Chip 
-                                                    label={leave.status} 
-                                                    color={leave.status === 'Approved' ? 'success' : (leave.status === 'Rejected' ? 'error' : 'warning')} 
-                                                    size="small" 
+                                                <Chip
+                                                    label={leave.status}
+                                                    color={leave.status === 'Approved' ? 'success' : (leave.status === 'Rejected' ? 'error' : 'warning')}
+                                                    size="small"
                                                 />
                                             </TableCell>
                                         </TableRow>

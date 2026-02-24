@@ -1,24 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Card, CardContent, Button, Grid, Chip, Container, CircularProgress } from '@mui/material';
+import { Box, Typography, Card, CardContent, Button, Grid, Chip, Container, CircularProgress, Pagination } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { invokeGetApi, apiList } from '../../services/ApiServices';
 
 const OnlineExamDashboard = () => {
     const [exams, setExams] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1); // API is 1-indexed (based on my previous PHP changes, actually let's check. Yes, I used page in PHP as 1-based by default)
+    // Wait, in PHP: $page = isset($params['page']) ? (int)$params['page'] : 1;
+    // MUI Pagination component is 1-based.
+    const [totalPages, setTotalPages] = useState(1);
     const navigate = useNavigate();
 
     useEffect(() => {
         fetchExams();
-    }, []);
+    }, [page]);
 
     const fetchExams = async () => {
+        setLoading(true);
         try {
-            // Fetch all exams (admin view)
-            const response = await invokeGetApi(apiList.getExams, {});
+            // Fetch online exams with pagination
+            const response = await invokeGetApi(apiList.getExams, {
+                exam_mode: 'Online',
+                page: page,
+                limit: 9 // 9 items per page fits well in 3 columns
+            });
             if (response.data.responseCode === "200") {
-                const onlineExams = response.data.exams.filter(exam => exam.exam_mode === 'Online');
-                setExams(onlineExams);
+                setExams(response.data.exams);
+                if (response.data.pagination) {
+                    setTotalPages(response.data.pagination.total_pages);
+                }
             }
         } catch (error) {
             console.error("Error fetching exams:", error);
@@ -27,11 +38,15 @@ const OnlineExamDashboard = () => {
         }
     };
 
+    const handlePageChange = (event, value) => {
+        setPage(value);
+    };
+
     if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}><CircularProgress /></Box>;
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+        <Container maxWidth="lg" sx={{ mb: 1 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography variant="h4" fontWeight={700} color="#303972">
                     Online Exams Management
                 </Typography>
@@ -62,11 +77,6 @@ const OnlineExamDashboard = () => {
                                     <Button
                                         variant="outlined"
                                         fullWidth
-                                        // Direct link to questions for now (assuming 1 schedule per exam or passing examID to pick schedule)
-                                        // For simplicity in this iteration, passing exam.id as schedule_id to show flow, 
-                                        // BUT ideally we need to list schedules first. 
-                                        // Let's assume the user selects a schedule ID manually or we list it.
-                                        // Temporary: Navigating to questions with param.
                                         onClick={() => navigate(`/online-exam/questions/${exam.id}`)}
                                     >
                                         Manage Questions
@@ -77,6 +87,16 @@ const OnlineExamDashboard = () => {
                     </Grid>
                 ))}
             </Grid>
+
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                <Pagination
+                    count={totalPages}
+                    page={page}
+                    onChange={handlePageChange}
+                    color="primary"
+                    shape="rounded"
+                />
+            </Box>
         </Container>
     );
 };

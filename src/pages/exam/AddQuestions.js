@@ -137,7 +137,7 @@ const AddQuestions = () => {
                 Manage Questions for Exam Schedule ID: {scheduleId}
             </Typography>
 
-            <Card sx={{ mb: 4, p: 2 }}>
+            <Card sx={{ mb: 1, p: 2 }}>
                 <CardContent>
                     <Typography variant="h6" gutterBottom>{editingId ? "Edit Question" : "Add New Question"}</Typography>
                     <Grid container spacing={2}>
@@ -252,13 +252,13 @@ const AddQuestions = () => {
 
             <TableContainer component={Paper}>
                 <Table>
-                    <TableHead>
+                    <TableHead sx={{ bgcolor: '#f4f5ff' }}>
                         <TableRow>
-                            <TableCell>#</TableCell>
-                            <TableCell>Question</TableCell>
-                            <TableCell>Options</TableCell>
-                            <TableCell>Marks</TableCell>
-                            <TableCell>Action</TableCell>
+                            <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>#</TableCell>
+                            <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Question</TableCell>
+                            <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Options</TableCell>
+                            <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Marks</TableCell>
+                            <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2, textAlign: 'center' }}>Action</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -268,7 +268,15 @@ const AddQuestions = () => {
                             </TableRow>
                         ) : (
                             filteredQuestions.map((q, idx) => (
-                                <TableRow key={q.id}>
+                                <TableRow
+                                    key={q.id}
+                                    sx={{
+                                        bgcolor: idx % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                                        '& td': { borderBottom: '1px solid #eef0fb', py: 1.4 },
+                                        '&:hover': { bgcolor: '#f0f1ff !important' },
+                                        '&:last-child td': { borderBottom: 0 }
+                                    }}
+                                >
                                     <TableCell>{idx + 1}</TableCell>
                                     <TableCell>{q.question_text} <br /><small style={{ color: '#666', background: '#eee', padding: '2px 4px', borderRadius: '4px' }}>{q.question_type || 'MCQ'}</small></TableCell>
                                     <TableCell>

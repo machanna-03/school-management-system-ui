@@ -199,9 +199,8 @@ const AddStudent = () => {
 
     return (
         <Box>
-            <Box sx={{ mb: 4 }}>
-                <Typography variant="h4" color="text.primary" fontWeight="bold">{isEditMode ? 'Edit Student' : 'Add New Student'}</Typography>
-                <Typography variant="body2" color="text.secondary">Home / Students / {isEditMode ? 'Edit' : 'Add'} Student</Typography>
+            <Box sx={{ mb: 1 }}>
+                <Typography variant="h4" color="text.primary" fontWeight="bold">{isEditMode ? 'Edit Student Portal' : 'Add Student Portal'}</Typography>
             </Box>
 
             {error && (

@@ -75,8 +75,8 @@ const StudentMarks = () => {
         studentId: "",
         subjectId: ""
       });
-      // Pass the class name to filter students
-      fetchStudents(selectedExam.class_name);
+      // Pass class_id (numeric) — reliable DB join, no text-match fragility
+      fetchStudents(selectedExam.class_id);
       fetchExamSubjects(examId);
     } else {
       setFormData({
@@ -90,35 +90,12 @@ const StudentMarks = () => {
     }
   };
 
-  const fetchStudents = async (examClassName) => {
+  const fetchStudents = async (classId) => {
     try {
-      let response = await invokeGetApi(config.getMySchool + apiList.getStudents, {});
-      if (response.status === 200 && response.data.responseCode === "200") {
-        const allStudents = response.data.students || [];
-
-        // Filter students where their class + section matches the exam's class name
-        // The examClassName is usually like "Class 1 A"
-        // The student object has `class` (e.g. "Class 1") and `section` (e.g. "A")
-        // We need to construct the student's full class string to compare, or do a loose match.
-        // Let's list all students if no match found, or try to filter strictly.
-
-        if (examClassName) {
-          const filtered = allStudents.filter(s => {
-            // Construct string roughly: "Class" + "Section"
-            // Case 1: examClassName is exact match to s.class ? (No, exam usually includes section)
-            // Case 2: s.class + " " + s.section === examClassName ?
-            // Let's try to normalize and check inclusion
-            const studentFullClass = `${s.class} ${s.section}`.trim();
-            const studentFullClass2 = `${s.class}-${s.section}`.trim();
-
-            return studentFullClass === examClassName ||
-              studentFullClass2 === examClassName ||
-              examClassName.includes(s.class) && examClassName.includes(s.section);
-          });
-          setStudents(filtered.length > 0 ? filtered : allStudents); // Fallback to all if filter fails to match any (safety)
-        } else {
-          setStudents(allStudents);
-        }
+      const params = classId ? { class_id: classId, limit: 500 } : { limit: 500 };
+      let response = await invokeGetApi(config.getMySchool + apiList.getStudents, params);
+      if (response.status === 200) {
+        setStudents(response.data.students || []);
       }
     } catch (error) {
       console.error("Error fetching students:", error);
@@ -212,7 +189,7 @@ const StudentMarks = () => {
       </Typography>
 
       {/* Add Marks Form */}
-      <Card sx={{ mb: 4, borderRadius: 2 }}>
+      <Card sx={{ mb: 1, borderRadius: 2 }}>
         <CardContent>
           <Typography variant="h6" mb={3} color="#4d44b5">
             Marks Entry Form
@@ -329,13 +306,13 @@ const StudentMarks = () => {
 
           <TableContainer component={Paper} elevation={0} sx={{ border: "1px solid #e0e0e0" }}>
             <Table size="small">
-              <TableHead sx={{ bgcolor: "#f1f1f1" }}>
+              <TableHead sx={{ bgcolor: '#f4f5ff' }}>
                 <TableRow>
-                  <TableCell><b>Exam</b></TableCell>
-                  <TableCell><b>Student</b></TableCell>
-                  <TableCell><b>Subject</b></TableCell>
-                  <TableCell><b>Marks</b></TableCell>
-                  <TableCell><b>Remarks</b></TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Exam</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Student</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Subject</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Marks</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Remarks</TableCell>
                 </TableRow>
               </TableHead>
 
@@ -343,8 +320,17 @@ const StudentMarks = () => {
                 {marksList.length === 0 ? (
                   <TableRow><TableCell colSpan={5} align="center">No marks entered yet.</TableCell></TableRow>
                 ) : (
-                  marksList.map((row) => (
-                    <TableRow key={row.id}>
+                  marksList.map((row, i) => (
+                    <TableRow
+                      key={row.id}
+                      hover
+                      sx={{
+                        bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                        '& td': { borderBottom: '1px solid #eef0fb', py: 1.4 },
+                        '&:hover': { bgcolor: '#f0f1ff !important' },
+                        '&:last-child td': { borderBottom: 0 }
+                      }}
+                    >
                       <TableCell>{row.exam}</TableCell>
                       <TableCell>{row.studentName}</TableCell>
                       <TableCell>{row.subject}</TableCell>

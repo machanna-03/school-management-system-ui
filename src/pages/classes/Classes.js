@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, Avatar, IconButton, InputBase, Select, MenuItem, Stack, Chip, Paper } from '@mui/material';
+import { Box, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Checkbox, Avatar, IconButton, InputBase, Select, MenuItem, Stack, Chip, Paper } from '@mui/material';
 import Card from '../../components/common/Card';
 import { BiPlus, BiPencil, BiTrash, BiSearch, BiBook, BiUser } from 'react-icons/bi';
 import { Link } from 'react-router-dom';
@@ -13,21 +13,41 @@ const Classes = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
 
+    // Pagination State
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [totalCount, setTotalCount] = useState(0);
+
     useEffect(() => {
         fetchClasses();
-    }, []);
+    }, [page, rowsPerPage]);
 
     const fetchClasses = async () => {
+        setLoading(true);
         try {
-            const response = await api.get('/getClasses');
+            const response = await api.get(`/getClasses?page=${page + 1}&limit=${rowsPerPage}`);
             if (response.data.classes) {
                 setClasses(response.data.classes);
+                if (response.data.pagination) {
+                    setTotalCount(response.data.pagination.total_count);
+                } else {
+                    setTotalCount(response.data.classes.length);
+                }
             }
         } catch (error) {
             console.error("Failed to fetch classes:", error);
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
     };
 
     const handleDelete = async (id) => {
@@ -59,7 +79,7 @@ const Classes = () => {
     return (
         <Box>
             {/* Header Section */}
-            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ mb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box>
                     <Typography variant="h4" color="text.primary" fontWeight="bold">Classes</Typography>
                     <Typography variant="body2" color="text.secondary">Manage your school classes and sections here.</Typography>
@@ -113,18 +133,29 @@ const Classes = () => {
             </Paper>
 
             {/* Classes Table */}
+            <Paper sx={{ mb: 2 }}>
+                <TablePagination
+                    component="div"
+                    count={parseInt(totalCount, 10)}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    rowsPerPage={rowsPerPage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    rowsPerPageOptions={[5, 10, 25, 50]}
+                />
+            </Paper>
             <Card>
                 <TableContainer>
                     <Table sx={{ minWidth: 800 }}>
                         <TableHead>
-                            <TableRow sx={{ '& th': { color: 'text.secondary', fontWeight: 600, borderBottom: '1px solid #f0f1f5', pb: 2 } }}>
-                                <TableCell padding="checkbox"><Checkbox /></TableCell>
-                                <TableCell>Class Name</TableCell>
-                                <TableCell>Section</TableCell>
-                                <TableCell>Academic Year</TableCell>
-                                <TableCell>Class Teacher</TableCell>
-                                <TableCell>Capacity</TableCell>
-                                <TableCell align="right">Actions</TableCell>
+                            <TableRow sx={{ bgcolor: '#f4f5ff' }}>
+                                <TableCell padding="checkbox" sx={{ borderBottom: '2px solid #e0e2ff' }}><Checkbox /></TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff' }}>Class Name</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff' }}>Section</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff' }}>Academic Year</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff' }}>Class Teacher</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff' }}>Capacity</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff' }}>Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -138,7 +169,7 @@ const Classes = () => {
                                 </TableRow>
                             ) : (
                                 filteredClasses.map((cls, i) => (
-                                    <TableRow key={cls.section_id} hover sx={{ '& td': { borderBottom: '1px solid #f0f1f5', py: 2.5 } }}>
+                                    <TableRow key={cls.section_id} hover sx={{ bgcolor: i % 2 === 0 ? '#fff' : '#f9f9ff', '& td': { borderBottom: '1px solid #eef0fb', py: 1.5 }, '&:hover': { bgcolor: '#f0f1ff' }, '&:last-child td': { borderBottom: 0 } }}>
                                         <TableCell padding="checkbox"><Checkbox /></TableCell>
                                         <TableCell>
                                             <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#3d4465' }}>{cls.class_name}</Typography>

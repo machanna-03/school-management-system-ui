@@ -72,12 +72,21 @@ import TakeExam from './studentportal/pages/TakeExam';
 // Teacher Portal Imports
 import TeacherLayout from './teacherportal/layout/TeacherLayout';
 import TeacherDashboard from './teacherportal/pages/TeacherDashboard';
+import TeacherClasses from './teacherportal/pages/TeacherClasses';
+import TeacherAttendancePage from './teacherportal/pages/TeacherAttendancePage';
+import TeacherTimetable from './teacherportal/pages/TeacherTimetable';
+import TeacherMarks from './teacherportal/pages/TeacherMarks';
+
+// Reports & Settings
+import Reports from './pages/Reports';
+import Settings from './pages/Settings';
 import ClassToTeacher from './pages/classes/ClassToTeacher';
 import SubToTeacher from './pages/subjects/SubToTeacher';
 import SubToClass from './pages/subjects/SubToClass';
 import LeaveApplicant from './parentportal/pages/SchoolLife/LeaveApplicant';
 import ApplicationForm from './pages/admission/ApplicationForm';
-// import Admission from './pages/admission/Admission';
+import Admission from './pages/admission/Admission';
+import AdmissionList from './pages/admission/AdmissionList';
 import StudentAttendance from './pages/attendance/StudentAttendance';
 
 // Attendance & Leave Imports
@@ -96,6 +105,7 @@ import StudentBusAssignment from './pages/transport/StudentBusAssignment';
 // Library Imports
 import LibraryDashboard from './pages/library/LibraryDashboard';
 import LibraryCirculation from './pages/library/LibraryCirculation';
+import LibraryBooks from './pages/library/LibraryBooks';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -192,8 +202,9 @@ const AppContent = () => {
               <Route path="/fees/receipts" element={<FeeReceipts />} />
               <Route path="/fees/payments-methods" element={<PaymentMethods />} />
 
-              {/* <Route path="/admission" element={<Admission />} /> */}
+              <Route path="/admission" element={<Admission />} />
               <Route path="/admission/application-form" element={<ApplicationForm />} />
+              <Route path="/admission/list" element={<AdmissionList />} />
 
               {/* Transport Module */}
               <Route path="/transport" element={<TransportDashboard />} />
@@ -204,6 +215,11 @@ const AppContent = () => {
               {/* Library Module */}
               <Route path="/library" element={<LibraryDashboard />} />
               <Route path="/library/circulation" element={<LibraryCirculation />} />
+              <Route path="/library/books" element={<LibraryBooks />} />
+
+              {/* Reports & Settings */}
+              <Route path="/reports" element={<Reports />} />
+              <Route path="/settings" element={<Settings />} />
             </Routes>
           </Layout>
         </ProtectedRoute>
@@ -258,7 +274,7 @@ const AppContent = () => {
               <Route path="attendance" element={<MyAttendance />} />
               <Route path="leave" element={<StudentLeave />} />
               <Route path="online-exams" element={<StudentOnlineExams />} />
-              <Route path="take-exam/:examId/:scheduleId" element={<TakeExam />} />
+              <Route path="take-exam/:scheduleId" element={<TakeExam />} />
             </Routes>
           </StudentLayout>
         </ProtectedRoute>
@@ -271,8 +287,10 @@ const AppContent = () => {
           <TeacherLayout>
             <Routes>
               <Route path="dashboard" element={<TeacherDashboard />} />
-              {/* Teacher can mark student attendance */}
-              <Route path="attendance/mark" element={<StudentAttendance />} />
+              <Route path="classes" element={<TeacherClasses />} />
+              <Route path="attendance" element={<TeacherAttendancePage />} />
+              <Route path="timetable" element={<TeacherTimetable />} />
+              <Route path="marks" element={<TeacherMarks />} />
               <Route path="leave" element={<LeaveApplication />} />
             </Routes>
           </TeacherLayout>

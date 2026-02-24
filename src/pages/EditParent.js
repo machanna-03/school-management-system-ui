@@ -90,7 +90,7 @@ const EditParent = () => {
 
     return (
         <Box>
-            <Box sx={{ mb: 4 }}>
+            <Box sx={{ mb: 1 }}>
                 <Typography variant="h4" color="text.primary" fontWeight="bold">Edit Parent</Typography>
                 <Typography variant="body2" color="text.secondary">Home / Parents / Edit Parent</Typography>
             </Box>

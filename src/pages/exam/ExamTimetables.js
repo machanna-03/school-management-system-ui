@@ -148,12 +148,12 @@ const ExamTimetables = () => {
               <Typography variant="h6" mb={2} color="#4d44b5">Scheduled Subjects</Typography>
               <TableContainer component={Paper} elevation={0} sx={{ border: "1px solid #e0e0e0" }}>
                 <Table>
-                  <TableHead sx={{ bgcolor: "#f1f1f1" }}>
+                  <TableHead sx={{ bgcolor: '#f4f5ff' }}>
                     <TableRow>
-                      <TableCell><b>Subject</b></TableCell>
-                      <TableCell><b>Date</b></TableCell>
-                      <TableCell><b>Time</b></TableCell>
-                      <TableCell><b>Marks (Pass/Total)</b></TableCell>
+                      <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Subject</TableCell>
+                      <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Date</TableCell>
+                      <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Time</TableCell>
+                      <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Marks (Pass/Total)</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -162,8 +162,17 @@ const ExamTimetables = () => {
                         <TableCell colSpan={4} align="center">No schedules added yet for this exam.</TableCell>
                       </TableRow>
                     ) : (
-                      schedule.map((row) => (
-                        <TableRow key={row.id}>
+                      schedule.map((row, i) => (
+                        <TableRow
+                          key={row.id}
+                          hover
+                          sx={{
+                            bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                            '& td': { borderBottom: '1px solid #eef0fb', py: 1.4 },
+                            '&:hover': { bgcolor: '#f0f1ff !important' },
+                            '&:last-child td': { borderBottom: 0 }
+                          }}
+                        >
                           <TableCell>
                             <Typography fontWeight={500}>{row.subject_name}</Typography>
                             <Typography variant="caption" color="textSecondary">{row.subject_code}</Typography>

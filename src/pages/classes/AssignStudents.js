@@ -141,7 +141,7 @@ const AssignStudents = () => {
     return (
         <Box>
             {/* Header */}
-            <Box sx={{ mb: 4 }}>
+            <Box sx={{ mb: 1 }}>
                 <Button
                     startIcon={<BiArrowBack />}
                     onClick={() => navigate('/classes')}
@@ -212,7 +212,7 @@ const AssignStudents = () => {
                 <TableContainer>
                     <Table>
                         <TableHead>
-                            <TableRow sx={{ '& th': { fontWeight: 600, color: 'text.secondary' } }}>
+                            <TableRow sx={{ bgcolor: '#f4f5ff' }}>
                                 <TableCell padding="checkbox">
                                     <Checkbox
                                         indeterminate={selectedStudents.length > 0 && selectedStudents.length < filteredStudents.filter(s => s.class !== classDetails?.class_name || s.section !== classDetails?.section_name).length}
@@ -277,7 +277,7 @@ const AssignStudents = () => {
                     <TableContainer>
                         <Table>
                             <TableHead>
-                                <TableRow sx={{ '& th': { fontWeight: 600, color: 'text.secondary' } }}>
+                                <TableRow sx={{ bgcolor: '#f4f5ff' }}>
                                     <TableCell>Admission No</TableCell>
                                     <TableCell>Student Name</TableCell>
                                     <TableCell>Assigned Class</TableCell>

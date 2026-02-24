@@ -234,17 +234,26 @@ const Communication = ({ initialTab = 'teachers' }) => {
                 <CardContent sx={{ p: 0 }}>
                     <TableContainer>
                         <Table>
-                            <TableHead sx={{ bgcolor: '#f9fafb' }}>
+                            <TableHead sx={{ bgcolor: '#f4f5ff' }}>
                                 <TableRow>
-                                    <TableCell sx={{ fontWeight: 700, color: '#A098AE' }}>Teacher / Department</TableCell>
-                                    <TableCell sx={{ fontWeight: 700, color: '#A098AE' }}>Date</TableCell>
-                                    <TableCell sx={{ fontWeight: 700, color: '#A098AE' }}>Status</TableCell>
-                                    <TableCell sx={{ fontWeight: 700, color: '#A098AE' }}>Notes</TableCell>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Teacher / Department</TableCell>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Date</TableCell>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Status</TableCell>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Notes</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {ptms.map((meeting) => (
-                                    <TableRow key={meeting.id}>
+                                {ptms.map((meeting, i) => (
+                                    <TableRow
+                                        key={meeting.id}
+                                        hover
+                                        sx={{
+                                            bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                                            '& td': { borderBottom: '1px solid #eef0fb', py: 1.4 },
+                                            '&:hover': { bgcolor: '#f0f1ff !important' },
+                                            '&:last-child td': { borderBottom: 0 }
+                                        }}
+                                    >
                                         <TableCell sx={{ fontWeight: 600, color: '#303972' }}>{meeting.teacher}</TableCell>
                                         <TableCell sx={{ color: '#A098AE' }}>{meeting.date}</TableCell>
                                         <TableCell>
@@ -263,7 +272,7 @@ const Communication = ({ initialTab = 'teachers' }) => {
 
     return (
         <Box>
-            <Box sx={{ mb: 4 }}>
+            <Box sx={{ mb: 1 }}>
                 <Tabs
                     value={activeTab}
                     onChange={handleTabChange}
