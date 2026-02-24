@@ -50,7 +50,7 @@ const TeacherDetails = () => {
 
     return (
         <Box>
-            <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
                 <IconButton component={Link} to="/teachers" sx={{ bgcolor: 'white' }}><BiArrowBack /></IconButton>
                 <Typography variant="h4" color="text.primary" fontWeight="bold">Teacher Details</Typography>
             </Box>

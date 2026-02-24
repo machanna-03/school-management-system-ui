@@ -120,7 +120,7 @@ const AddClass = () => {
 
     return (
         <Box sx={{ maxWidth: 800, mx: 'auto' }}>
-            <Box sx={{ mb: 4 }}>
+            <Box sx={{ mb: 1 }}>
                 <Typography variant="h4" color="text.primary" fontWeight="bold">
                     {isEdit ? 'Edit Class Section' : 'Add New Class Section'}
                 </Typography>
@@ -146,18 +146,18 @@ const AddClass = () => {
                                 variant="outlined"
                                 sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
                             >
-                                <MenuItem value="Grade 1">Grade 1</MenuItem>
-                                <MenuItem value="Grade 2">Grade 2</MenuItem>
-                                <MenuItem value="Grade 3">Grade 3</MenuItem>
-                                <MenuItem value="Grade 4">Grade 4</MenuItem>
-                                <MenuItem value="Grade 5">Grade 5</MenuItem>
-                                <MenuItem value="Grade 6">Grade 6</MenuItem>
-                                <MenuItem value="Grade 7">Grade 7</MenuItem>
-                                <MenuItem value="Grade 8">Grade 8</MenuItem>
-                                <MenuItem value="Grade 9">Grade 9</MenuItem>
-                                <MenuItem value="Grade 10">Grade 10</MenuItem>
-                                <MenuItem value="Grade 11">Grade 11</MenuItem>
-                                <MenuItem value="Grade 12">Grade 12</MenuItem>
+                                <MenuItem value="Class 1">Class 1</MenuItem>
+                                <MenuItem value="Class 2">Class 2</MenuItem>
+                                <MenuItem value="Class 3">Class 3</MenuItem>
+                                <MenuItem value="Class 4">Class 4</MenuItem>
+                                <MenuItem value="Class 5">Class 5</MenuItem>
+                                <MenuItem value="Class 6">Class 6</MenuItem>
+                                <MenuItem value="Class 7">Class 7</MenuItem>
+                                <MenuItem value="Class 8">Class 8</MenuItem>
+                                <MenuItem value="Class 9">Class 9</MenuItem>
+                                <MenuItem value="Class 10">Class 10</MenuItem>
+                                <MenuItem value="Class 11">Class 11</MenuItem>
+                                <MenuItem value="Class 12">Class 12</MenuItem>
                             </TextField>
                         </Grid>
                         <Grid item xs={12} sm={6}>

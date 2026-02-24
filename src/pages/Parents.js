@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, Avatar, IconButton, InputBase, Select, MenuItem, Stack, Paper } from '@mui/material';
+import { Box, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, Checkbox, Avatar, IconButton, InputBase, Paper } from '@mui/material';
 import Card from '../components/common/Card';
-import { BiPlus, BiSearch, BiDotsHorizontalRounded, BiPhone, BiEnvelope, BiEdit, BiTrash } from 'react-icons/bi';
+import { BiSearch, BiEdit, BiTrash } from 'react-icons/bi';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 
@@ -10,15 +10,22 @@ const Parents = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
 
+    // Pagination
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [totalCount, setTotalCount] = useState(0);
+
     useEffect(() => {
         fetchParents();
-    }, []);
+    }, [page, rowsPerPage]);
 
     const fetchParents = async () => {
+        setLoading(true);
         try {
-            const response = await api.get('/getParents');
+            const response = await api.get(`/getParents?page=${page + 1}&limit=${rowsPerPage}`);
             if (response.data.parents) {
                 setParents(response.data.parents);
+                setTotalCount(response.data.pagination?.total_count || response.data.parents.length);
             }
         } catch (error) {
             console.error("Failed to fetch parents:", error);
@@ -45,7 +52,7 @@ const Parents = () => {
 
     return (
         <Box>
-            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ mb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="h4" color="text.primary" fontWeight="bold">Parents</Typography>
                 {/* <Box sx={{ display: 'flex', gap: 2 }}>
                     <Button 
@@ -87,14 +94,14 @@ const Parents = () => {
                 <TableContainer>
                     <Table sx={{ minWidth: 800 }}>
                         <TableHead>
-                            <TableRow sx={{ '& th': { color: 'text.secondary', fontWeight: 600, borderBottom: 'none' } }}>
-                                <TableCell padding="checkbox"><Checkbox /></TableCell>
-                                <TableCell>Name</TableCell>
-                                <TableCell>Email</TableCell>
-                                <TableCell>Phone</TableCell>
-                                <TableCell>Occupation</TableCell>
-                                <TableCell>Location</TableCell>
-                                <TableCell>Action</TableCell>
+                            <TableRow sx={{ bgcolor: '#f4f5ff' }}>
+                                <TableCell sx={{ borderBottom: '2px solid #e0e2ff' }}></TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Name</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Email</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Phone</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Occupation</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Location</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Action</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -108,8 +115,17 @@ const Parents = () => {
                                 </TableRow>
                             ) : (
                                 filteredParents.map((parent, i) => (
-                                    <TableRow key={parent.id} hover sx={{ '& td': { borderBottom: 'none', py: 2 } }}>
-                                        <TableCell padding="checkbox"><Checkbox /></TableCell>
+                                    <TableRow
+                                        key={parent.id}
+                                        hover
+                                        sx={{
+                                            bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                                            '& td': { borderBottom: '1px solid #eef0fb', py: 1.4 },
+                                            '&:hover': { bgcolor: '#f0f1ff !important' },
+                                            '&:last-child td': { borderBottom: 0 }
+                                        }}
+                                    >
+                                        <TableCell padding="checkbox"></TableCell>
                                         <TableCell>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                                 <Avatar
@@ -154,6 +170,19 @@ const Parents = () => {
                     </Table>
                 </TableContainer>
             </Card>
+
+            {/* Pagination */}
+            <Paper elevation={0} sx={{ mt: 2, borderRadius: 4 }}>
+                <TablePagination
+                    component="div"
+                    count={totalCount}
+                    page={page}
+                    onPageChange={(e, newPage) => setPage(newPage)}
+                    rowsPerPage={rowsPerPage}
+                    onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0); }}
+                    rowsPerPageOptions={[5, 10, 25, 50]}
+                />
+            </Paper>
         </Box>
     );
 };

@@ -1,6 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Box, Typography, Grid, Card, CardContent, Button, Stack, Chip, Avatar, IconButton, Divider } from '@mui/material';
+import {
+    Box,
+    Grid,
+    Typography,
+    Card,
+    CardContent,
+    Avatar,
+    Chip,
+    Button,
+    Stack,
+    CircularProgress
+} from '@mui/material';
 import {
     BiUser,
     BiBook,
@@ -9,7 +20,8 @@ import {
     BiTime,
     BiBell,
     BiMessageDetail,
-    BiPlus
+    BiPlus,
+    BiTrendingUp
 } from 'react-icons/bi';
 import { motion } from 'framer-motion';
 import {
@@ -23,70 +35,105 @@ import {
     AreaChart,
     Area
 } from 'recharts';
-
-// Mock Data matching the image exactly
-const students = [
-    {
-        id: 1,
-        name: "Rahul Sharma",
-        grade: "Grade 5-A",
-        roll: 23,
-        stats: {
-            academics: { overall: "87%", grade: "A", lastTest: "95%" },
-            fees: { paid: "₹45,000", due: "₹5,000", dueDate: "25 Jan" },
-            attendance: { present: "92%", leaves: "8 days", late: "3 times" }
-        }
-    },
-    {
-        id: 2,
-        name: "Priya Sharma",
-        grade: "Grade 2-B",
-        roll: 12,
-        stats: {
-            academics: { overall: "91%", grade: "A+", lastTest: "98%" },
-            fees: { paid: "₹40,000", due: "₹0", dueDate: "-" },
-            attendance: { present: "95%", leaves: "4 days", late: "1 time" }
-        }
-    },
-];
+import { invokeGetApi, apiList } from '../../services/ApiServices';
+import { config } from '../../config/Config';
 
 const quickActions = [
-    { label: "Apply Leave", icon: <BiCalendarCheck />, color: "#4d44b5", path: "/parent/leave" },
-    { label: "View Timetable", icon: <BiTime />, color: "#fb7d5b", path: "/parent/timetable" },
     { label: "Check Reports", icon: <BiBook />, color: "#303972", path: "/parent/report-cards" },
     { label: "Pay Fees", icon: <BiMoney />, color: "#FCC43E", path: "/parent/fees" },
-    { label: "Contact Teacher", icon: <BiMessageDetail />, color: "#27AE60", path: "/parent/messages" },
+    { label: "Performance", icon: <BiTrendingUp />, color: "#4d44b5", path: "/parent/performance" },
 ];
-
-const notifications = [
-    { id: 1, title: "Rahul won 1st prize in Science Fair", date: "15 Jan", icon: "🏆", type: "achievement" },
-    { id: 2, title: "Math test scheduled for 20 Jan", date: "14 Jan", icon: "📅", type: "exam" },
-    { id: 3, title: "Fee payment reminder for ₹5,000", date: "13 Jan", icon: "💰", type: "alert" },
-];
-
-const schedule = [
-    { time: "8:00 - 8:45", subject: "Mathematics", room: "Room 201", teacher: "Mr. Patel" },
-    { time: "8:45 - 9:30", subject: "Science", room: "Lab 3", teacher: "Ms. Rao" },
-    { time: "9:30 - 10:15", subject: "English", room: "Room 105", teacher: "Mrs. Kumar" },
-    { time: "10:15 - 10:30", subject: "Break", room: "-", teacher: "-" },
-    { time: "10:30 - 11:15", subject: "Sports", room: "Ground", teacher: "Coach Singh" },
-];
-
 
 const ParentDashboard = () => {
     const location = useLocation();
-    const [selectedStudent, setSelectedStudent] = useState(students[0]);
+    const [students, setStudents] = useState([]);
+    const [selectedStudent, setSelectedStudent] = useState(null);
+    const [stats, setStats] = useState({
+        academics: { overall: "0%", grade: "-", lastTest: "-" },
+        fees: { paid: "₹0", due: "₹0" },
+        attendance: { present: "0%", leaves: "0" }
+    });
+    const [schedule, setSchedule] = useState([]);
+    const [notifications, setNotifications] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    React.useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        const studentId = params.get('studentId');
-        if (studentId) {
-            const student = students.find(s => s.id === parseInt(studentId));
-            if (student) {
-                setSelectedStudent(student);
+    const parentId = localStorage.getItem('user_id');
+
+    useEffect(() => {
+        fetchStudents();
+        fetchNotifications();
+    }, []);
+
+    const fetchStudents = async () => {
+        try {
+            // In a real scenario, this would fetch students linked to parentId
+            // For now, let's fetch students for a generic class or all students if needed
+            let response = await invokeGetApi(config.getMySchool + apiList.getStudents, { limit: 10 });
+            if (response.status === 200) {
+                const fetchedStudents = response.data.students || [];
+                setStudents(fetchedStudents);
+                if (fetchedStudents.length > 0) {
+                    setSelectedStudent(fetchedStudents[0]);
+                }
             }
+        } catch (error) {
+            console.error("Error fetching students:", error);
+        } finally {
+            setLoading(false);
         }
-    }, [location.search]);
+    };
+
+    const fetchNotifications = async () => {
+        try {
+            let response = await invokeGetApi(config.getMySchool + apiList.getAnnouncements);
+            if (response.status === 200) {
+                setNotifications(response.data.announcements || []);
+            }
+        } catch (err) {
+            console.error("Error fetching announcements:", err);
+        }
+    };
+
+    useEffect(() => {
+        if (selectedStudent) {
+            fetchStudentDetails(selectedStudent.id);
+        }
+    }, [selectedStudent]);
+
+    const fetchStudentDetails = async (sid) => {
+        try {
+            // Fetch Marks
+            let marksRes = await invokeGetApi(config.getMySchool + apiList.getMarksHistory, { student_id: sid });
+            let marks = marksRes.data.marks || [];
+
+            // Fetch Fees
+            let feeRes = await invokeGetApi(`${config.getMySchool}${apiList.getStudentFeeDetails}/${sid}`);
+            let feeData = feeRes.data || [];
+
+            // Calculate Stats
+            const avgScore = marks.length > 0
+                ? Math.round(marks.reduce((acc, m) => acc + (Number(m.marks_obtained) / Number(m.total_marks)) * 100, 0) / marks.length)
+                : 0;
+
+            const totalFeeDue = feeData.reduce((acc, f) => acc + (Number(f.amount) - Number(f.paid_amount || 0)), 0);
+            const totalFeePaid = feeData.reduce((acc, f) => acc + Number(f.paid_amount || 0), 0);
+
+            setStats({
+                academics: { overall: `${avgScore}%`, lastTest: marks[0]?.marks_obtained || "-" },
+                fees: { paid: `₹${totalFeePaid}`, due: `₹${totalFeeDue}` },
+                attendance: { present: "92%", leaves: "3" } // Placeholder attendance
+            });
+
+            // Timetable - fetch for this specific class
+            if (selectedStudent.class_id) {
+                let ttRes = await invokeGetApi(config.getMySchool + apiList.getTimetable, { class_id: selectedStudent.class_id });
+                if (ttRes.status === 200) setSchedule(ttRes.data.timetable || []);
+            }
+        } catch (err) {
+            console.error("Error fetching student details:", err);
+        }
+    };
+
 
     const StatCard = ({ title, icon, color, data, progress }) => (
         <Card sx={{ height: '100%', borderRadius: 4, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
@@ -128,10 +175,12 @@ const ParentDashboard = () => {
         </Card>
     );
 
+    if (loading || !selectedStudent) return <Box sx={{ p: 4, textAlign: 'center' }}>Loading Dashboard...</Box>;
+
     return (
         <Box>
             {/* Student Selection Header */}
-            <Box sx={{ mb: 4 }}>
+            <Box sx={{ mb: 1 }}>
                 <Typography variant="caption" sx={{ color: '#A098AE', fontWeight: 600, letterSpacing: 1, mb: 1, display: 'block' }}>
                     SELECT STUDENT TO VIEW
                 </Typography>
@@ -158,31 +207,16 @@ const ParentDashboard = () => {
                                 </Avatar>
                                 <Box>
                                     <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>{student.name}</Typography>
-                                    <Typography variant="body2" color="text.secondary">{student.grade}</Typography>
+                                    <Typography variant="body2" color="text.secondary">{student.class_name || "Grade " + student.class_id}</Typography>
                                 </Box>
                             </Stack>
                         </Card>
                     ))}
-                    <Button
-                        startIcon={<BiPlus />}
-                        sx={{
-                            minWidth: 160,
-                            height: 60,
-                            borderRadius: 3,
-                            border: '2px dashed #C1BBEB',
-                            color: '#A098AE',
-                            textTransform: 'none',
-                            fontWeight: 600,
-                            '&:hover': { borderColor: '#4d44b5', color: '#4d44b5', bgcolor: 'rgba(77, 68, 181, 0.05)' }
-                        }}
-                    >
-                        Add Another Child
-                    </Button>
                 </Stack>
             </Box>
 
             <Typography variant="h6" sx={{ color: '#303972', fontWeight: 700, mb: 2 }}>
-                Current View: {selectedStudent.name} ({selectedStudent.grade}) | Roll: {selectedStudent.roll}
+                Current View: {selectedStudent.name} | Roll: {selectedStudent.roll_number || "-"}
             </Typography>
 
             <Grid container spacing={3}>
@@ -193,7 +227,7 @@ const ParentDashboard = () => {
                         <Grid item xs={12} sm={6}>
                             <StatCard
                                 title="Academics"
-                                data={selectedStudent.stats.academics}
+                                data={stats.academics}
                                 color="#4d44b5"
                                 icon={<BiBook size={24} />}
                             />
@@ -201,19 +235,19 @@ const ParentDashboard = () => {
                         <Grid item xs={12} sm={6}>
                             <StatCard
                                 title="Fee Status"
-                                data={selectedStudent.stats.fees}
+                                data={stats.fees}
                                 color="#FCC43E"
                                 icon={<BiMoney size={24} />}
-                                progress={65} // Example based on user request "65%"
+                                progress={65}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <StatCard
                                 title="Attendance"
-                                data={selectedStudent.stats.attendance}
+                                data={stats.attendance}
                                 color="#27AE60"
                                 icon={<BiCalendarCheck size={24} />}
-                                progress={92} // Matching user request "92%"
+                                progress={92}
                             />
                         </Grid>
                     </Grid>
@@ -266,11 +300,11 @@ const ParentDashboard = () => {
 
                     {/* Schedule Section */}
                     <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography variant="h6" sx={{ color: '#303972', fontWeight: 700 }}>Today's Schedule for Rahul</Typography>
+                        <Typography variant="h6" sx={{ color: '#303972', fontWeight: 700 }}>Today's Schedule for {selectedStudent.name}</Typography>
                     </Box>
                     <Card sx={{ borderRadius: 4, mb: 4, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
                         <CardContent sx={{ p: 0 }}>
-                            {schedule.map((item, index) => (
+                            {schedule.length > 0 ? schedule.map((item, index) => (
                                 <Box
                                     key={index}
                                     sx={{
@@ -282,28 +316,26 @@ const ParentDashboard = () => {
                                     }}
                                 >
                                     <Box sx={{ width: 140 }}>
-                                        <Typography variant="body2" sx={{ fontWeight: 700, color: '#303972' }}>{item.time}</Typography>
+                                        <Typography variant="body2" sx={{ fontWeight: 700, color: '#303972' }}>{item.start_time} - {item.end_time}</Typography>
                                     </Box>
                                     <Box sx={{ flexGrow: 1 }}>
-                                        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#303972' }}>{item.subject}</Typography>
-                                        {item.room !== "-" && (
-                                            <Typography variant="body2" color="text.secondary">
-                                                {item.room} • {item.teacher}
-                                            </Typography>
-                                        )}
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#303972' }}>{item.subject_name}</Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {item.room_number || "Room -"} • {item.teacher_name || "Teacher"}
+                                        </Typography>
                                     </Box>
-                                    {item.subject === "Break" ? (
-                                        <Chip label="Break" size="small" />
-                                    ) : (
-                                        <Chip
-                                            label={index === 0 ? "Now" : "Upcoming"}
-                                            size="small"
-                                            color={index === 0 ? "primary" : "default"}
-                                            variant={index === 0 ? "filled" : "outlined"}
-                                        />
-                                    )}
+                                    <Chip
+                                        label={index === 0 ? "Now" : "Upcoming"}
+                                        size="small"
+                                        color={index === 0 ? "primary" : "default"}
+                                        variant={index === 0 ? "filled" : "outlined"}
+                                    />
                                 </Box>
-                            ))}
+                            )) : (
+                                <Box sx={{ p: 4, textAlign: 'center' }}>
+                                    <Typography color="text.secondary">No classes scheduled for today.</Typography>
+                                </Box>
+                            )}
                         </CardContent>
                     </Card>
                 </Grid>
@@ -344,13 +376,13 @@ const ParentDashboard = () => {
                             width: 24, height: 24, borderRadius: '50%', bgcolor: '#4d44b5', color: 'white',
                             display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700
                         }}>
-                            3
+                            {notifications.length}
                         </Box>
                     </Box>
 
                     <Card sx={{ borderRadius: 4, height: 'fit-content', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
                         <CardContent sx={{ p: 0 }}>
-                            {notifications.map((notif, index) => (
+                            {notifications.length > 0 ? notifications.slice(0, 5).map((notif, index) => (
                                 <Box
                                     key={index}
                                     sx={{
@@ -363,34 +395,24 @@ const ParentDashboard = () => {
                                     }}
                                 >
                                     <Box sx={{ mt: 0.5 }}>
-                                        {notif.type === 'alert' && (
-                                            <Box sx={{
-                                                width: 20, height: 20, borderRadius: '50%', bgcolor: '#E74C3C', color: 'white',
-                                                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700
-                                            }}>!</Box>
-                                        )}
-                                        {notif.type === 'achievement' && (
-                                            <Box sx={{
-                                                width: 10, height: 10, borderRadius: '50%', bgcolor: '#27AE60', mt: 0.5
-                                            }} />
-                                        )}
-                                        {notif.type === 'exam' && (
-                                            <Box sx={{
-                                                width: 20, height: 20, borderRadius: '50%', bgcolor: '#3498DB', color: 'white',
-                                                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 700
-                                            }}>3</Box>
-                                        )}
+                                        <Box sx={{
+                                            width: 10, height: 10, borderRadius: '50%', bgcolor: '#4d44b5', mt: 0.5
+                                        }} />
                                     </Box>
                                     <Box>
                                         <Typography variant="body2" sx={{ fontWeight: 600, color: '#303972', lineHeight: 1.4 }}>
                                             {notif.title}
                                         </Typography>
                                         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                                            {notif.date}
+                                            {new Date(notif.created_at).toLocaleDateString()}
                                         </Typography>
                                     </Box>
                                 </Box>
-                            ))}
+                            )) : (
+                                <Box sx={{ p: 4, textAlign: 'center' }}>
+                                    <Typography color="text.secondary">No new notifications</Typography>
+                                </Box>
+                            )}
                             <Button fullWidth sx={{ p: 2, color: '#4d44b5', fontWeight: 600, textTransform: 'none' }}>
                                 View All Notifications →
                             </Button>

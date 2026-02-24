@@ -89,9 +89,11 @@ export const apiList = {
     getExamSchedule: "/getExamSchedule", // Appended with /:id
     enterMarks: "/enterMarks",
     getStudentMarks: "/getStudentMarks",
+    getMarksHistory: "/getMarksHistory",
 
     // Transport Module
     getRoutes: "/transport/routes",
+
     addRoute: "/transport/addRoute",
     getStops: "/transport/stops", // requires /{route_id}
     addStop: "/transport/addStop",
@@ -150,4 +152,49 @@ export const apiList = {
     updateQuestion: "/updateQuestion",
     deleteQuestion: "/deleteQuestion", // /{id}
     getQuestion: "/getQuestion", // /{id}
+
+    // Admission Module
+    submitAdmission: "/admission/submit",
+    getAdmissions: "/admission/list",
+    getAdmission: "/admission/get",     // append /{id}
+    approveAdmission: "/admission/approve", // append /{id}
+    rejectAdmission: "/admission/reject",  // append /{id}
+    deleteAdmission: "/admission/delete",
+    createAdmissionTable: "/admission/createTable",
+
+    // Transport Stats
+    getTransportStats: "/transport/stats",
+
+    // Library — Book Catalog
+    getLibraryBooks: "/library/books",
+    addLibraryBook: "/library/addBook",
+    updateLibraryBook: "/library/updateBook",
+    deleteLibraryBook: "/library/deleteBook",
+    createLibraryBooksTable: "/library/createBooksTable",
+
+    // Notifications / Announcements
+    getNotifications: "/notifications/list",
+    createNotification: "/notifications/create",
+    deleteNotification: "/notifications/delete",
+    getAnnouncements: "/getAnnouncements",
+    addAnnouncement: "/addAnnouncement",
+    updateAnnouncement: "/updateAnnouncement",
+    deleteAnnouncement: "/deleteAnnouncement",
+    createNotificationsTable: "/notifications/createTable",
+
+    // Timetable
+    getTimetable: "/timetable",
+    saveTimetable: "/timetable/save",
+    deleteTimetableSlot: "/timetable/delete",
+    createTimetableTable: "/timetable/createTable",
+
+    // Reports / Analytics
+    getAttendanceReport: "/reports/attendance",
+    getFeeReport: "/reports/fees",
+    getStudentsReport: "/reports/students",
+
+    // School Settings
+    getSettings: "/settings",
+    updateSettings: "/settings/update",
+    createSettingsTable: "/settings/createTable",
 };

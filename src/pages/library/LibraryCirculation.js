@@ -3,7 +3,7 @@ import {
     Box, Grid, Card, Typography, TextField, Button,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     Tabs, Tab, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio,
-    Autocomplete, Modal, Backdrop, Fade, Paper
+    Autocomplete, Modal, Backdrop, Fade, Paper, TablePagination
 } from '@mui/material';
 import { apiList, invokeGetApi, invokePostApi } from '../../services/ApiServices';
 import { config } from '../../config/Config';
@@ -16,6 +16,11 @@ const LibraryCirculation = () => {
     const [staff, setStaff] = useState([]);
     const [issues, setIssues] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
+
+    // Pagination State
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [totalCount, setTotalCount] = useState(0);
 
     // Filter issues based on search
     const filteredIssues = issues.filter(issue => {
@@ -56,7 +61,7 @@ const LibraryCirculation = () => {
         fetchStudents();
         fetchStaff();
         fetchIssues();
-    }, []);
+    }, [page, rowsPerPage]);
 
     const fetchStudents = async () => {
         try {
@@ -74,11 +79,27 @@ const LibraryCirculation = () => {
 
     const fetchIssues = async () => {
         try {
-            let res = await invokeGetApi(config.getMySchool + "/library/issues", {});
-            if (res.status === 200 && res.data.responseCode === "200") setIssues(res.data.issues || []);
+            let res = await invokeGetApi(`${config.getMySchool}/library/issues?page=${page + 1}&limit=${rowsPerPage}`, {});
+            if (res.status === 200 && res.data.responseCode === "200") {
+                setIssues(res.data.issues || []);
+                if (res.data.pagination) {
+                    setTotalCount(res.data.pagination.total_count);
+                } else {
+                    setTotalCount(res.data.issues.length);
+                }
+            }
         } catch (e) {
             toast.error("Failed to load issues");
         }
+    };
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
     };
 
     const handleIssueBook = async () => {
@@ -209,113 +230,143 @@ const LibraryCirculation = () => {
             )}
 
             {tabValue === 1 && (
-                <Card sx={{ borderRadius: 2, p: 3 }}>
-                    <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+                <Box>
+                    <Paper elevation={0} sx={{ p: 2, borderRadius: 2, mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <TextField
-                            fullWidth
                             variant="outlined"
+                            size="small"
                             placeholder="Search by Student/Staff Name..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
+                            sx={{ width: 300 }}
                         />
-                    </Box>
+                        <TablePagination
+                            component="div"
+                            count={parseInt(totalCount, 10)}
+                            page={page}
+                            onPageChange={handleChangePage}
+                            rowsPerPage={rowsPerPage}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
+                            rowsPerPageOptions={[5, 10, 25, 50]}
+                        />
+                    </Paper>
 
-                    {/* Active Issues Table */}
-                    <Typography variant="h6" fontWeight="bold" mb={2} color="#FB7D5B">
-                        Books Currently Issued {searchTerm && `to "${searchTerm}"`}
-                    </Typography>
-                    <TableContainer component={Paper} sx={{ mb: 4, boxShadow: "none", border: "1px solid #e0e0e0" }}>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell><b>Book</b></TableCell>
-                                    <TableCell><b>Borrower</b></TableCell>
-                                    <TableCell><b>Issue Date</b></TableCell>
-                                    <TableCell><b>Due Date</b></TableCell>
-                                    <TableCell><b>Status</b></TableCell>
-                                    <TableCell><b>Action</b></TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {activeIssues.length > 0 ? activeIssues.map((issue) => (
-                                    <TableRow key={issue.id}>
-                                        <TableCell>
-                                            <Typography variant="body1" fontWeight="bold">{issue.book_title}</Typography>
-                                            <Typography variant="caption">{issue.book_author}</Typography>
-                                        </TableCell>
-                                        <TableCell>
-                                            {issue.student_name || issue.staff_name || "N/A"}<br />
-                                            <Typography variant="caption" color="textSecondary">{issue.user_type}</Typography>
-                                        </TableCell>
-                                        <TableCell>{issue.issue_date}</TableCell>
-                                        <TableCell>{issue.due_date}</TableCell>
-                                        <TableCell>
-                                            <Box component="span" sx={{
-                                                px: 1, py: 0.5, borderRadius: 1, fontSize: '0.75rem', fontWeight: 'bold',
-                                                bgcolor: '#FFF2E5', color: '#FB7D5B'
-                                            }}>
-                                                {issue.status}
-                                            </Box>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Button size="small" variant="contained" color="primary" onClick={() => handleOpenReturn(issue)}>
-                                                Return
-                                            </Button>
-                                        </TableCell>
+                    <Card sx={{ borderRadius: 2, p: 3 }}>
+                        {/* Active Issues Table */}
+                        <Typography variant="h6" fontWeight="bold" mb={2} color="#FB7D5B">
+                            Books Currently Issued {searchTerm && `to "${searchTerm}"`}
+                        </Typography>
+                        <TableContainer component={Paper} sx={{ mb: 4, boxShadow: "none", border: "1px solid #e0e0e0" }}>
+                            <Table>
+                                <TableHead>
+                                    <TableRow sx={{ bgcolor: '#f4f5ff' }}>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Book</TableCell>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Borrower</TableCell>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Issue Date</TableCell>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Due Date</TableCell>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Status</TableCell>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Action</TableCell>
                                     </TableRow>
-                                )) : (
-                                    <TableRow><TableCell colSpan={6} align="center">No active issues found</TableCell></TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                                </TableHead>
+                                <TableBody>
+                                    {activeIssues.length > 0 ? activeIssues.map((issue, i) => (
+                                        <TableRow
+                                            key={issue.id}
+                                            hover
+                                            sx={{
+                                                bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                                                '& td': { borderBottom: '1px solid #eef0fb', py: 1.4 },
+                                                '&:hover': { bgcolor: '#f0f1ff !important' },
+                                                '&:last-child td': { borderBottom: 0 }
+                                            }}
+                                        >
+                                            <TableCell>
+                                                <Typography variant="body1" fontWeight="bold">{issue.book_title}</Typography>
+                                                <Typography variant="caption">{issue.book_author}</Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                {issue.student_name || issue.staff_name || "N/A"}<br />
+                                                <Typography variant="caption" color="textSecondary">{issue.user_type}</Typography>
+                                            </TableCell>
+                                            <TableCell>{issue.issue_date}</TableCell>
+                                            <TableCell>{issue.due_date}</TableCell>
+                                            <TableCell>
+                                                <Box component="span" sx={{
+                                                    px: 1, py: 0.5, borderRadius: 1, fontSize: '0.75rem', fontWeight: 'bold',
+                                                    bgcolor: '#FFF2E5', color: '#FB7D5B'
+                                                }}>
+                                                    {issue.status}
+                                                </Box>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Button size="small" variant="contained" color="primary" onClick={() => handleOpenReturn(issue)}>
+                                                    Return
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    )) : (
+                                        <TableRow><TableCell colSpan={6} align="center">No active issues found</TableCell></TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
 
-                    {/* Return History Table */}
-                    <Typography variant="h6" fontWeight="bold" mb={2} color="#2DA646">
-                        Return History
-                    </Typography>
-                    <TableContainer component={Paper} sx={{ boxShadow: "none", border: "1px solid #e0e0e0" }}>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell><b>Book</b></TableCell>
-                                    <TableCell><b>Borrower</b></TableCell>
-                                    <TableCell><b>Issue Date</b></TableCell>
-                                    <TableCell><b>Return Date</b></TableCell>
-                                    <TableCell><b>Fine</b></TableCell>
-                                    <TableCell><b>Status</b></TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {historyIssues.length > 0 ? historyIssues.map((issue) => (
-                                    <TableRow key={issue.id}>
-                                        <TableCell>
-                                            <Typography variant="body1" fontWeight="bold">{issue.book_title}</Typography>
-                                            <Typography variant="caption">{issue.book_author}</Typography>
-                                        </TableCell>
-                                        <TableCell>
-                                            {issue.student_name || issue.staff_name || "N/A"}<br />
-                                            <Typography variant="caption" color="textSecondary">{issue.user_type}</Typography>
-                                        </TableCell>
-                                        <TableCell>{issue.issue_date}</TableCell>
-                                        <TableCell>{issue.return_date || "-"}</TableCell>
-                                        <TableCell>₹{issue.fine || 0}</TableCell>
-                                        <TableCell>
-                                            <Box component="span" sx={{
-                                                px: 1, py: 0.5, borderRadius: 1, fontSize: '0.75rem', fontWeight: 'bold',
-                                                bgcolor: '#E1F7E3', color: '#2DA646'
-                                            }}>
-                                                {issue.status}
-                                            </Box>
-                                        </TableCell>
+                        {/* Return History Table */}
+                        <Typography variant="h6" fontWeight="bold" mb={2} color="#2DA646">
+                            Return History
+                        </Typography>
+                        <TableContainer component={Paper} sx={{ boxShadow: "none", border: "1px solid #e0e0e0" }}>
+                            <Table>
+                                <TableHead>
+                                    <TableRow sx={{ bgcolor: '#f4f5ff' }}>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Book</TableCell>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Borrower</TableCell>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Issue Date</TableCell>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Return Date</TableCell>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Fine</TableCell>
+                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Status</TableCell>
                                     </TableRow>
-                                )) : (
-                                    <TableRow><TableCell colSpan={6} align="center">No return history found</TableCell></TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </Card>
+                                </TableHead>
+                                <TableBody>
+                                    {historyIssues.length > 0 ? historyIssues.map((issue, i) => (
+                                        <TableRow
+                                            key={issue.id}
+                                            hover
+                                            sx={{
+                                                bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                                                '& td': { borderBottom: '1px solid #eef0fb', py: 1.4 },
+                                                '&:hover': { bgcolor: '#f0f1ff !important' },
+                                                '&:last-child td': { borderBottom: 0 }
+                                            }}
+                                        >
+                                            <TableCell>
+                                                <Typography variant="body1" fontWeight="bold">{issue.book_title}</Typography>
+                                                <Typography variant="caption">{issue.book_author}</Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                {issue.student_name || issue.staff_name || "N/A"}<br />
+                                                <Typography variant="caption" color="textSecondary">{issue.user_type}</Typography>
+                                            </TableCell>
+                                            <TableCell>{issue.issue_date}</TableCell>
+                                            <TableCell>{issue.return_date || "-"}</TableCell>
+                                            <TableCell>₹{issue.fine || 0}</TableCell>
+                                            <TableCell>
+                                                <Box component="span" sx={{
+                                                    px: 1, py: 0.5, borderRadius: 1, fontSize: '0.75rem', fontWeight: 'bold',
+                                                    bgcolor: '#E1F7E3', color: '#2DA646'
+                                                }}>
+                                                    {issue.status}
+                                                </Box>
+                                            </TableCell>
+                                        </TableRow>
+                                    )) : (
+                                        <TableRow><TableCell colSpan={6} align="center">No return history found</TableCell></TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Card>
+                </Box>
             )}
 
             {/* Return Modal */}
@@ -331,8 +382,8 @@ const LibraryCirculation = () => {
                         </Box>
                     </Box>
                 </Fade>
-            </Modal>
-        </Box>
+            </Modal >
+        </Box >
     );
 };
 

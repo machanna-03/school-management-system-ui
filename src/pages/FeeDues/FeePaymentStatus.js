@@ -17,7 +17,8 @@ import {
     Paper,
     Chip,
     Stack,
-    CircularProgress
+    CircularProgress,
+    TablePagination
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
@@ -33,18 +34,34 @@ const FeePaymentStatus = () => {
     // Classes for filter - in a real app, fetch from API
     const classesList = ["9", "10", "11", "12"];
 
+    // Pagination State
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [totalCount, setTotalCount] = useState(0);
+
     const navigate = useNavigate();
 
     const fetchDues = async () => {
         setLoading(true);
         try {
-            const response = await api.get(apiList.getFeeStructures); // Use getFeeStructures as requested
-            if (Array.isArray(response.data)) {
-                // Show all fee details, even if not linked to student (to handle orphan structures)
+            // Pass page and limit to the API
+            // Note: Material UI uses 0-based page index, API likely uses 1-based
+            const response = await api.get(`${apiList.getFeeStructures}?page=${page + 1}&limit=${rowsPerPage}`);
+
+            if (response.data && response.data.structures) {
+                setStudents(response.data.structures);
+                if (response.data.pagination) {
+                    setTotalCount(response.data.pagination.total_count);
+                } else {
+                    setTotalCount(response.data.structures.length);
+                }
+            } else if (Array.isArray(response.data)) {
+                // Fallback for legacy array response
                 setStudents(response.data);
+                setTotalCount(response.data.length);
             } else {
                 setStudents([]);
-                console.error("Fee Payment API returned non-array:", response.data);
+                console.error("Fee Payment API returned unexpected format:", response.data);
             }
         } catch (error) {
             console.error("Error fetching fee payment status:", error);
@@ -60,7 +77,16 @@ const FeePaymentStatus = () => {
 
     useEffect(() => {
         fetchDues();
-    }, []);
+    }, [page, rowsPerPage]);
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
 
     const getStatus = (student) => {
         const total = parseFloat(student.assignment_total_fee || student.total_annual_fee || 0);
@@ -175,18 +201,28 @@ const FeePaymentStatus = () => {
             </Grid>
 
             {/* Table */}
-            <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
+            <TablePagination
+                component="div"
+                count={parseInt(totalCount, 10)}
+                page={page}
+                onPageChange={handleChangePage}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                rowsPerPageOptions={[5, 10, 25, 50]}
+                sx={{ mb: 2 }}
+            />
+            <TableContainer component={Paper} elevation={0} sx={{ border: "1px solid #eef0fb", borderRadius: 3, overflow: 'hidden' }}>
                 <Table size="small">
                     <TableHead>
-                        <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-                            <TableCell>Roll No</TableCell>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Class</TableCell>
-                            <TableCell align="right">Total Fee</TableCell>
-                            <TableCell align="right">Paid</TableCell>
-                            <TableCell align="right">Due</TableCell>
-                            <TableCell align="center">Status</TableCell>
-                            <TableCell align="center">Action</TableCell>
+                        <TableRow sx={{ bgcolor: '#f4f5ff' }}>
+                            <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Roll No</TableCell>
+                            <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Name</TableCell>
+                            <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Class</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Total Fee</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Paid</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Due</TableCell>
+                            <TableCell align="center" sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Status</TableCell>
+                            <TableCell align="center" sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Action</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

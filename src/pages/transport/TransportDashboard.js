@@ -18,24 +18,15 @@ const TransportDashboard = () => {
 
     const fetchStats = async () => {
         try {
-            // Parallel-ish fetching for dashboard stats
-            // In a real scenario, we might have a specific dashboard API
-            // For now, let's fetch lists and count. 
-            // Optimization: Create a /transport/stats endpoint later.
-
-            const [busesRes, routesRes, assignRes] = await Promise.all([
-                invokeGetApi(config.getMySchool + apiList.getBuses, {}),
-                invokeGetApi(config.getMySchool + apiList.getRoutes, {}),
-                invokeGetApi(config.getMySchool + apiList.getAssignments, {})
-            ]);
-
-            setStats({
-                totalBuses: busesRes.data?.buses?.length || 0,
-                activeRoutes: routesRes.data?.routes?.length || 0,
-                totalStops: 0, // Need to sum up stops or fetch all
-                assignedStudents: assignRes.data?.assignments?.length || 0
-            });
-
+            const res = await invokeGetApi(config.getMySchool + apiList.getTransportStats);
+            if (res?.data?.responseCode === "200") {
+                setStats({
+                    totalBuses: res.data.total_buses || 0,
+                    activeRoutes: res.data.total_routes || 0,
+                    totalStops: 0,
+                    assignedStudents: res.data.assigned_students || 0
+                });
+            }
         } catch (error) {
             console.error("Error fetching transport stats:", error);
         }

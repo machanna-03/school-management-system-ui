@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Box, Typography, Card, CardContent, Grid, Chip,
     Stack, Avatar, LinearProgress, Divider
@@ -10,37 +10,85 @@ import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
     Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis
 } from 'recharts';
+import { invokeGetApi, apiList } from '../../services/ApiServices';
+import { config } from '../../config/Config';
 
 const Performance = () => {
+    const [marks, setMarks] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const studentId = localStorage.getItem('student_id') || 1;
 
-    // --- Mock Data ---
-    const performanceTrend = [
-        { term: 'Term 1', score: 82, avg: 75 },
-        { term: 'Mid-Term', score: 85, avg: 76 },
-        { term: 'Term 2', score: 88, avg: 78 },
-        { term: 'Finals', score: 91, avg: 80 },
-    ];
+    useEffect(() => {
+        fetchPerformance();
+    }, [studentId]);
 
-    const subjectAnalysis = [
-        { subject: 'Math', A: 95, fullMark: 100 },
-        { subject: 'Science', A: 88, fullMark: 100 },
-        { subject: 'English', A: 92, fullMark: 100 },
-        { subject: 'History', A: 85, fullMark: 100 },
-        { subject: 'Geography', A: 90, fullMark: 100 },
-        { subject: 'Arts', A: 98, fullMark: 100 },
-    ];
+    const fetchPerformance = async () => {
+        setLoading(true);
+        try {
+            let response = await invokeGetApi(config.getMySchool + apiList.getMarksHistory, { student_id: studentId });
+            if (response.status === 200 && response.data.responseCode === "200") {
+                setMarks(response.data.marks || []);
+            }
+        } catch (error) {
+            console.error("Error fetching performance data:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    const recentAssessments = [
-        { title: "Algebra Unit Test", subject: "Mathematics", date: "15 Jan", score: "18/20", grade: "A1" },
-        { title: "Science Project", subject: "Science", date: "12 Jan", score: "45/50", grade: "A1" },
-        { title: "History Essay", subject: "Social Studies", date: "10 Jan", score: "22/30", grade: "B1" },
-    ];
+    // --- Process Data for Charts ---
+
+    // 1. Performance Trend (grouped by Exam)
+    const examGroups = marks.reduce((acc, m) => {
+        if (!acc[m.exam_name]) acc[m.exam_name] = { total: 0, obtained: 0, count: 0 };
+        acc[m.exam_name].total += Number(m.total_marks);
+        acc[m.exam_name].obtained += Number(m.marks_obtained);
+        acc[m.exam_name].count += 1;
+        return acc;
+    }, {});
+
+    const performanceTrend = Object.keys(examGroups).map(name => ({
+        term: name,
+        score: Math.round((examGroups[name].obtained / examGroups[name].total) * 100),
+        avg: 75 // Mock average for comparison
+    }));
+
+    // 2. Subject Analysis (Radar)
+    const subjectGroups = marks.reduce((acc, m) => {
+        if (!acc[m.subject_name]) acc[m.subject_name] = { total: 0, obtained: 0 };
+        acc[m.subject_name].total += Number(m.total_marks);
+        acc[m.subject_name].obtained += Number(m.marks_obtained);
+        return acc;
+    }, {});
+
+    const subjectAnalysis = Object.keys(subjectGroups).map(name => ({
+        subject: name,
+        A: Math.round((subjectGroups[name].obtained / subjectGroups[name].total) * 100),
+        fullMark: 100
+    }));
+
+    // 3. Recent Assessments
+    const recentAssessments = marks.slice(0, 5).map(m => ({
+        title: m.exam_name,
+        subject: m.subject_name,
+        date: new Date(m.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+        score: `${m.marks_obtained}/${m.total_marks}`,
+        grade: Number(m.marks_obtained) >= Number(m.passing_marks) ? "PASS" : "FAIL"
+    }));
+
+    // Calculate GPA/Stats
+    const totalPercentage = performanceTrend.length > 0
+        ? Math.round(performanceTrend.reduce((acc, curr) => acc + curr.score, 0) / performanceTrend.length)
+        : 0;
 
     const stats = [
-        { label: "Current GPA", value: "3.8/4.0", icon: <BiTrophy size={24} />, color: "#F39C12", bgcolor: "#FFF4DE" },
-        { label: "Class Rank", value: "Top 5%", icon: <BiTrendingUp size={24} />, color: "#27AE60", bgcolor: "#E1F8E8" },
+        { label: "Overall Score", value: `${totalPercentage}%`, icon: <BiTrophy size={24} />, color: "#F39C12", bgcolor: "#FFF4DE" },
+        { label: "Subject Count", value: Object.keys(subjectGroups).length, icon: <BiBook size={24} />, color: "#27AE60", bgcolor: "#E1F8E8" },
         { label: "Attendance", value: "96%", icon: <BiCheckCircle size={24} />, color: "#4d44b5", bgcolor: "#F3F4FF" },
     ];
+
+    if (loading) return <Box sx={{ p: 4, textAlign: 'center' }}>Loading Analytics...</Box>;
+
 
     return (
         <Box>
@@ -49,7 +97,7 @@ const Performance = () => {
             </Typography>
 
             {/* Quick Stats Row */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid container spacing={3} sx={{ mb: 1 }}>
                 {stats.map((stat, index) => (
                     <Grid item xs={12} sm={4} key={index}>
                         <Card sx={{ borderRadius: 4, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
