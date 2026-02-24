@@ -60,7 +60,7 @@ const StudentSidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
                 {
                     name: "Exam Schedule",
                     icon: <BiTime />,
-                    path: "/student/examschedule"
+                    path: "/student/exams"
                 },
                 {
                     name: "Online Exams",
