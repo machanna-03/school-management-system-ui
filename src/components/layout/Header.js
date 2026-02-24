@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
     Box,
@@ -28,6 +28,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useCookies } from 'react-cookie';
 import { config } from '../../config/Config';
+import { invokeGetApi, apiList } from '../../services/ApiServices';
 
 import { useThemeContext } from '../../context/ThemeContext';
 import { MessagesPopover, NotificationsPopover } from './HeaderPopovers';
@@ -38,6 +39,7 @@ const Header = ({ toggleSidebar, collapsed, handleDrawerToggle }) => {
     const [messagesAnchorEl, setMessagesAnchorEl] = useState(null);
     const [notificationsAnchorEl, setNotificationsAnchorEl] = useState(null);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [notificationsCount, setNotificationsCount] = useState(0);
 
     const open = Boolean(anchorEl);
     const openMessages = Boolean(messagesAnchorEl);
@@ -45,6 +47,22 @@ const Header = ({ toggleSidebar, collapsed, handleDrawerToggle }) => {
 
     const navigate = useNavigate();
     const [, , removeCookie] = useCookies([config.cookieName]);
+
+    useEffect(() => {
+        const fetchCount = async () => {
+            try {
+                const res = await invokeGetApi(config.getMySchool + apiList.getAnnouncements);
+                if (res.status === 200 && res.data?.responseCode === "200") {
+                    setNotificationsCount(res.data.announcements?.length || 0);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        fetchCount();
+        const interval = setInterval(fetchCount, 60000);
+        return () => clearInterval(interval);
+    }, []);
 
     const handleAvatarClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -136,7 +154,7 @@ const Header = ({ toggleSidebar, collapsed, handleDrawerToggle }) => {
 
                 {/* Notifications */}
                 <IconButton onClick={(e) => setNotificationsAnchorEl(e.currentTarget)} sx={{ p: 0.5, bgcolor: 'background.default', color: "text.secondary", width: 40, height: 40, borderRadius: "12px", "&:hover": { bgcolor: "action.hover" } }}>
-                    <Badge badgeContent={5} color="warning">
+                    <Badge badgeContent={notificationsCount} color="warning">
                         <BiBell />
                     </Badge>
                 </IconButton>

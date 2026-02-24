@@ -23,7 +23,7 @@ const TransportDashboard = () => {
                 setStats({
                     totalBuses: res.data.total_buses || 0,
                     activeRoutes: res.data.total_routes || 0,
-                    totalStops: 0,
+                    totalStops: res.data.total_stops || 0,
                     assignedStudents: res.data.assigned_students || 0
                 });
             }
@@ -88,14 +88,14 @@ const TransportDashboard = () => {
                         color="#303972"
                     />
                 </Grid>
-                {/* <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs={12} sm={6} md={3}>
                     <StatCard
-                        title="Avg. Efficiency"
-                        value="Coming Soon"
+                        title="Total Stops"
+                        value={stats.totalStops}
                         icon={<BiMap size={32} />}
                         color="#4D44B5"
                     />
-                </Grid> */}
+                </Grid>
             </Grid>
 
             {/* TODO: Add Map View Here */}

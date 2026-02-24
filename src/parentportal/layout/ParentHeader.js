@@ -18,6 +18,8 @@ const ParentHeader = ({ collapsed, toggleSidebar, handleDrawerToggle }) => {
 
     const navigate = useNavigate();
     const [cookies, setCookie, removeCookie] = useCookies([config.cookieName]);
+    const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+    const parentName = userInfo.name || 'Parent';
 
     const handleLogout = () => {
         handleMenuClose();
@@ -85,14 +87,14 @@ const ParentHeader = ({ collapsed, toggleSidebar, handleDrawerToggle }) => {
                     >
                         <Avatar
                             sx={{ width: 36, height: 36, mr: 1, bgcolor: '#4d44b5' }}
-                            alt="Parent Name"
+                            alt={parentName}
                             src="/static/images/avatar/1.jpg"
                         >
-                            Mr
+                            {parentName.charAt(0)}
                         </Avatar>
                         <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
                             <Typography variant="subtitle2" sx={{ fontWeight: 600, lineHeight: 1.2 }}>
-                                Mr. Sharma
+                                {parentName}
                             </Typography>
                             <Typography variant="caption" color="text.secondary">
                                 Parent
