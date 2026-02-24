@@ -73,7 +73,7 @@ const AddSubject = () => {
 
     return (
         <Box sx={{ maxWidth: 800, mx: 'auto' }}>
-            <Box sx={{ mb: 4 }}>
+            <Box sx={{ mb: 1 }}>
                 <Typography variant="h4" color="text.primary" fontWeight="bold">
                     {isEditMode ? 'Edit Subject' : 'Add New Subject'}
                 </Typography>

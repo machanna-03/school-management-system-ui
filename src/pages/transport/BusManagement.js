@@ -14,6 +14,7 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
+    TablePagination,
     TextField,
     MenuItem,
     Grid,
@@ -40,21 +41,40 @@ const BusManagement = () => {
         gps_device_id: ""
     });
 
+    // Pagination State
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [totalCount, setTotalCount] = useState(0);
+
     useEffect(() => {
         fetchBuses();
         fetchRoutes();
         fetchStaff();
-    }, []);
+    }, [page, rowsPerPage]);
 
     const fetchBuses = async () => {
         try {
-            let response = await invokeGetApi(config.getMySchool + apiList.getBuses, {});
+            let response = await invokeGetApi(`${config.getMySchool + apiList.getBuses}?page=${page + 1}&limit=${rowsPerPage}`, {});
             if (response.status === 200 && response.data.responseCode === "200") {
                 setBuses(response.data.buses || []);
+                if (response.data.pagination) {
+                    setTotalCount(response.data.pagination.total_count);
+                } else {
+                    setTotalCount(response.data.buses.length);
+                }
             }
         } catch (error) {
             console.error("Error fetching buses:", error);
         }
+    };
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
     };
 
     const fetchRoutes = async () => {
@@ -135,45 +155,67 @@ const BusManagement = () => {
                 </Button>
             </Box>
 
-            <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 2, border: "1px solid #e0e0e0" }}>
-                <Table>
-                    <TableHead sx={{ bgcolor: "#f8f9fa" }}>
-                        <TableRow>
-                            <TableCell><b>Bus No.</b></TableCell>
-                            <TableCell><b>Reg. No.</b></TableCell>
-                            <TableCell><b>Route</b></TableCell>
-                            <TableCell><b>Driver</b></TableCell>
-                            <TableCell><b>Conductor</b></TableCell>
-                            <TableCell><b>Capacity</b></TableCell>
-                            <TableCell><b>Status</b></TableCell>
-                            <TableCell><b>Actions</b></TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {buses.map((bus) => (
-                            <TableRow key={bus.id}>
-                                <TableCell>{bus.bus_number}</TableCell>
-                                <TableCell>{bus.registration_number}</TableCell>
-                                <TableCell>{bus.route_name || "-"}</TableCell>
-                                <TableCell>{bus.driver_name || "-"}</TableCell>
-                                <TableCell>{bus.conductor_name || "-"}</TableCell>
-                                <TableCell>{bus.capacity}</TableCell>
-                                <TableCell>
-                                    {bus.is_active ?
-                                        <Typography color="green" variant="caption" fontWeight="bold">Active</Typography> :
-                                        <Typography color="error" variant="caption">Inactive</Typography>
-                                    }
-                                </TableCell>
-                                <TableCell>
-                                    <IconButton color="error" onClick={() => handleDeleteBus(bus.id)}>
-                                        <BiTrash />
-                                    </IconButton>
-                                </TableCell>
+            <Paper sx={{ mb: 2 }}>
+                <TablePagination
+                    component="div"
+                    count={parseInt(totalCount, 10)}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    rowsPerPage={rowsPerPage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    rowsPerPageOptions={[5, 10, 25, 50]}
+                />
+            </Paper>
+            <Paper elevation={0} sx={{ borderRadius: 2, border: "1px solid #e0e0e0", overflow: 'hidden' }}>
+                <TableContainer>
+                    <Table>
+                        <TableHead>
+                            <TableRow sx={{ bgcolor: '#f4f5ff' }}>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Bus No.</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Reg. No.</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Route</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Driver</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Conductor</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Capacity</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Status</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Actions</TableCell>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                        </TableHead>
+                        <TableBody>
+                            {buses.map((bus, i) => (
+                                <TableRow
+                                    key={bus.id}
+                                    hover
+                                    sx={{
+                                        bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                                        '& td': { borderBottom: '1px solid #eef0fb', py: 1.4 },
+                                        '&:hover': { bgcolor: '#f0f1ff !important' },
+                                        '&:last-child td': { borderBottom: 0 }
+                                    }}
+                                >
+                                    <TableCell>{bus.bus_number}</TableCell>
+                                    <TableCell>{bus.registration_number}</TableCell>
+                                    <TableCell>{bus.route_name || "-"}</TableCell>
+                                    <TableCell>{bus.driver_name || "-"}</TableCell>
+                                    <TableCell>{bus.conductor_name || "-"}</TableCell>
+                                    <TableCell>{bus.capacity}</TableCell>
+                                    <TableCell>
+                                        {bus.is_active ?
+                                            <Typography color="green" variant="caption" fontWeight="bold">Active</Typography> :
+                                            <Typography color="error" variant="caption">Inactive</Typography>
+                                        }
+                                    </TableCell>
+                                    <TableCell>
+                                        <IconButton color="error" onClick={() => handleDeleteBus(bus.id)}>
+                                            <BiTrash />
+                                        </IconButton>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Paper>
 
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="md" fullWidth>
                 <DialogTitle>Add New Bus</DialogTitle>

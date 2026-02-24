@@ -211,19 +211,28 @@ export default function SubToTeacher() {
                     </Typography>
 
                     <Table size="small">
-                        <TableHead>
+                        <TableHead sx={{ bgcolor: '#f4f5ff' }}>
                             <TableRow>
-                                <TableCell>Class</TableCell>
-                                <TableCell>Section</TableCell>
-                                <TableCell>Subject</TableCell>
-                                <TableCell>Teacher</TableCell>
-                                <TableCell align="center">Action</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Class</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Section</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Subject</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Teacher</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2, textAlign: 'center' }}>Action</TableCell>
                             </TableRow>
                         </TableHead>
 
                         <TableBody>
-                            {assignments.map((row, index) => (
-                                <TableRow key={index}>
+                            {assignments.map((row, i) => (
+                                <TableRow
+                                    key={i}
+                                    hover
+                                    sx={{
+                                        bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                                        '& td': { borderBottom: '1px solid #eef0fb', py: 1.4 },
+                                        '&:hover': { bgcolor: '#f0f1ff !important' },
+                                        '&:last-child td': { borderBottom: 0 }
+                                    }}
+                                >
                                     <TableCell>{row.class_name}</TableCell>
                                     <TableCell>{row.section_name}</TableCell>
                                     <TableCell>{row.subject_name}</TableCell>

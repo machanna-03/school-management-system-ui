@@ -56,7 +56,7 @@ const StudentDetails = () => {
 
     return (
         <Box>
-            <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
                 <IconButton component={Link} to="/students" sx={{ bgcolor: 'white' }}><BiArrowBack /></IconButton>
                 <Typography variant="h4" color="text.primary" fontWeight="bold">Student Details</Typography>
             </Box>

@@ -301,19 +301,28 @@ const StudentBusAssignment = () => {
                             <TableContainer component={Paper}>
                                 <Table>
                                     <TableHead>
-                                        <TableRow>
-                                            <TableCell><b>User</b></TableCell>
-                                            <TableCell><b>Type</b></TableCell>
-                                            <TableCell><b>Route</b></TableCell>
-                                            <TableCell><b>Stop</b></TableCell>
-                                            <TableCell><b>Bus</b></TableCell>
-                                            <TableCell><b>Fee</b></TableCell>
-                                            <TableCell><b>Action</b></TableCell>
+                                        <TableRow sx={{ bgcolor: '#f4f5ff' }}>
+                                            <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>User</TableCell>
+                                            <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Type</TableCell>
+                                            <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Route</TableCell>
+                                            <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Stop</TableCell>
+                                            <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Bus</TableCell>
+                                            <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Fee</TableCell>
+                                            <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Action</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {filteredAssignments.map((assignment) => (
-                                            <TableRow key={assignment.id}>
+                                        {filteredAssignments.map((assignment, i) => (
+                                            <TableRow
+                                                key={assignment.id}
+                                                hover
+                                                sx={{
+                                                    bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                                                    '& td': { borderBottom: '1px solid #eef0fb', py: 1.4 },
+                                                    '&:hover': { bgcolor: '#f0f1ff !important' },
+                                                    '&:last-child td': { borderBottom: 0 }
+                                                }}
+                                            >
                                                 <TableCell>
                                                     {assignment.user_type === 'Student' ?
                                                         `${assignment.student_name} (${assignment.class}-${assignment.section})` :

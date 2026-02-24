@@ -16,7 +16,10 @@ import {
   TableHead,
   TableRow,
   Paper,
-  CircularProgress
+  CircularProgress,
+  TablePagination,
+  IconButton,
+  Tooltip
 } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
 import DownloadIcon from "@mui/icons-material/Download";
@@ -34,25 +37,46 @@ const FeeReceipts = () => {
   const [rollSearch, setRollSearch] = useState("");
   const [studentData, setStudentData] = useState(null); // Selected receipt for view
 
+  // Pagination State
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
+
   useEffect(() => {
     fetchReceipts();
-  }, []);
+  }, [page, rowsPerPage]);
 
   const fetchReceipts = async () => {
     setLoading(true);
     try {
-      const res = await invokeGetApi(apiList.getFeeReceipts);
-      if (Array.isArray(res.data)) {
-        setReceipts(res.data);
-      } else {
-        setReceipts([]);
-        console.error("Receipts API returned non-array:", res.data);
+      const res = await invokeGetApi(`${apiList.getFeeReceipts}?page=${page + 1}&limit=${rowsPerPage}`);
+      if (res.status === 200) {
+        if (res.data.receipts) {
+          setReceipts(res.data.receipts);
+          if (res.data.pagination) {
+            setTotalCount(res.data.pagination.total_count);
+          } else {
+            setTotalCount(res.data.receipts.length);
+          }
+        } else if (Array.isArray(res.data)) {
+          setReceipts(res.data);
+          setTotalCount(res.data.length);
+        }
       }
     } catch (error) {
       notifications.show({ title: 'Error', message: 'Failed to fetch receipts', color: 'red' });
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
   };
 
   // Filter Logic
@@ -69,6 +93,23 @@ const FeeReceipts = () => {
     window.print();
     document.body.innerHTML = originalContents;
     window.location.reload(); // Simple reload to restore state
+  };
+
+  const receiptBottomRef = useRef();
+
+  // Quick-print a row: set the receipt, scroll to it, then print
+  const handleQuickPrint = (receipt) => {
+    setStudentData(receipt);
+    // Use a small timeout to allow React to render the receipt view first
+    setTimeout(() => {
+      const printContent = receiptRef.current?.innerHTML;
+      if (!printContent) return;
+      const originalContents = document.body.innerHTML;
+      document.body.innerHTML = printContent;
+      window.print();
+      document.body.innerHTML = originalContents;
+      window.location.reload();
+    }, 300);
   };
 
   const handleDownload = async () => {
@@ -125,24 +166,44 @@ const FeeReceipts = () => {
             Payment History
           </Typography>
 
-          <TableContainer component={Paper}>
+          <Paper sx={{ mb: 2 }}>
+            <TablePagination
+              component="div"
+              count={parseInt(totalCount, 10)}
+              page={page}
+              onPageChange={handleChangePage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              rowsPerPageOptions={[5, 10, 25, 50]}
+            />
+          </Paper>
+          <TableContainer component={Paper} elevation={0} sx={{ border: "1px solid #eef0fb", borderRadius: 3, overflow: 'hidden' }}>
             <Table size="small">
               <TableHead>
-                <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-                  <TableCell>Date</TableCell>
-                  <TableCell>Receipt No</TableCell>
-                  <TableCell>Roll No</TableCell>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Class</TableCell>
-                  <TableCell>Mode</TableCell>
-                  <TableCell align="right">Amount</TableCell>
-                  <TableCell align="center">Action</TableCell>
+                <TableRow sx={{ bgcolor: '#f4f5ff' }}>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Date</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Receipt No</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Roll No</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Name</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Class</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Mode</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Amount</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Action</TableCell>
                 </TableRow>
               </TableHead>
 
               <TableBody>
-                {filteredReceipts.map((receipt) => (
-                  <TableRow key={receipt.payment_id} hover>
+                {filteredReceipts.map((receipt, i) => (
+                  <TableRow
+                    key={receipt.payment_id}
+                    hover
+                    sx={{
+                      bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                      '& td': { borderBottom: '1px solid #eef0fb', py: 1.4 },
+                      '&:hover': { bgcolor: '#f0f1ff !important' },
+                      '&:last-child td': { borderBottom: 0 }
+                    }}
+                  >
                     <TableCell>{receipt.payment_date}</TableCell>
                     <TableCell>{receipt.payment_id}</TableCell>
                     <TableCell>{receipt.roll_number}</TableCell>
@@ -151,14 +212,25 @@ const FeeReceipts = () => {
                     <TableCell>{receipt.payment_mode}</TableCell>
                     <TableCell align="right">₹ {receipt.paid_amount}</TableCell>
                     <TableCell align="center">
-                      <Button
-                        size="small"
-                        variant="contained"
-                        onClick={() => setStudentData(receipt)}
-                        sx={{ textTransform: "none" }}
-                      >
-                        View
-                      </Button>
+                      <Box display="flex" justifyContent="center" gap={0.5}>
+                        <Button
+                          size="small"
+                          variant="contained"
+                          onClick={() => setStudentData(receipt)}
+                          sx={{ textTransform: "none" }}
+                        >
+                          View
+                        </Button>
+                        <Tooltip title="Quick Print">
+                          <IconButton
+                            size="small"
+                            sx={{ bgcolor: '#e3f2fd', color: '#1976d2' }}
+                            onClick={() => handleQuickPrint(receipt)}
+                          >
+                            <PrintIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ))}

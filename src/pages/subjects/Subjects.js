@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, Avatar, IconButton, InputBase, Select, MenuItem, Stack, Chip } from '@mui/material';
+import { Box, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Checkbox, Avatar, IconButton, InputBase, Select, MenuItem, Stack, Chip, Paper } from '@mui/material';
 import Card from '../../components/common/Card';
 import { BiPlus, BiPencil, BiTrash, BiSearch, BiBook, BiTime } from 'react-icons/bi';
 import { Link } from 'react-router-dom';
@@ -10,30 +10,41 @@ const Subjects = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
 
+    // Pagination State
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [totalCount, setTotalCount] = useState(0);
+
     useEffect(() => {
         fetchSubjects();
-    }, []);
+    }, [page, rowsPerPage]);
 
     const fetchSubjects = async () => {
         try {
             setLoading(true);
-            const response = await api.get('/getSubjects');
+            const response = await api.get(`/getSubjects?page=${page + 1}&limit=${rowsPerPage}`);
             if (response.data.subjects) {
-                // Map API data to UI structure if needed, or use directly
-                // API returns: id, name, code, type
-                // UI expects: id, name, code, grade (not in subject table), teacher (not in subject table), sessions (not in subject table), color (generate)
-                // For now, we will show what we have and maybe fetch related counts if possible, or just show basic info.
-                // The "Grade", "Teacher", "Sessions" info is actually in `class_subjects` and `subject_teacher_assignments`. 
-                // The main "Subjects" list usually just lists the global catalog. 
-                // Detailed view could show where it is assigned.
-                // Let's stick to showing the Subject Catalog details. 
                 setSubjects(response.data.subjects);
+                if (response.data.pagination) {
+                    setTotalCount(response.data.pagination.total_count);
+                } else {
+                    setTotalCount(response.data.subjects.length);
+                }
             }
         } catch (error) {
             console.error("Failed to fetch subjects:", error);
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
     };
 
     const handleDelete = async (id) => {
@@ -58,7 +69,7 @@ const Subjects = () => {
     return (
         <Box>
             {/* Header Section */}
-            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ mb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box>
                     <Typography variant="h1" color="text.primary" sx={{ mb: 1 }}>Subjects</Typography>
                     <Typography variant="body2" color="text.secondary">Manage curriculum subjects global catalog.</Typography>
@@ -106,16 +117,27 @@ const Subjects = () => {
             </Box>
 
             {/* Subjects Table */}
+            <Paper sx={{ mb: 2 }}>
+                <TablePagination
+                    component="div"
+                    count={parseInt(totalCount, 10)}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    rowsPerPage={rowsPerPage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    rowsPerPageOptions={[5, 10, 25, 50]}
+                />
+            </Paper>
             <Card>
                 <TableContainer>
                     <Table sx={{ minWidth: 800 }}>
                         <TableHead>
-                            <TableRow sx={{ '& th': { color: 'text.secondary', fontWeight: 600, borderBottom: '1px solid #f0f1f5', pb: 2 } }}>
-                                <TableCell padding="checkbox"><Checkbox /></TableCell>
-                                <TableCell>Subject Name</TableCell>
-                                <TableCell>Subject Code</TableCell>
-                                <TableCell>Type</TableCell>
-                                <TableCell align="right">Actions</TableCell>
+                            <TableRow sx={{ bgcolor: '#f4f5ff' }}>
+                                <TableCell padding="checkbox" sx={{ borderBottom: '2px solid #e0e2ff' }}><Checkbox /></TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Subject Name</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Subject Code</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Type</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.78rem', color: '#4d44b5', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid #e0e2ff', py: 2 }}>Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -129,7 +151,16 @@ const Subjects = () => {
                                 </TableRow>
                             ) : (
                                 filteredSubjects.map((sub, i) => (
-                                    <TableRow key={sub.id} hover sx={{ '& td': { borderBottom: '1px solid #f0f1f5', py: 2.5 } }}>
+                                    <TableRow
+                                        key={sub.id}
+                                        hover
+                                        sx={{
+                                            bgcolor: i % 2 === 0 ? '#ffffff' : '#f9f9ff',
+                                            '& td': { borderBottom: '1px solid #eef0fb', py: 1.4 },
+                                            '&:hover': { bgcolor: '#f0f1ff !important' },
+                                            '&:last-child td': { borderBottom: 0 }
+                                        }}
+                                    >
                                         <TableCell padding="checkbox"><Checkbox /></TableCell>
                                         <TableCell>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>

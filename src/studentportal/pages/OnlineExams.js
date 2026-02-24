@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Card, CardContent, Button, Grid, Chip, Container, CircularProgress } from '@mui/material';
+import { Box, Typography, Card, CardContent, Button, Grid, Chip, Container, CircularProgress, Accordion, AccordionSummary, AccordionDetails, List, ListItem, ListItemText, ListItemSecondaryAction, Paper } from '@mui/material';
+import { BiChevronDown, BiTime, BiFile, BiPlayCircle } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
 import { invokeGetApi, apiList } from '../../services/ApiServices';
+import { config } from '../../config/Config';
 
 const StudentOnlineExams = () => {
     const [exams, setExams] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [schedules, setSchedules] = useState({}); // { examId: [schedules] }
     const navigate = useNavigate();
-    const studentId = localStorage.getItem('student_id'); // Assuming student_id is stored
 
     useEffect(() => {
         fetchExams();
@@ -15,14 +17,12 @@ const StudentOnlineExams = () => {
 
     const fetchExams = async () => {
         try {
-            // Fetch exams for the student's class
-            // This endpoint might need adjustment depending on how we filter by class/student
             const classId = localStorage.getItem('class_id');
-            const response = await invokeGetApi(apiList.getExams, { class_id: classId });
+            const response = await invokeGetApi(config.getMySchool + apiList.getExams, { class_id: classId, exam_mode: 'Online' });
             if (response.data.responseCode === "200") {
-                // Filter exams that are "Published" or "Ongoing" and are Online Exams (if distinction exists)
-                // For now, assuming all exams fetched here are candidates for online taking if they have questions
-                setExams(response.data.exams);
+                setExams(response.data.exams || []);
+                // Fetch schedules for each exam
+                response.data.exams.forEach(exam => fetchSchedule(exam.id));
             }
         } catch (error) {
             console.error("Error fetching exams:", error);
@@ -31,56 +31,106 @@ const StudentOnlineExams = () => {
         }
     };
 
-    const handleTakeExam = (examId, scheduleId) => {
-        navigate(`/student/take-exam/${examId}/${scheduleId}`);
+    const fetchSchedule = async (examId) => {
+        try {
+            const response = await invokeGetApi(config.getMySchool + apiList.getExamSchedule + `/${examId}`);
+            if (response.data.responseCode === "200") {
+                setSchedules(prev => ({ ...prev, [examId]: response.data.schedule }));
+            }
+        } catch (error) {
+            console.error(`Error fetching schedule for exam ${examId}:`, error);
+        }
     };
 
-    if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}><CircularProgress /></Box>;
+    const handleTakeExam = (scheduleId) => {
+        navigate(`/student/take-exam/${scheduleId}`);
+    };
+
+    if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}><CircularProgress /></Box>;
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Typography variant="h4" gutterBottom sx={{ color: '#303972', fontWeight: 700 }}>
-                Online Exams
-            </Typography>
-            <Grid container spacing={3}>
-                {exams.length === 0 ? (
-                    <Grid item xs={12}>
-                        <Typography>No exams available at the moment.</Typography>
-                    </Grid>
-                ) : (
-                    exams.map((exam) => (
-                        <Grid item xs={12} md={6} lg={4} key={exam.id}>
-                            <Card sx={{ borderRadius: 4, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
-                                <CardContent>
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                                        <Typography variant="h6" fontWeight={700} color="#303972">
-                                            {exam.exam_name}
-                                        </Typography>
-                                        <Chip label={exam.status} color={exam.status === 'Ongoing' ? 'success' : 'default'} size="small" />
-                                    </Box>
-                                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                                        Date: {exam.start_date}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                                        Type: {exam.type_name}
-                                    </Typography>
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 1 }}>
+            <Box sx={{ mb: 4 }}>
+                <Typography variant="h4" fontWeight={700} color="#303972" gutterBottom>
+                    Online Exams
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                    View and take your scheduled online examinations.
+                </Typography>
+            </Box>
 
-                                    <Box sx={{ mt: 3 }}>
-                                        <Button
-                                            variant="contained"
-                                            fullWidth
-                                            sx={{ bgcolor: '#4d44b5', borderRadius: 2 }}
-                                            onClick={() => handleTakeExam(exam.id, 999)} // Placeholder schedule ID for now, need logic to fetch schedule
-                                        >
-                                            View Papers
-                                        </Button>
+            {exams.length === 0 ? (
+                <Paper sx={{ p: 6, textAlign: 'center', borderRadius: 4 }}>
+                    <BiFile size={40} color="#ccc" />
+                    <Typography sx={{ mt: 2 }} color="text.secondary">No online exams scheduled for your class.</Typography>
+                </Paper>
+            ) : (
+                <Grid container spacing={3}>
+                    {exams.map((exam) => (
+                        <Grid item xs={12} key={exam.id}>
+                            <Accordion sx={{ borderRadius: '16px !important', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', mb: 2 }}>
+                                <AccordionSummary expandIcon={<BiChevronDown />}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
+                                        <Box sx={{ bgcolor: exam.status === 'Ongoing' ? '#4caf5022' : '#4d44b522', p: 1, borderRadius: 2, color: exam.status === 'Ongoing' ? '#4caf50' : '#4d44b5' }}>
+                                            <BiFile size={24} />
+                                        </Box>
+                                        <Box sx={{ flexGrow: 1 }}>
+                                            <Typography variant="h6" fontWeight={700} color="#303972">{exam.exam_name}</Typography>
+                                            <Typography variant="caption" color="text.secondary">{exam.type_name} • {exam.start_date} to {exam.end_date}</Typography>
+                                        </Box>
+                                        <Chip
+                                            label={exam.status}
+                                            color={exam.status === 'Ongoing' ? 'success' : 'primary'}
+                                            size="small"
+                                            sx={{ fontWeight: 600 }}
+                                        />
                                     </Box>
-                                </CardContent>
-                            </Card>
+                                </AccordionSummary>
+                                <AccordionDetails sx={{ bgcolor: '#fcfcfd', borderTop: '1px solid #f0f0f0' }}>
+                                    <List>
+                                        {(schedules[exam.id] || []).length === 0 ? (
+                                            <Typography variant="body2" sx={{ p: 2 }} color="text.secondary">No papers scheduled for this exam.</Typography>
+                                        ) : (
+                                            schedules[exam.id].map((sched) => (
+                                                <ListItem key={sched.id} divider sx={{ py: 2 }}>
+                                                    <ListItemText
+                                                        primary={<Typography fontWeight={600} color="#303972">{sched.subject_name}</Typography>}
+                                                        secondary={
+                                                            <Box sx={{ display: 'flex', gap: 2, mt: 0.5 }}>
+                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                    <BiTime size={14} />
+                                                                    <Typography variant="caption">{sched.exam_date} • {sched.start_time} - {sched.end_time}</Typography>
+                                                                </Box>
+                                                                <Typography variant="caption" fontWeight={600}>Marks: {sched.total_marks}</Typography>
+                                                            </Box>
+                                                        }
+                                                    />
+                                                    <ListItemSecondaryAction>
+                                                        <Button
+                                                            variant="contained"
+                                                            startIcon={<BiPlayCircle />}
+                                                            onClick={() => handleTakeExam(sched.id)}
+                                                            disabled={exam.status !== 'Ongoing'}
+                                                            sx={{
+                                                                bgcolor: '#4d44b5',
+                                                                borderRadius: 2,
+                                                                textTransform: 'none',
+                                                                '&:disabled': { bgcolor: '#e0e0e0' }
+                                                            }}
+                                                        >
+                                                            Start Exam
+                                                        </Button>
+                                                    </ListItemSecondaryAction>
+                                                </ListItem>
+                                            ))
+                                        )}
+                                    </List>
+                                </AccordionDetails>
+                            </Accordion>
                         </Grid>
-                    ))
-                )}
-            </Grid>
+                    ))}
+                </Grid>
+            )}
         </Container>
     );
 };
