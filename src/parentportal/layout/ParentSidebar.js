@@ -42,7 +42,7 @@ import logo from "../../assets/GMs-logo.png";
 
 const sidebarWidth = 280;
 
-const ParentSidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
+const ParentSidebar = ({ collapsed, mobileOpen, handleDrawerToggle, students, selectedStudent }) => {
     const location = useLocation();
 
     // State for submenus
@@ -69,10 +69,10 @@ const ParentSidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
                     hasSubmenu: true,
                     isOpen: openChildren,
                     onClick: () => setOpenChildren(!openChildren),
-                    children: [
-                        { name: "Rahul Sharma (5-A)", path: "/parent/dashboard?studentId=1" },
-                        { name: "Priya Sharma (2-B)", path: "/parent/dashboard?studentId=2" },
-                    ],
+                    children: (students || []).map(student => ({
+                        name: `${student.name} (${student.class_name || 'N/A'})`,
+                        path: `/parent/dashboard?studentId=${student.id}`
+                    })),
                 },
             ],
         },

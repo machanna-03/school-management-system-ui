@@ -14,6 +14,7 @@ const LibraryCirculation = () => {
     // const [userType, setUserType] = useState('Student'); // Removed unused state
     const [students, setStudents] = useState([]);
     const [staff, setStaff] = useState([]);
+    const [books, setBooks] = useState([]);
     const [issues, setIssues] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -39,6 +40,7 @@ const LibraryCirculation = () => {
     const [issueForm, setIssueForm] = useState({
         user_type: 'Student',
         user_id: '',
+        book_id: '',
         book_title: '',
         book_author: '',
         isbn: '',
@@ -60,8 +62,16 @@ const LibraryCirculation = () => {
 
         fetchStudents();
         fetchStaff();
+        fetchBooks();
         fetchIssues();
     }, [page, rowsPerPage]);
+
+    const fetchBooks = async () => {
+        try {
+            let res = await invokeGetApi(config.getMySchool + apiList.getLibraryBooks, { limit: 1000 });
+            if (res.status === 200 && res.data.responseCode === "200") setBooks(res.data.books || []);
+        } catch (e) { }
+    };
 
     const fetchStudents = async () => {
         try {
@@ -205,13 +215,25 @@ const LibraryCirculation = () => {
                         </Grid>
 
                         <Grid item xs={12} md={6}>
-                            <TextField fullWidth label="Book Title" value={issueForm.book_title} onChange={(e) => setIssueForm({ ...issueForm, book_title: e.target.value })} />
+                            <Autocomplete
+                                options={books}
+                                getOptionLabel={(option) => option.title || ""}
+                                value={books.find(b => b.id === issueForm.book_id) || null}
+                                onChange={(event, newValue) => setIssueForm({
+                                    ...issueForm,
+                                    book_id: newValue ? newValue.id : '',
+                                    book_title: newValue ? newValue.title : '',
+                                    book_author: newValue ? newValue.author : '',
+                                    isbn: newValue ? newValue.isbn : ''
+                                })}
+                                renderInput={(params) => <TextField {...params} label="Search & Select Book" fullWidth />}
+                            />
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <TextField fullWidth label="Author" value={issueForm.book_author} onChange={(e) => setIssueForm({ ...issueForm, book_author: e.target.value })} />
+                            <TextField fullWidth label="Author" value={issueForm.book_author} InputProps={{ readOnly: true }} />
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <TextField fullWidth label="ISBN (Optional)" value={issueForm.isbn} onChange={(e) => setIssueForm({ ...issueForm, isbn: e.target.value })} />
+                            <TextField fullWidth label="ISBN" value={issueForm.isbn} InputProps={{ readOnly: true }} />
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField fullWidth type="date" label="Issue Date" InputLabelProps={{ shrink: true }} value={issueForm.issue_date} onChange={(e) => setIssueForm({ ...issueForm, issue_date: e.target.value })} />
