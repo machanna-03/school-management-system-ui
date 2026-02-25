@@ -61,7 +61,7 @@ const NotificationPage = () => {
     const endpoint = form.id ? apiList.updateAnnouncement : apiList.addAnnouncement;
     const res = await invokeApi(config.getMySchool + endpoint, {
       ...form,
-      created_by: localStorage.getItem('user_id')
+      created_by: JSON.parse(localStorage.getItem('userInfo') || '{}').id
     });
     setSaving(false);
     if (res.status === 200) {
