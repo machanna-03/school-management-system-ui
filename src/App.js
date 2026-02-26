@@ -67,6 +67,7 @@ import StudentDashboard from './studentportal/pages/StudentDashboard';
 import StudentTimeTable from './studentportal/pages/StudentTimeTable';
 import StudentOnlineExams from './studentportal/pages/OnlineExams';
 import TakeExam from './studentportal/pages/TakeExam';
+import ExamSchedule from './studentportal/pages/ExamSchedule';
 // Removed duplicate StudentAttendance import to avoid collision
 
 
@@ -275,6 +276,7 @@ const AppContent = () => {
               <Route path="timetable" element={<StudentTimeTable />} />
               <Route path="attendance" element={<MyAttendance />} />
               <Route path="leave" element={<StudentLeave />} />
+              <Route path="exam-schedule" element={<ExamSchedule />} />
               <Route path="online-exams" element={<StudentOnlineExams />} />
               <Route path="take-exam/:scheduleId" element={<TakeExam />} />
             </Routes>
