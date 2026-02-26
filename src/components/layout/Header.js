@@ -112,28 +112,6 @@ const Header = ({ toggleSidebar, collapsed, handleDrawerToggle }) => {
             {/* Right */}
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
 
-                {/* Search */}
-                {isSearchOpen ? (
-                    <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: 'action.hover', borderRadius: '20px', px: 2, py: 0.5 }}>
-                        <BiSearch size={20} color="inherit" />
-                        <input
-                            autoFocus
-                            placeholder="Search..."
-                            style={{ border: 'none', outline: 'none', background: 'transparent', marginLeft: '8px', width: '150px', color: 'inherit' }}
-                            onBlur={() => setIsSearchOpen(false)}
-                        />
-                    </Box>
-                ) : (
-                    <IconButton onClick={() => setIsSearchOpen(true)} sx={{ p: 0.5, bgcolor: 'background.default', color: "text.secondary", width: 40, height: 40, borderRadius: "12px", "&:hover": { bgcolor: "action.hover" } }}>
-                        <BiSearch />
-                    </IconButton>
-                )}
-
-                {/* Apps Grid - Placeholder */}
-                <IconButton sx={{ p: 0.5, bgcolor: 'background.default', color: "text.secondary", width: 40, height: 40, borderRadius: "12px", "&:hover": { bgcolor: "action.hover" } }}>
-                    <BiGridAlt />
-                </IconButton>
-
                 {/* Dark Mode */}
                 <IconButton onClick={toggleColorMode} sx={{ p: 0.5, bgcolor: 'background.default', color: "text.secondary", width: 40, height: 40, borderRadius: "12px", "&:hover": { bgcolor: "action.hover" } }}>
                     <BiMoon />
