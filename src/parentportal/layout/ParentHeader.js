@@ -1,32 +1,55 @@
-import React from 'react';
-import { Box, IconButton, AppBar, Toolbar, Typography, Avatar, Badge, Menu, MenuItem, Stack } from '@mui/material';
-import { BiMenu, BiBell, BiSearch, BiChevronDown } from 'react-icons/bi';
-import { useCookies } from 'react-cookie';
-import { useNavigate } from 'react-router-dom';
-import { config } from '../../config/Config';
+import React, { useState } from "react";
+import {
+    AppBar,
+    Toolbar,
+    Box,
+    IconButton,
+    Avatar,
+    Badge,
+    Menu,
+    MenuItem,
+    Typography,
+    Divider,
+    Stack
+} from "@mui/material";
+import {
+    BiMenu,
+    BiBell,
+    BiMoon,
+    BiMessageDetail,
+    BiFullscreen,
+    BiCog
+} from "react-icons/bi";
+import { useNavigate } from "react-router-dom";
+import { useCookies } from "react-cookie";
+import { config } from "../../config/Config";
+import { useThemeContext } from "../../context/ThemeContext";
 
-const ParentHeader = ({ collapsed, toggleSidebar, handleDrawerToggle }) => {
-    const [anchorEl, setAnchorEl] = React.useState(null);
-
-    const handleProfileMenuOpen = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-    };
-
+const ParentHeader = ({ toggleSidebar, handleDrawerToggle }) => {
     const navigate = useNavigate();
-    const [cookies, setCookie, removeCookie] = useCookies([config.cookieName]);
-    const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
-    const parentName = userInfo.name || 'Parent';
+    const { toggleColorMode } = useThemeContext();
+    const [, , removeCookie] = useCookies([config.cookieName]);
+
+    const [profileAnchor, setProfileAnchor] = useState(null);
+    const [msgAnchor, setMsgAnchor] = useState(null);
+    const [notiAnchor, setNotiAnchor] = useState(null);
+
+    const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+    const parentName = userInfo.name || "Parent";
 
     const handleLogout = () => {
-        handleMenuClose();
-        removeCookie(config.cookieName, { path: '/' });
-        localStorage.removeItem('userInfo');
-        localStorage.removeItem('sms-data');
-        navigate('/login');
+        removeCookie(config.cookieName, { path: "/" });
+        localStorage.removeItem("userInfo");
+        localStorage.removeItem("sms-data");
+        navigate("/login");
+    };
+
+    const toggleFullscreen = () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+        } else {
+            document.exitFullscreen();
+        }
     };
 
     return (
@@ -34,100 +57,167 @@ const ParentHeader = ({ collapsed, toggleSidebar, handleDrawerToggle }) => {
             position="sticky"
             elevation={0}
             sx={{
-                bgcolor: 'rgba(255, 255, 255, 0.8)',
-                backdropFilter: 'blur(8px)',
-                borderBottom: '1px solid rgba(0,0,0,0.05)',
-                color: '#333'
+                bgcolor: "background.paper",
+                borderBottom: "1px solid rgba(0,0,0,0.05)"
             }}
         >
+            <Toolbar sx={{ px: 3 }}>
 
-            <Toolbar sx={{ px: { xs: 2, md: 4 } }}>
-                {/* Mobile Menu
-                 Button */}
-                <IconButton
-                    color="inherit"
-                    aria-label="open drawer"
-                    edge="start"
-                    onClick={handleDrawerToggle}
-                    sx={{ mr: 2, display: { md: 'none' } }}
-                >
-                    <BiMenu />
-                </IconButton>
-
-                {/* Desktop Sidebar Toggle */}
-                <IconButton
-                    color="inherit"
-                    onClick={toggleSidebar}
-                    sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
-                >
-                    <BiMenu size={24} />
+                {/* Sidebar Toggle */}
+                <IconButton onClick={handleDrawerToggle} sx={{ mr: 1 }}>
+                    <BiMenu size={22} />
                 </IconButton>
 
                 <Box sx={{ flexGrow: 1 }} />
 
                 <Stack direction="row" spacing={2} alignItems="center">
-                    {/* Notifications */}
-                    <IconButton size="large" color="inherit">
-                        <Badge badgeContent={3} color="error">
-                            <BiBell size={22} />
+
+                    {/* Dark Mode */}
+                    <IconButton
+                        onClick={toggleColorMode}
+                        sx={{ bgcolor: "action.hover", borderRadius: "12px" }}
+                    >
+                        <BiMoon />
+                    </IconButton>
+
+                    {/* Fullscreen */}
+                    <IconButton
+                        onClick={toggleFullscreen}
+                        sx={{ bgcolor: "action.hover", borderRadius: "12px" }}
+                    >
+                        <BiFullscreen />
+                    </IconButton>
+
+                    {/* Messages */}
+                    <IconButton
+                        onClick={(e) => setMsgAnchor(e.currentTarget)}
+                        sx={{ bgcolor: "action.hover", borderRadius: "12px" }}
+                    >
+                        <Badge badgeContent={2} color="primary">
+                            <BiMessageDetail />
                         </Badge>
                     </IconButton>
 
-                    {/* Profile Section */}
-                    <Box
-                        onClick={handleProfileMenuOpen}
-                        sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            cursor: 'pointer',
-                            p: 0.5,
-                            borderRadius: 2,
-                            '&:hover': { bgcolor: 'rgba(0,0,0,0.04)' }
-                        }}
+                    <Menu
+                        anchorEl={msgAnchor}
+                        open={Boolean(msgAnchor)}
+                        onClose={() => setMsgAnchor(null)}
                     >
+                        <MenuItem
+                            onClick={() => {
+                                navigate("/parent/messages");
+                                setMsgAnchor(null);
+                            }}
+                        >
+                            View Messages
+                        </MenuItem>
+                    </Menu>
+
+                    {/* Notifications */}
+                    <IconButton
+                        onClick={(e) => setNotiAnchor(e.currentTarget)}
+                        sx={{ bgcolor: "action.hover", borderRadius: "12px" }}
+                    >
+                        <Badge badgeContent={3} color="error">
+                            <BiBell />
+                        </Badge>
+                    </IconButton>
+
+                    <Menu
+                        anchorEl={notiAnchor}
+                        open={Boolean(notiAnchor)}
+                        onClose={() => setNotiAnchor(null)}
+                    >
+                        <MenuItem
+                            onClick={() => {
+                                navigate("/parent/notifications");
+                                setNotiAnchor(null);
+                            }}
+                        >
+                            View Notifications
+                        </MenuItem>
+                    </Menu>
+
+                    {/* Settings */}
+                    <IconButton
+                        onClick={() => navigate("/parent/settings")}
+                        sx={{ bgcolor: "action.hover", borderRadius: "12px" }}
+                    >
+                        <BiCog />
+                    </IconButton>
+
+                    {/* Avatar Only */}
+                    <IconButton onClick={(e) => setProfileAnchor(e.currentTarget)}>
                         <Avatar
-                            sx={{ width: 36, height: 36, mr: 1, bgcolor: '#4d44b5' }}
-                            alt={parentName}
+                            sx={{
+                                width: 40,
+                                height: 40,
+                                borderRadius: "12px",
+                                bgcolor: "#4d44b5"
+                            }}
                             src="/static/images/avatar/1.jpg"
                         >
                             {parentName.charAt(0)}
                         </Avatar>
-                        <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 600, lineHeight: 1.2 }}>
-                                {parentName}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                                Parent
-                            </Typography>
-                        </Box>
-                        <BiChevronDown size={20} style={{ marginLeft: 4, color: '#888' }} />
-                    </Box>
+                    </IconButton>
 
+                    {/* Large Profile Dropdown */}
                     <Menu
-                        anchorEl={anchorEl}
-                        open={Boolean(anchorEl)}
-                        onClose={handleMenuClose}
+                        anchorEl={profileAnchor}
+                        open={Boolean(profileAnchor)}
+                        onClose={() => setProfileAnchor(null)}
                         PaperProps={{
-                            elevation: 0,
                             sx: {
-                                overflow: 'visible',
-                                filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.1))',
-                                mt: 1.5,
-                                '& .MuiAvatar-root': {
-                                    width: 32,
-                                    height: 32,
-                                    ml: -0.5,
-                                    mr: 1,
-                                },
-                            },
+                                width: 260,
+                                borderRadius: "18px",
+                                p: 2
+                            }
                         }}
-                        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                     >
-                        <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-                        <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
-                        <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>Logout</MenuItem>
+                        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                            <Avatar
+                                sx={{ width: 50, height: 50, mr: 2, bgcolor: "#4d44b5" }}
+                            >
+                                {parentName.charAt(0)}
+                            </Avatar>
+                            <Box>
+                                <Typography fontWeight={700}>
+                                    {parentName}
+                                </Typography>
+                                <Typography fontSize={13} color="text.secondary">
+                                    Parent
+                                </Typography>
+                            </Box>
+                        </Box>
+
+                        <Divider />
+
+                        <MenuItem onClick={() => navigate("/parent/profile")}>
+                            My Profile
+                        </MenuItem>
+
+                        <MenuItem onClick={() => navigate("/parent/messages")}>
+                            Message
+                        </MenuItem>
+
+                        <MenuItem onClick={() => navigate("/parent/notifications")}>
+                            Notification
+                        </MenuItem>
+
+                        <MenuItem onClick={() => navigate("/parent/settings")}>
+                            Settings
+                        </MenuItem>
+
+                        <Divider sx={{ my: 1 }} />
+
+                        <MenuItem
+                            onClick={handleLogout}
+                            sx={{ color: "error.main", fontWeight: 600 }}
+                        >
+                            Logout
+                        </MenuItem>
                     </Menu>
+
                 </Stack>
             </Toolbar>
         </AppBar>

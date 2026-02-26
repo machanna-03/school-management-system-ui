@@ -48,11 +48,6 @@ const StudentSidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
             header: "ACADEMICS",
             items: [
                 {
-                    name: "My Classes",
-                    icon: <BiBook />,
-                    path: "/student/classes"
-                },
-                {
                     name: "Homework",
                     icon: <BiBook />,
                     path: "/student/homework"
@@ -60,7 +55,7 @@ const StudentSidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
                 {
                     name: "Exam Schedule",
                     icon: <BiTime />,
-                    path: "/student/exams"
+                    path: "/student/exam-schedule"
                 },
                 {
                     name: "Online Exams",
@@ -74,12 +69,6 @@ const StudentSidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
                 }
             ],
         },
-        {
-            header: "COMMUNICATION",
-            items: [
-                { name: "Messages", icon: <BiMessageDetail />, path: "/student/messages" },
-            ]
-        }
     ];
 
     const sidebarContent = (
@@ -208,22 +197,6 @@ const StudentSidebar = ({ collapsed, mobileOpen, handleDrawerToggle }) => {
                     </React.Fragment>
                 ))}
             </List>
-
-            <Box sx={{ mt: 'auto', p: 2 }}>
-                <ListItemButton
-                    sx={{
-                        borderRadius: "12px",
-                        justifyContent: collapsed ? "center" : "initial",
-                        color: "#ff8a80",
-                        "&:hover": { bgcolor: "rgba(255, 138, 128, 0.1)" },
-                    }}
-                >
-                    <ListItemIcon sx={{ color: "inherit", minWidth: 34, fontSize: 24, justifyContent: "center", mr: collapsed ? 0 : 2 }}>
-                        <BiLogOut />
-                    </ListItemIcon>
-                    {!collapsed && <ListItemText primary="Logout" />}
-                </ListItemButton>
-            </Box>
         </Box>
     );
 
